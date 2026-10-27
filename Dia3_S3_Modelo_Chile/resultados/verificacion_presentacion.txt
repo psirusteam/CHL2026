@@ -1,0 +1,69 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+
+
+processing file: Modelo_Chile.qmd
+1/13                  
+2/13 [setup]          
+3/13                  
+4/13 [unnamed-chunk-1]
+5/13                  
+6/13 [chile-lista]    
+7/13                  
+8/13 [chile-ajuste]   
+9/13                  
+10/13 [unnamed-chunk-2]
+11/13                  
+12/13 [unnamed-chunk-3]
+13/13                  
+output file: Modelo_Chile.knit.md
+
+pandoc 
+  to: revealjs
+  output-file: Modelo_Chile.html
+  standalone: true
+  embed-resources: true
+  wrap: none
+  default-image-extension: png
+  html-math-method:
+    method: mathjax
+    url: >-
+      https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full
+  slide-level: 2
+  css:
+    - styles.css
+  variables: {}
+  
+metadata
+  link-citations: true
+  width: 1600
+  height: 900
+  margin: 0.08
+  center: false
+  navigationMode: linear
+  controlsLayout: edges
+  controlsTutorial: false
+  hash: true
+  history: true
+  hashOneBasedIndex: false
+  fragmentInURL: false
+  transition: fade
+  backgroundTransition: none
+  pdfSeparateFragments: false
+  lang: es
+  auto-stretch: true
+  engines:
+    - path: C:\Program Files\RStudio\resources\app\bin\quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  title: Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
+  subtitle: 'El modelo de población en Chile: de los datos censales a Stan'
+  author: Andrés Gutiérrez · Stalyn Guerrero
+  institute: CEPAL · UNFPA América Latina y el Caribe · INE Chile
+  date: 25 de noviembre de 2026 · Día 3, sesión 3 · 14:30–16:00
+  theme: simple
+  slideNumber: true
+  
+Output created: Modelo_Chile.html
+
