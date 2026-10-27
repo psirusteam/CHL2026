@@ -1,0 +1,116 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+
+
+processing file: Modelo_lineal.qmd
+1/59                        
+2/59 [setup]                
+3/59                        
+4/59 [datos]                
+5/59                        
+6/59 [construir-x]          
+7/59                        
+8/59 [exploracion]          
+9/59                        
+10/59 [unnamed-chunk-1]      
+11/59                        
+12/59 [mco]                  
+13/59                        
+14/59 [unnamed-chunk-2]      
+15/59                        
+16/59 [condicional-analitica]
+17/59                        
+18/59 [unnamed-chunk-3]      
+19/59                        
+20/59 [ajuste-stan]          
+21/59                        
+22/59 [diagnostico-rapido]   
+23/59                        
+24/59 [unnamed-chunk-4]      
+25/59                        
+26/59 [coeficientes]         
+27/59                        
+28/59 [unnamed-chunk-5]      
+29/59                        
+30/59 [comparacion]          
+31/59                        
+32/59 [unnamed-chunk-6]      
+33/59                        
+34/59 [previa-vaga]          
+35/59                        
+36/59 [unnamed-chunk-7]      
+37/59                        
+38/59 [r2]                   
+39/59                        
+40/59 [unnamed-chunk-8]      
+41/59                        
+42/59 [unnamed-chunk-9]      
+43/59                        
+44/59 [ppc]                  
+45/59                        
+46/59 [unnamed-chunk-10]     
+47/59                        
+48/59 [heterocedasticidad]   
+49/59                        
+50/59 [unnamed-chunk-11]     
+51/59                        
+52/59 [unnamed-chunk-12]     
+53/59                        
+54/59 [prediccion]           
+55/59                        
+56/59 [unnamed-chunk-13]     
+57/59                        
+58/59 [unnamed-chunk-14]     
+59/59                        
+output file: Modelo_lineal.knit.md
+
+pandoc 
+  to: revealjs
+  output-file: Modelo_lineal.html
+  standalone: true
+  wrap: none
+  default-image-extension: png
+  html-math-method:
+    method: mathjax
+    url: >-
+      https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full
+  slide-level: 2
+  css:
+    - styles.css
+  variables: {}
+  
+metadata
+  link-citations: true
+  width: 1600
+  height: 900
+  margin: 0.08
+  center: false
+  navigationMode: linear
+  controlsLayout: edges
+  controlsTutorial: false
+  hash: true
+  history: true
+  hashOneBasedIndex: false
+  fragmentInURL: false
+  transition: fade
+  backgroundTransition: none
+  pdfSeparateFragments: false
+  lang: es
+  auto-stretch: true
+  engines:
+    - path: C:\Program Files\RStudio\resources\app\bin\quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  title: Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
+  subtitle: Introducción a modelos lineales con métodos bayesianos
+  author: Andrés Gutiérrez
+  institute: CEPAL · UNFPA América Latina y el Caribe · INE Chile
+  date: 24 de noviembre de 2026 · Día 2, sesión 1 · 09:30–11:00
+  bibliography:
+    - references.bib
+  theme: simple
+  slideNumber: true
+  
+Output created: Modelo_lineal.html
+

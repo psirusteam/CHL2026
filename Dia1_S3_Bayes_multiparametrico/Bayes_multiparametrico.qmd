@@ -1,0 +1,560 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Fundamentos de la inferencia bayesiana II: modelos multiparamétricos y MCMC"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "23 de noviembre de 2026 · Día 1, sesión 3 · 14:30–16:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+bibliography: references.bib
+---
+
+```{r setup, include = FALSE}
+source("Rcode/utilidades.R")
+knitr::read_chunk("Rcode/Bayes_multiparametrico.R")
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "", fig.align = "center", out.width = "92%")
+v <- leer_valores()
+```
+
+## De un parámetro a una distribución conjunta
+
+En D1S2 se fijó la desviación estándar para estudiar una sola media. Ahora aprendemos sobre **media y variabilidad simultáneamente**.
+
+1. Distinguir posteriores conjuntas, marginales y condicionales.
+2. Obtener funciones y predicciones a partir de draws conjuntos.
+3. Comprender la actualización Multinomial–Dirichlet.
+4. Construir un Metropolis sencillo y reconocer problemas de exploración.
+5. Interpretar los diagnósticos y la estructura de un programa Stan.
+
+::: {.notes}
+Las derivaciones y la integración leapfrog son apoyo docente. La programación guiada se retoma en D1S4.
+:::
+
+# Modelos multiparamétricos
+
+## Más de un parámetro
+
+Con $\boldsymbol\theta = (\theta_1, \dots, \theta_k)$ la regla de Bayes no cambia:
+
+$$
+p(\boldsymbol\theta \mid \mathbf{Y}) \propto p(\mathbf{Y} \mid \boldsymbol\theta)\, p(\boldsymbol\theta),
+$$
+
+pero la posterior es una distribución **conjunta** en $\mathbb{R}^k$. De ella se obtienen:
+
+- **Marginales**: $p(\theta_1 \mid \mathbf{Y}) = \int p(\theta_1, \boldsymbol\theta_{-1} \mid \mathbf{Y})\, d\boldsymbol\theta_{-1}$. Resumen cada parámetro teniendo en cuenta la incertidumbre de los demás.
+- **Condicionales**: $p(\theta_1 \mid \boldsymbol\theta_{-1}, \mathbf{Y})$. Base del muestreador de Gibbs.
+- **Funciones**: cualquier $g(\boldsymbol\theta)$, por ejemplo $e^{\mu + \sigma^2/2}$, tiene su propia posterior.
+
+::: {.caja}
+Con **draws** de la posterior conjunta todo es inmediato: la marginal de $\theta_1$ es la columna de sus draws, y la posterior de $g(\boldsymbol\theta)$ se obtiene aplicando $g$ a cada draw.
+:::
+
+## Parámetros de interés y parámetros auxiliares
+
+Con frecuencia solo interesa una parte de $\boldsymbol\theta = (\boldsymbol\phi, \boldsymbol\eta)$: $\boldsymbol\phi$ de interés y $\boldsymbol\eta$ de **auxiliares** (*nuisance*). La inferencia se hace con la marginal
+
+$$
+p(\boldsymbol\phi \mid \mathbf{Y}) = \int p(\boldsymbol\phi \mid \boldsymbol\eta, \mathbf{Y})\, p(\boldsymbol\eta \mid \mathbf{Y})\, d\boldsymbol\eta,
+$$
+
+un **promedio** de las condicionales ponderado por la posterior de $\boldsymbol\eta$.
+
+- A diferencia de fijar $\boldsymbol\eta$ en un estimador, la marginal **propaga** su incertidumbre.
+- En el modelo de población, las densidades latentes $\delta_i$ de los segmentos aptos son parámetros auxiliares cuando interesa $\boldsymbol\beta$; y $\boldsymbol\beta$ es de ruido cuando interesa la predicción de un segmento.
+
+# Normal con media y varianza desconocidas
+
+## Planteamiento
+
+Sea $y_i = \log\delta_i$ el logaritmo de las personas por vivienda en los segmentos aptos:
+
+$$
+y_i \mid \mu, \sigma \sim N(\mu, \sigma^2), \qquad i = 1, \dots, n.
+$$
+
+$$
+p(\mathbf{y} \mid \mu, \sigma^2) = (2\pi\sigma^2)^{-n/2}\exp\!\Big(-\frac{1}{2\sigma^2}\sum_{i=1}^n (y_i - \mu)^2\Big).
+$$
+
+- $\mu$: nivel típico de $\log\delta$. $e^{\mu}$ es la **mediana** de personas por vivienda.
+- $\sigma$: variabilidad **entre segmentos** de la densidad; el parámetro que faltaba en la sesión anterior.
+
+## ¿Por qué el logaritmo?
+
+```{r distribucion-delta}
+```
+
+::: {.columns}
+::: {.column width="70%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_log")
+```
+:::
+::: {.column width="30%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_asimetria", digits = 2)
+```
+:::
+:::
+
+$\delta_i$ es **positiva y asimétrica**; en escala log su distribución es más simétrica, y los efectos de las covariables se vuelven **multiplicativos** sobre $\delta_i$.
+
+## Descomposición de la suma de cuadrados
+
+La verosimilitud depende de los datos a través de $\bar y$ y $s^2 = \frac{1}{n-1}\sum_i (y_i - \bar y)^2$:
+
+$$
+\sum_{i=1}^n (y_i - \mu)^2 = \sum_{i=1}^n (y_i - \bar y)^2 + n(\bar y - \mu)^2 = (n-1)s^2 + n(\bar y - \mu)^2.
+$$
+
+Por lo tanto
+
+$$
+p(\mathbf{y} \mid \mu, \sigma^2) \propto (\sigma^2)^{-n/2}\exp\!\Big(-\frac{(n-1)s^2 + n(\bar y - \mu)^2}{2\sigma^2}\Big).
+$$
+
+$(\bar y, s^2)$ son **estadísticos suficientes**.
+
+## Posterior con previa de referencia
+
+La previa de referencia $p(\mu, \sigma^2) \propto 1/\sigma^2$ es **impropia** y está expresada respecto de $d\mu\,d\sigma^2$. Con $n\ge2$ y variación observada positiva, la posterior es propia:
+
+La posterior conjunta es
+
+$$
+p(\mu, \sigma^2 \mid \mathbf{y}) \propto (\sigma^2)^{-n/2 - 1}\exp\!\Big(-\frac{(n-1)s^2 + n(\bar y - \mu)^2}{2\sigma^2}\Big).
+$$
+
+Se factoriza como condicional de $\mu$ por marginal de $\sigma^2$:
+
+$$
+\mu \mid \sigma^2, \mathbf{y} \sim N\!\Big(\bar y,\ \frac{\sigma^2}{n}\Big), \qquad
+\sigma^2 \mid \mathbf{y} \sim \text{Inv-}\chi^2\big(n - 1,\ s^2\big).
+$$
+
+## La marginal de $\mu$: una $t$ de Student
+
+Integrando $\sigma^2$:
+
+$$
+\begin{aligned}
+p(\mu \mid \mathbf{y}) &= \int_0^\infty p(\mu, \sigma^2 \mid \mathbf{y})\,d\sigma^2
+\;\propto\; \Big[(n-1)s^2 + n(\mu - \bar y)^2\Big]^{-n/2} \\
+&\propto \Big[1 + \frac{1}{n-1}\frac{(\mu - \bar y)^2}{s^2/n}\Big]^{-n/2},
+\end{aligned}
+$$
+
+es decir, usando una $t$ con localización y **escala al cuadrado** como segundo argumento,
+
+$$
+\mu \mid \mathbf{y} \sim t_{n-1}\!\Big(\bar y,\ \frac{s^2}{n}\Big).
+$$
+
+::: {.caja}
+No conocer $\sigma$ convierte la Normal en una $t$ con colas más pesadas: la **incertidumbre de $\sigma$ se propaga** a $\mu$. Con $n$ grande, la $t$ es casi normal.
+:::
+
+## Previas débilmente informativas en Stan
+
+En la práctica se usan previas propias y débilmente informativas:
+
+$$
+\mu \sim N(0, 10^2), \qquad \sigma \sim \text{Cauchy}^+(0;\ 2{,}5).
+$$
+
+- Es un modelo con previas distintas de la referencia: su posterior no es la misma solución analítica. MCMC permite aproximarla.
+- Son previas amplias para esta escala: $N(0,10^2)$ para $\mu$ induce valores extremos de $e^\mu$ y la media Cauchy tiene cola pesada. Se conservan para comparar los algoritmos bajo el mismo modelo; deben evaluarse con predicción previa [@gelman2013].
+- Con `r fmt(v$n_aptos)` segmentos, comparamos los resúmenes con la referencia; su cercanía debe comprobarse y no se deduce solo del tamaño de los datos.
+
+## Solución exacta con la previa de referencia
+
+```{r normal-analitica}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("normal_exacta", digits = 4)
+```
+
+## El modelo en Stan
+
+::: {.columns}
+::: {.column width="50%"}
+```{r, eval = TRUE, echo = FALSE, class.output = "stan"}
+cat(readLines("stan/normal_media_varianza.stan"), sep = "\n")
+```
+:::
+::: {.column width="50%"}
+```{r normal-stan}
+```
+
+```{r normal-resumen}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("resumen_normal", digits = 4)
+```
+:::
+:::
+
+## Posterior conjunta y marginales
+
+```{r normal-conjunta}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_conjunta")
+```
+
+Correlación posterior entre $\mu$ y $\sigma$: `r fmt(v$cor_mu_sigma, 3)`. La independencia muestral de $\bar y$ y $s^2$ no implica independencia posterior de $\mu$ y $\sigma$. Incluso con la previa de referencia, la varianza de $\mu\mid\sigma^2,\mathbf y$ depende de $\sigma^2$. Una correlación cercana a cero no demuestra independencia.
+
+## Funciones de los parámetros
+
+Si $\log\delta \sim N(\mu, \sigma^2)$, la **mediana** de $\delta$ es $e^{\mu}$ y la **media** es
+
+$$
+E(\delta) = E\big(e^{\log\delta}\big) = e^{\mu + \sigma^2/2},
+$$
+
+porque la función generadora de momentos de la Normal es $E(e^{tX}) = e^{t\mu + t^2\sigma^2/2}$.
+
+```{r normal-funciones}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_funciones", digits = 3)
+```
+
+## Predecir un segmento frente a estimar el promedio
+
+La predictiva de la densidad de un segmento nuevo es
+
+$$
+p(\tilde\delta \mid \mathbf{y}) = \iint p(\tilde\delta \mid \mu, \sigma)\,p(\mu, \sigma \mid \mathbf{y})\,d\mu\,d\sigma,
+\qquad \tilde\delta^{(s)} = \exp\big(\mu^{(s)} + \sigma^{(s)}\varepsilon^{(s)}\big).
+$$
+
+::: {.caja}
+- La incertidumbre de la **media** $e^{\mu + \sigma^2/2}$ depende de $n$ y se reduce con más datos.
+- La incertidumbre de la **predicción** $\tilde\delta$ incluye la variabilidad entre segmentos $\sigma$, que **no** se reduce con más datos.
+- Por eso el intervalo de `delta_nuevo` es mucho más ancho: predecir un segmento es más incierto que estimar el promedio.
+:::
+
+## Chequeo predictivo posterior
+
+¿Reproducen datos simulados con el modelo la distribución observada de $\log\delta_i$?
+
+```{r normal-ppc}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "75%"}
+mostrar("grafico_ppc")
+```
+
+La superposición de densidades permite revisar el ajuste global; no basta para validar colas, subgrupos o patrones territoriales. La media y la varianza del modelo son **las mismas para todos los segmentos**. El día 2 se agregan covariables: $\mu_i = \mathbf{x}_i^\top\boldsymbol\beta$.
+
+# Modelo Multinomial–Dirichlet
+
+## Planteamiento
+
+**Pregunta didáctica:** ¿cómo aprender sobre las probabilidades de tres clases de cobertura para segmentos comparables?
+
+Las proporciones del conjunto observado se conocen al contar sus categorías. La posterior describe los parámetros del modelo multinomial, no incertidumbre sobre esos porcentajes descriptivos.
+
+Con $\mathbf{y} = (y_1, y_2, y_3)$ los segmentos de cada clase, $n = \sum_k y_k$, y $\boldsymbol\theta = (\theta_1, \theta_2, \theta_3)$ sus proporciones con $\sum_k \theta_k = 1$:
+
+$$
+p(\mathbf{y} \mid \boldsymbol\theta) = \frac{n!}{y_1!\,y_2!\,y_3!}\,\theta_1^{y_1}\theta_2^{y_2}\theta_3^{y_3}.
+$$
+
+La previa **Dirichlet** extiende la Beta a $K$ categorías:
+
+$$
+p(\boldsymbol\theta) = \frac{\Gamma\big(\sum_k \alpha_k\big)}{\prod_k \Gamma(\alpha_k)}\prod_{k=1}^K \theta_k^{\alpha_k - 1},
+\qquad
+E(\theta_k) = \frac{\alpha_k}{\alpha_0}, \quad \alpha_0 = \sum_k \alpha_k.
+$$
+
+## Derivación de la posterior
+
+$$
+p(\boldsymbol\theta \mid \mathbf{y}) \propto \prod_{k=1}^K \theta_k^{y_k}\cdot\prod_{k=1}^K \theta_k^{\alpha_k - 1} = \prod_{k=1}^K \theta_k^{(\alpha_k + y_k) - 1},
+$$
+
+así que
+
+$$
+\boldsymbol\theta \mid \mathbf{y} \sim \text{Dirichlet}(\alpha_1 + y_1, \dots, \alpha_K + y_K),
+$$
+
+con marginales Beta:
+
+$$
+\theta_k \mid \mathbf{y} \sim \text{Beta}\big(\alpha_k + y_k,\ \alpha_0 + n - \alpha_k - y_k\big),
+\qquad
+\text{Cov}(\theta_j, \theta_k \mid \mathbf{y}) = -\frac{\alpha'_j\alpha'_k}{\alpha_0'^2(\alpha_0' + 1)} < 0.
+$$
+
+## Ajuste en Stan
+
+::: {.columns}
+::: {.column width="45%"}
+```{r, eval = TRUE, echo = FALSE, class.output = "stan"}
+cat(readLines("stan/multinomial_dirichlet.stan"), sep = "\n")
+```
+
+`simplex[K]` declara un vector de proporciones: positivas y que suman 1.
+:::
+::: {.column width="55%"}
+```{r multinomial-stan}
+```
+:::
+:::
+
+## Stan frente a la solución exacta
+
+```{r multinomial-resumen}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("resumen_multi", digits = 4)
+```
+
+## Las proporciones están correlacionadas
+
+Como suman 1, si una proporción sube otra debe bajar: la posterior conjunta tiene **correlación negativa**.
+
+::: {.columns}
+::: {.column width="65%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_pares")
+```
+:::
+::: {.column width="35%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("cor_theta", digits = 2)
+```
+:::
+:::
+
+# Métodos MCMC
+
+## ¿Por qué simular?
+
+- En los modelos conjugados la posterior tiene forma conocida. En el modelo de población **no**: tiene miles de parámetros y ninguna forma cerrada.
+- Calcular $p(\mathbf{Y}) = \int p(\mathbf{Y} \mid \boldsymbol\theta)p(\boldsymbol\theta)\,d\boldsymbol\theta$ en miles de dimensiones es inviable numéricamente.
+- Los métodos de **Monte Carlo por cadenas de Markov** (MCMC) generan $\boldsymbol\theta^{(1)}, \boldsymbol\theta^{(2)}, \dots$ cuya distribución converge a la posterior, **sin conocer** $p(\mathbf{Y})$.
+
+Con $S$ draws, cualquier esperanza posterior se aproxima con un promedio:
+
+$$
+E\big[g(\boldsymbol\theta) \mid \mathbf{Y}\big] \approx \frac{1}{S}\sum_{s=1}^S g\big(\boldsymbol\theta^{(s)}\big).
+$$
+
+## Cadenas de Markov
+
+Una cadena de Markov es una secuencia en la que cada estado depende solo del anterior, a través de un **núcleo de transición** $T(\boldsymbol\theta' \mid \boldsymbol\theta)$.
+
+Una distribución $\pi$ es **estacionaria** si se conserva al aplicar la transición:
+
+$$
+\pi(\boldsymbol\theta') = \int T(\boldsymbol\theta' \mid \boldsymbol\theta)\,\pi(\boldsymbol\theta)\,d\boldsymbol\theta.
+$$
+
+Una condición suficiente es el **balance detallado**:
+
+$$
+\pi(\boldsymbol\theta)\,T(\boldsymbol\theta' \mid \boldsymbol\theta) = \pi(\boldsymbol\theta')\,T(\boldsymbol\theta \mid \boldsymbol\theta').
+$$
+
+Bajo condiciones de ergodicidad —incluidas irreducibilidad, aperiodicidad y recurrencia apropiada— la cadena puede converger a $\pi$. El balance detallado por sí solo no garantiza una exploración útil en una ejecución finita. MCMC construye cadenas con $\pi(\boldsymbol\theta) = p(\boldsymbol\theta \mid \mathbf{Y})$.
+
+## El algoritmo de Metropolis
+
+Desde el valor actual $\boldsymbol\theta^{(t)}$ [@metropolis1953]:
+
+::: {.caja}
+1. Proponer $\boldsymbol\theta^* = \boldsymbol\theta^{(t)} + \boldsymbol\epsilon$, con $\boldsymbol\epsilon \sim N(\mathbf{0}, s^2\mathbf{I})$ (propuesta **simétrica**).
+2. Calcular $r = \dfrac{p(\boldsymbol\theta^* \mid \mathbf{Y})}{p(\boldsymbol\theta^{(t)} \mid \mathbf{Y})} = \dfrac{p(\mathbf{Y} \mid \boldsymbol\theta^*)p(\boldsymbol\theta^*)}{p(\mathbf{Y} \mid \boldsymbol\theta^{(t)})p(\boldsymbol\theta^{(t)})}$: la constante $p(\mathbf{Y})$ se **cancela**.
+3. Aceptar $\boldsymbol\theta^{(t+1)} = \boldsymbol\theta^*$ con probabilidad $\min(1, r)$; si no, $\boldsymbol\theta^{(t+1)} = \boldsymbol\theta^{(t)}$.
+:::
+
+**¿Por qué funciona?** Para $\boldsymbol\theta \neq \boldsymbol\theta'$, con propuesta simétrica $q$:
+
+$$
+\pi(\boldsymbol\theta)\,q(\boldsymbol\theta' \mid \boldsymbol\theta)\min\!\Big(1, \frac{\pi(\boldsymbol\theta')}{\pi(\boldsymbol\theta)}\Big)
+= q(\boldsymbol\theta' \mid \boldsymbol\theta)\min\big(\pi(\boldsymbol\theta), \pi(\boldsymbol\theta')\big),
+$$
+
+expresión simétrica en $(\boldsymbol\theta, \boldsymbol\theta')$: se cumple el balance detallado.
+
+## Metropolis a mano para $(\mu, \sigma)$
+
+Se muestrea $(\mu, \log\sigma)$ en $\mathbb{R}^2$. El cambio de variable $\sigma = e^{u}$ agrega el **jacobiano** $\lvert d\sigma/du\rvert = e^{u}$, es decir, usando una $t$ con localización y **escala al cuadrado** como segundo argumento, $+\log\sigma$ en la log-posterior:
+
+```{r metropolis}
+```
+
+## Cuatro cadenas desde puntos distintos
+
+```{r metropolis-cadenas}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "85%"}
+mostrar("grafico_cadenas")
+```
+
+Las primeras 1.000 iteraciones se descartan como calentamiento en este ejercicio. Descartar iteraciones no garantiza convergencia: hay que revisar las cadenas retenidas. En Stan el calentamiento incluye además adaptación del algoritmo.
+
+## ¿Convergieron las cadenas?
+
+Con las iteraciones 1.001 a 3.000 de cada cadena:
+
+```{r metropolis-diagnostico}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("diagnostico_metropolis", digits = 3)
+```
+
+- $\hat R$ [@vehtari2021] detecta discrepancias entre cadenas; un valor cercano a 1 es necesario como diagnóstico práctico, pero no prueba que se haya explorado toda la posterior.
+- El **tamaño efectivo de muestra** (ESS) descuenta la autocorrelación de los draws.
+
+## Lo que muestra el diagnóstico de Metropolis
+
+::: {.caja}
+En esta ejecución, R-hat de `log_sigma` es `r fmt(readRDS("resultados/diagnostico_metropolis.rds")$Rhat[2], 3)`: supera el criterio de 1,01. El ejemplo muestra que un resultado aceptable para `mu` no garantiza buena exploración de todos los parámetros. Antes de usar estas cadenas para inferencia final, habría que mejorar la exploración y volver a comprobar los diagnósticos.
+:::
+
+## $\hat R$ y ESS: intuición y cálculo
+
+La siguiente fórmula clásica ilustra la comparación entre y dentro de cadenas. Con $M$ cadenas de $N$ draws, $\bar\theta_{\cdot m}$ la media de la cadena $m$ y $\bar\theta_{\cdot\cdot}$ la media global:
+
+$$
+B = \frac{N}{M-1}\sum_{m=1}^M(\bar\theta_{\cdot m} - \bar\theta_{\cdot\cdot})^2, \qquad
+W = \frac{1}{M}\sum_{m=1}^M s_m^2, \qquad
+\hat R = \sqrt{\frac{\frac{N-1}{N}W + \frac{1}{N}B}{W}}.
+$$
+
+$$
+\text{ESS} = \frac{MN}{1 + 2\sum_{t=1}^{\infty}\rho_t},
+$$
+
+con $\rho_t$ la autocorrelación a distancia $t$. El código usa `posterior::rhat`, con división de cadenas, normalización por rangos y plegado, y distingue **ESS_bulk** y **ESS_tail** [@vehtari2021].
+
+Como guía para cuatro cadenas: $\hat R < 1{,}01$ y ESS_bulk y ESS_tail de al menos 400. Revise también trazas, error Monte Carlo y, en NUTS, divergencias y profundidad del árbol. Estos criterios evalúan el muestreo, no la validez del modelo.
+
+## Autocorrelación: Metropolis frente a Stan
+
+```{r autocorrelacion}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
+mostrar("grafico_acf")
+```
+
+## El tamaño del paso
+
+Pasos pequeños se aceptan casi siempre pero avanzan poco; pasos grandes avanzan mucho pero se rechazan casi siempre:
+
+```{r tamano-paso}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("experimento_paso", digits = 3)
+```
+
+Compare aceptación, R-hat y ESS en la tabla: una aceptación alta puede coexistir con mala exploración. No hay una tasa óptima universal; el valor aproximado 0,234 se refiere a resultados asintóticos bajo supuestos específicos de paseo aleatorio y dimensión creciente.
+
+## Monte Carlo Hamiltoniano
+
+HMC [@betancourt2017] agrega un **momento** $\mathbf{p}$ y simula la dinámica de una partícula sobre la superficie $U(\boldsymbol\theta) = -\log p(\boldsymbol\theta \mid \mathbf{Y})$:
+
+$$
+H(\boldsymbol\theta, \mathbf{p}) = U(\boldsymbol\theta) + \tfrac{1}{2}\mathbf{p}^\top\mathbf{M}^{-1}\mathbf{p}.
+$$
+
+Integrador *leapfrog* con paso $\epsilon$:
+
+$$
+\mathbf{p} \leftarrow \mathbf{p} - \tfrac{\epsilon}{2}\nabla U(\boldsymbol\theta), \qquad
+\boldsymbol\theta \leftarrow \boldsymbol\theta + \epsilon\,\mathbf{M}^{-1}\mathbf{p}, \qquad
+\mathbf{p} \leftarrow \mathbf{p} - \tfrac{\epsilon}{2}\nabla U(\boldsymbol\theta).
+$$
+
+- Usa el **gradiente** de la log-posterior: propone saltos largos siguiendo la geometría.
+- Se acepta con probabilidad $\min\big(1, e^{H(\boldsymbol\theta, \mathbf{p}) - H(\boldsymbol\theta^*, \mathbf{p}^*)}\big)$, dependiendo del error de integración.
+- **NUTS** [@hoffman2014] elige automáticamente el número de pasos: duplica la trayectoria hasta que "da la vuelta". La **profundidad máxima del árbol** limita esas duplicaciones.
+
+## Metropolis frente a NUTS
+
+```{r comparacion-ess}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("comparacion_ess")
+```
+
+La tabla compara ESS para **mu y sigma en ambos algoritmos**, junto al número de draws retenidos. No mide eficiencia por segundo: cada iteración tiene distinto costo. En modelos de gran dimensión, el paseo aleatorio puede explorar lentamente; NUTS suele aprovechar mejor la geometría.
+
+## Diagnósticos del ajuste en Stan
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("diagnostico_stan", digits = 3)
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("diagnostico_nuts", digits = 0)
+```
+
+Estos controles se complementan con las trazas y el chequeo predictivo. Una ejecución sin advertencias de muestreo aún puede corresponder a un modelo inadecuado.
+
+## Estructura de un programa Stan
+
+| Bloque | Contenido | Ejemplo en el modelo de población |
+|---|---|---|
+| `data` | Datos y dimensiones | $Y_i$, $V_i$, matriz de covariables $X$ |
+| `transformed data` | Cálculos sobre los datos (una vez) | — |
+| `parameters` | Parámetros a estimar | $\boldsymbol\beta$, $\sigma$, $\delta_i$ |
+| `transformed parameters` | Funciones de los parámetros | $\mathbf{x}_i^\top\boldsymbol\beta$, $\lambda_i = \delta_i V_i$ |
+| `model` | Previas y verosimilitud | $Y_i \sim \text{Poisson}(\lambda_i)$ |
+| `generated quantities` | Cantidades por draw, tras el muestreo | predicción $\hat Y_i$ en todos los segmentos |
+
+::: {.caja}
+Las **restricciones** (`<lower=0>`, `simplex`) importan: Stan transforma internamente los parámetros a $\mathbb{R}^k$ y agrega el jacobiano, como se hizo a mano con $\log\sigma$.
+:::
+
+# Resumen
+
+## Resumen de la sesión
+
+- Un modelo con varios parámetros tiene una posterior **conjunta**; marginales y funciones se obtienen de los draws.
+- Con previa de referencia, la media de una Normal con varianza desconocida tiene posterior $t$: la incertidumbre de $\sigma$ se propaga.
+- La **Dirichlet** es conjugada de la Multinomial; las proporciones tienen correlación posterior negativa.
+- **MCMC** genera draws de la posterior sin conocer $p(\mathbf{Y})$; Metropolis cumple el balance detallado.
+- Se usan varias cadenas, se descarta el calentamiento y se revisan $\hat R$ y ESS.
+- **HMC/NUTS** (Stan) usa el gradiente y es mucho más eficiente: es la herramienta del resto del taller.
+
+## Referencias
+
+::: {#refs}
+:::
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)

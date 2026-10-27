@@ -1,0 +1,472 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Introducción a modelos lineales con métodos bayesianos"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "24 de noviembre de 2026 · Día 2, sesión 1 · 09:30–11:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+bibliography: references.bib
+---
+
+```{r setup, include = FALSE}
+source("Rcode/utilidades.R")
+knitr::read_chunk("Rcode/Modelo_lineal.R")
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "", fig.align = "center", out.width = "92%")
+v <- leer_valores()
+```
+
+## Del día 1 a la regresión
+
+En D1S3 se estimaron una media y una dispersión comunes; en D1S4 se compararon zonas por separado. Ahora se incorporan **zona y covariables simultáneamente**.
+
+1. Construir e interpretar la matriz de diseño.
+2. Relacionar mínimos cuadrados con regresión bayesiana y regularización.
+3. Ajustar el modelo en Stan y revisar sus diagnósticos.
+4. Distinguir media, mediana y predicción en la escala original.
+5. Reconocer las limitaciones de modelar log(personas por vivienda).
+
+::: {.notes}
+Las derivaciones matriciales son apoyo docente. La práctica de D2S2 retoma la ejecución y la comparación de modelos.
+:::
+
+# El modelo de regresión
+
+## De una densidad común a una densidad por segmento
+
+El día 1 se modeló $\log\delta_i \sim N(\mu, \sigma^2)$: **la misma media para todos los segmentos**. Pero la densidad depende de las características del segmento: zona, tipo de edificación, urbanización...
+
+El **modelo de regresión lineal** hace que la media dependa de covariables:
+
+$$
+y_i = \log\delta_i = \beta_0 + \beta_1 x_{i1} + \dots + \beta_{p-1} x_{i,p-1} + \varepsilon_i,
+\qquad \varepsilon_i \overset{iid}{\sim} N(0, \sigma^2).
+$$
+
+- $\beta_0$: nivel de $\log\delta$ cuando todas las covariables valen 0 (las medias nacionales de las covariables continuas estandarizadas) en la zona de referencia. No es el promedio nacional de la respuesta.
+- $\beta_k$: cambio esperado en $\log\delta$ por una unidad de $x_k$, con las demás covariables fijas.
+- $\sigma$: variabilidad de la densidad **no explicada** por las covariables.
+
+## Forma matricial
+
+Con $n$ segmentos y $p$ columnas en la matriz de diseño:
+
+$$
+\mathbf{y} = \mathbf{X}\boldsymbol\beta + \boldsymbol\varepsilon, \qquad
+\boldsymbol\varepsilon \sim N_n(\mathbf{0}, \sigma^2\mathbf{I}_n),
+$$
+
+$$
+\mathbf{y} = \begin{pmatrix} y_1 \\ \vdots \\ y_n\end{pmatrix}, \quad
+\mathbf{X} = \begin{pmatrix} 1 & x_{11} & \cdots & x_{1,p-1} \\ \vdots & & & \vdots \\ 1 & x_{n1} & \cdots & x_{n,p-1}\end{pmatrix}, \quad
+\boldsymbol\beta = \begin{pmatrix}\beta_0 \\ \vdots \\ \beta_{p-1}\end{pmatrix}.
+$$
+
+Equivalentemente, $\mathbf{y} \mid \boldsymbol\beta, \sigma \sim N_n(\mathbf{X}\boldsymbol\beta, \sigma^2\mathbf{I}_n)$.
+
+## Interpretación en la escala de la densidad
+
+Como el modelo está en escala logarítmica, los efectos son **multiplicativos**:
+
+$$
+\delta_i = e^{\beta_0}\; e^{\beta_1 x_{i1}}\; \cdots\; e^{\beta_{p-1} x_{i,p-1}}\; e^{\varepsilon_i}.
+$$
+
+::: {.caja}
+- Si $x_k$ aumenta en **una desviación estándar**, la mediana condicional se multiplica por $e^{\beta_k}$, manteniendo las demás covariables fijas.
+- $\beta_k = 0{,}05 \Rightarrow e^{0{,}05} = 1{,}051$: **5,1% más** personas por vivienda.
+- Para la indicadora de zona urbana, $e^{\beta_{\text{urbana}}}$ es la razón de medianas condicionales urbana/rural con las demás covariables fijas.
+- La mediana condicional de $\delta_i$ es $e^{\mathbf{x}_i^\top\boldsymbol\beta}$; la media es $e^{\mathbf{x}_i^\top\boldsymbol\beta + \sigma^2/2}$.
+:::
+
+## Covariables estandarizadas
+
+Cada covariable se estandariza con su media y desviación estándar **nacionales**:
+
+$$
+z_{ik} = \frac{x_{ik} - \bar x_k}{s_k}.
+$$
+
+- Un coeficiente en la escala original, $\beta_k^{\text{orig}}$, se relaciona con el estandarizado por $\beta_k = s_k\,\beta_k^{\text{orig}}$.
+- Los coeficientes quedan **comparables** entre sí: todos miden el efecto de una desviación estándar.
+- Para covariables continuas estandarizadas, la previa se interpreta por una desviación estándar. En las indicadoras de zona se refiere al cambio de categoría, no a una desviación estándar.
+- En MCO, una transformación lineal invertible de las covariables conserva el ajuste. En Bayes, conservar las predicciones requiere transformar también las previas: usar la misma $N(0,1)$ en dos escalas define modelos distintos.
+
+## Datos: segmentos aptos de Aysén
+
+```{r datos}
+```
+
+Se usan los `r fmt(v$n_aptos)` segmentos **aptos**: según el indicador operativo: sin viviendas colectivas y con densidad definida mayor que 1. El código comprueba además positividad, finitud y rango completo del diseño.
+
+La elegibilidad selecciona un subconjunto de segmentos; generalizar sus relaciones a los no aptos requiere evaluar la transportabilidad del modelo. El filtro no convierte la Normal en una verosimilitud truncada.
+
+## La matriz de diseño
+
+```{r construir-x}
+```
+
+- La zona tiene tres categorías: se incluyen **dos indicadoras** (urbana y aldea) y la **rural** es la referencia. Incluir las tres sería colineal con el intercepto.
+- $\mathbf{X}$ tiene `r v$p` columnas: intercepto, 2 indicadoras de zona y 10 covariables.
+
+## Relación de $\log\delta_i$ con algunas covariables
+
+```{r exploracion}
+```
+
+## Relación de $\log\delta_i$ con algunas covariables (gráfico)
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_exploracion")
+```
+
+La línea negra resume una tendencia lineal descriptiva en cada panel; no controla simultáneamente por zona ni por las demás covariables.
+
+# Mínimos cuadrados
+
+## El estimador de mínimos cuadrados
+
+Minimiza la suma de cuadrados de los residuos:
+
+$$
+S(\boldsymbol\beta) = (\mathbf{y} - \mathbf{X}\boldsymbol\beta)^\top(\mathbf{y} - \mathbf{X}\boldsymbol\beta)
+= \mathbf{y}^\top\mathbf{y} - 2\boldsymbol\beta^\top\mathbf{X}^\top\mathbf{y} + \boldsymbol\beta^\top\mathbf{X}^\top\mathbf{X}\boldsymbol\beta.
+$$
+
+Derivando e igualando a cero:
+
+$$
+\frac{\partial S}{\partial\boldsymbol\beta} = -2\mathbf{X}^\top\mathbf{y} + 2\mathbf{X}^\top\mathbf{X}\boldsymbol\beta = \mathbf{0}
+\quad\Longrightarrow\quad
+\hat{\boldsymbol\beta} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}.
+$$
+
+Existe si $\mathbf{X}^\top\mathbf{X}$ es invertible, es decir, si las columnas de $\mathbf{X}$ **no son colineales**.
+
+## Propiedades del estimador
+
+Con $\mathbf{y} = \mathbf{X}\boldsymbol\beta + \boldsymbol\varepsilon$:
+
+$$
+E(\hat{\boldsymbol\beta}) = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{X}\boldsymbol\beta = \boldsymbol\beta,
+\qquad
+\text{Var}(\hat{\boldsymbol\beta}) = \sigma^2(\mathbf{X}^\top\mathbf{X})^{-1},
+$$
+
+y $\sigma^2$ se estima con
+
+$$
+\hat\sigma^2 = \frac{(\mathbf{y} - \mathbf{X}\hat{\boldsymbol\beta})^\top(\mathbf{y} - \mathbf{X}\hat{\boldsymbol\beta})}{n - p}.
+$$
+
+::: {.caja}
+Si dos covariables son casi colineales, $\mathbf{X}^\top\mathbf{X}$ es casi singular y $(\mathbf{X}^\top\mathbf{X})^{-1}$ tiene elementos enormes: los errores estándar **explotan**. La colinealidad puede dificultar la identificación y el muestreo, pero no demuestra por sí sola la causa de problemas del modelo de Chile. Esos problemas se examinarán en las sesiones de diagnóstico.
+:::
+
+## Resultados de mínimos cuadrados
+
+```{r mco}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_mco", digits = 4, font_size = 20)
+```
+
+# Regresión bayesiana
+
+## Verosimilitud
+
+$$
+p(\mathbf{y} \mid \boldsymbol\beta, \sigma) = (2\pi\sigma^2)^{-n/2}\exp\!\Big(-\frac{1}{2\sigma^2}(\mathbf{y} - \mathbf{X}\boldsymbol\beta)^\top(\mathbf{y} - \mathbf{X}\boldsymbol\beta)\Big).
+$$
+
+Usando $\hat{\boldsymbol\beta}$ de MCO, la suma de cuadrados se descompone:
+
+$$
+(\mathbf{y} - \mathbf{X}\boldsymbol\beta)^\top(\mathbf{y} - \mathbf{X}\boldsymbol\beta)
+= (n - p)\hat\sigma^2 + (\boldsymbol\beta - \hat{\boldsymbol\beta})^\top\mathbf{X}^\top\mathbf{X}(\boldsymbol\beta - \hat{\boldsymbol\beta}).
+$$
+
+Con $\sigma$ fija y diseño de rango completo, como función de $\boldsymbol\beta$ la verosimilitud es el núcleo de una normal centrada en $\hat{\boldsymbol\beta}$ con covarianza $\sigma^2(\mathbf{X}^\top\mathbf{X})^{-1}$.
+
+## Distribuciones previas
+
+$$
+\beta_k \overset{iid}{\sim} N(0, 1), \qquad \sigma \sim \text{Cauchy}^+(0;\ 2{,}5).
+$$
+
+- Con covariables estandarizadas, $|\beta_k| < 2$ con probabilidad 0,95: efectos de hasta $e^{2} \approx 7{,}4$ veces por desviación estándar. Su plausibilidad se evalúa en conjunto con el diseño y la predicción previa.
+- El intercepto también tiene previa $N(0, 1)$: $e^{\beta_0}$ entre $0{,}14$ y $7{,}4$ personas por vivienda.
+- La Cauchy positiva para $\sigma$ tiene cola pesada. Su carácter informativo depende de la escala; se conserva aquí para dar continuidad a los ejemplos.
+
+## La condicional de $\boldsymbol\beta$ dado $\sigma$
+
+Con $\boldsymbol\beta \sim N_p(\mathbf{0}, \mathbf{I}_p)$:
+
+$$
+\begin{aligned}
+p(\boldsymbol\beta \mid \sigma, \mathbf{y}) &\propto \exp\!\Big(-\frac{1}{2\sigma^2}(\mathbf{y} - \mathbf{X}\boldsymbol\beta)^\top(\mathbf{y} - \mathbf{X}\boldsymbol\beta) - \frac{1}{2}\boldsymbol\beta^\top\boldsymbol\beta\Big) \\
+&\propto \exp\!\Big(-\frac{1}{2}\Big[\boldsymbol\beta^\top\Big(\frac{\mathbf{X}^\top\mathbf{X}}{\sigma^2} + \mathbf{I}\Big)\boldsymbol\beta - 2\boldsymbol\beta^\top\frac{\mathbf{X}^\top\mathbf{y}}{\sigma^2}\Big]\Big).
+\end{aligned}
+$$
+
+Completando el cuadrado:
+
+$$
+\boldsymbol\beta \mid \sigma, \mathbf{y} \sim N_p\big(\mathbf{m}, \mathbf{V}\big), \qquad
+\mathbf{V} = \Big(\frac{\mathbf{X}^\top\mathbf{X}}{\sigma^2} + \mathbf{I}\Big)^{-1}, \quad
+\mathbf{m} = \mathbf{V}\frac{\mathbf{X}^\top\mathbf{y}}{\sigma^2}.
+$$
+
+## Interpretación: encogimiento hacia cero
+
+$$
+\mathbf{m} = \big(\mathbf{X}^\top\mathbf{X} + \sigma^2\mathbf{I}\big)^{-1}\mathbf{X}^\top\mathbf{y}.
+$$
+
+- Con $\sigma$ fija es una forma de **regresión ridge**, aquí penalizando también el intercepto. La regularización contrae direcciones del diseño; no implica que cada coeficiente individual disminuya en valor absoluto.
+- Si la previa es muy vaga ($\beta_k \sim N(0, \tau^2)$ con $\tau \to \infty$), $\mathbf{m} \to \hat{\boldsymbol\beta}_{MCO}$.
+- Si $\mathbf{X}^\top\mathbf{X}$ es casi singular (colinealidad), el término $\sigma^2\mathbf{I}$ la hace invertible: la previa **estabiliza** la estimación, en las direcciones poco informadas los coeficientes pueden depender más de la previa.
+
+```{r condicional-analitica}
+```
+
+## ¿Por qué no resolver todo analíticamente?
+
+- Con la previa conjugada Normal–Gamma inversa, $\boldsymbol\beta \mid \sigma^2 \sim N(\mathbf{m}_0, \sigma^2\mathbf{V}_0)$ y $\sigma^2 \sim \text{Inv-Gamma}(a_0, b_0)$, la posterior conjunta es analítica.
+- Pero basta cambiar la previa de $\sigma$, agregar un efecto por segmento o pasar a conteos Poisson para perder la solución cerrada.
+- Stan resuelve todos esos casos con el **mismo** procedimiento: se usará este modelo para introducir la sintaxis que se reutiliza en el modelo de población.
+
+## El programa Stan
+
+::: {.columns}
+::: {.column width="52%"}
+```{r, eval = TRUE, echo = FALSE, class.output = "stan"}
+cat(readLines("stan/regresion_lineal.stan"), sep = "\n")
+```
+:::
+::: {.column width="48%"}
+- `matrix[n, p] X` y `X * beta`: el predictor lineal de todos los segmentos en una sola operación (**vectorización**).
+- `sd_beta` como dato permite cambiar la previa sin recompilar.
+- `y_rep`: réplicas de los datos en cada draw, para el chequeo predictivo.
+- `normal_rng` vectorizado devuelve un arreglo con un valor por segmento.
+:::
+:::
+
+## Ajuste
+
+```{r ajuste-stan}
+```
+
+```{r diagnostico-rapido}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("diagnostico", digits = 4)
+```
+
+Revise R-hat, ESS_bulk y ESS_tail junto con trazas y diagnósticos NUTS. Los indicadores favorables no prueban convergencia ni validan la especificación del modelo.
+
+## Coeficientes posteriores
+
+```{r coeficientes}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "78%"}
+mostrar("grafico_coeficientes")
+```
+
+## Bayes, condicional exacta y mínimos cuadrados
+
+```{r comparacion}
+```
+
+## Comparación: resultados
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("comparacion", digits = 3, font_size = 19)
+```
+
+## Lectura de la comparación
+
+::: {.caja}
+- Compare MCO y Bayes por término. La información depende de las direcciones de $\mathbf X$, no solo de los `r fmt(v$n_aptos)` segmentos; un diseño colineal puede mantener sensibilidad a las previas.
+- `condicional_sigma_fija` es la media de $\boldsymbol\beta\mid\sigma,\mathbf y$ evaluada en $\hat\sigma$. Stan integra la incertidumbre de $\sigma$: no es una verificación exacta de la misma posterior.
+- `efecto_pct` es la media posterior de $100(e^{\beta_k}-1)$, calculada draw a draw. Para covariables continuas se refiere a una desviación estándar; para zona es una comparación con rural. El intercepto es un nivel base, no un efecto de cambio.
+:::
+
+La distribución posterior permite propagar la incertidumbre de coeficientes y dispersión a funciones y predicciones.
+
+## Sensibilidad a la previa
+
+¿Y si la previa fuera mucho más vaga, $\beta_k \sim N(0, 100^2)$? Como `sd_beta` es un dato, no hay que recompilar:
+
+```{r previa-vaga}
+```
+
+## Sensibilidad a la previa (gráfico)
+
+```{r, eval = TRUE, echo = FALSE, out.width = "85%"}
+mostrar("grafico_previa")
+```
+
+Compare los desplazamientos por término y los diagnósticos de ambos ajustes. La sensibilidad debe examinarse también en intervalos y predicciones, no solo en medias.
+
+# Evaluación del modelo
+
+## ¿Cuánto explica el modelo?
+
+El **$R^2$ bayesiano** [@gelman2019r2] se calcula en cada draw como la varianza explicada sobre la total:
+
+$$
+R^2_{(s)} = \frac{\text{Var}_{i}\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)}\big)}{\text{Var}_{i}\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)}\big) + \sigma^{2(s)}},
+$$
+
+donde $\text{Var}_i$ es la varianza entre segmentos. Esta definición:
+
+- Tiene una **distribución posterior**: se reporta su media y su intervalo.
+- Siempre está entre 0 y 1, porque usa la varianza **modelada** del error.
+
+```{r r2}
+```
+
+## $R^2$ bayesiano: resultados
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_r2", digits = 3)
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "70%"}
+mostrar("grafico_r2")
+```
+
+::: {.caja}
+Las covariables explican solo una parte de la variabilidad de la densidad. El resto se captura con $\sigma$: el modelo de población debe **propagar esa incertidumbre** a la predicción.
+:::
+
+## Chequeo predictivo posterior
+
+Para cada draw $s$ se simula $\mathbf{y}^{rep,(s)} \sim N(\mathbf{X}\boldsymbol\beta^{(s)}, \sigma^{2(s)}\mathbf{I})$ y se compara con $\mathbf{y}$:
+
+- **Densidad superpuesta**: ¿la distribución de los datos se parece a la de las réplicas?
+- **Estadístico por grupo**: $T(\mathbf{y}) =$ desviación estándar de $\log\delta_i$ en cada zona, frente a su distribución en las réplicas.
+
+```{r ppc}
+```
+
+## Chequeo predictivo: resultados
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_ppc")
+```
+
+Revise la densidad global y la desviación por zona. Una superposición global favorable puede ocultar discrepancias de subgrupos; si aparecen, se debe evaluar una estructura de dispersión más flexible.
+
+## Una limitación: el ruido de conteo
+
+$\log(Y_i/V_i)$ no es igual de preciso en todos los segmentos. Si $Y_i \sim \text{Poisson}(\delta_i V_i)$, por el **método delta**, con media del conteo suficientemente grande y lejos de cero:
+
+$$
+\text{Var}\Big(\log\frac{Y_i}{V_i}\Big) \approx \Big(\frac{d\log u}{du}\Big|_{u = \delta_i V_i}\Big)^2\text{Var}(Y_i) = \frac{1}{(\delta_i V_i)^2}\,\delta_i V_i = \frac{1}{\delta_i V_i}.
+$$
+
+- Un segmento de 5 viviendas con 2,5 personas por vivienda: desviación $\approx 1/\sqrt{12{,}5} = 0{,}28$.
+- Uno de 100 viviendas: desviación $\approx 1/\sqrt{250} = 0{,}06$.
+
+El modelo lineal supone la **misma varianza** $\sigma^2$ para todos: mezcla la variación real de la densidad con el ruido de conteo.
+
+## El ruido de conteo en los datos
+
+```{r heterocedasticidad}
+```
+
+::: {.columns}
+::: {.column width="58%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_residuos")
+```
+:::
+::: {.column width="42%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_residuos", digits = 3, font_size = 18)
+```
+:::
+:::
+
+Compare la desviación de los residuos con la aproximación Poisson, $1/\sqrt{\delta_i V_i}$. La comparación es descriptiva: no descompone formalmente la varianza ni demuestra que el ruido de conteo explique la mayor parte. El modelo de conteos de D2S3 representa explícitamente este componente.
+
+## Predicción de la densidad
+
+Para un segmento con covariables $\tilde{\mathbf{x}}$, la predictiva posterior es
+
+$$
+p(\tilde y \mid \mathbf{y}) = \iint N\big(\tilde y \mid \tilde{\mathbf{x}}^\top\boldsymbol\beta, \sigma^2\big)\,p(\boldsymbol\beta, \sigma \mid \mathbf{y})\,d\boldsymbol\beta\,d\sigma,
+$$
+
+y en la escala de la densidad:
+
+$$
+\tilde\delta^{(s)} = \exp\big(\tilde{\mathbf{x}}^\top\boldsymbol\beta^{(s)} + \sigma^{(s)}\varepsilon^{(s)}\big),
+\qquad \varepsilon^{(s)} \sim N(0, 1).
+$$
+
+Su varianza tiene dos partes: $\text{Var}(\tilde y \mid \mathbf{y}) = \underbrace{E(\sigma^2 \mid \mathbf{y})}_{\text{entre segmentos}} + \underbrace{\tilde{\mathbf{x}}^\top\text{Var}(\boldsymbol\beta \mid \mathbf{y})\,\tilde{\mathbf{x}}}_{\text{incertidumbre de } \boldsymbol\beta}$.
+
+## Predicción en todos los segmentos
+
+Se mantiene el diseño y la estandarización del ajuste. Las predicciones en no aptos son una extrapolación del modelo seleccionado; esta tabla ilustra **personas por vivienda**, no población corregida por cobertura. La media observada se calcula con densidades finitas y no necesariamente con el mismo conjunto que el ajuste.
+
+```{r prediccion}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_prediccion", digits = 3)
+```
+
+# Resumen
+
+## Diagnósticos de ambos ajustes
+
+```{r, eval = TRUE, echo = FALSE}
+d <- readRDS("resultados/diagnostico_completo.rds")
+nuts <- readRDS("resultados/diagnostico_nuts.rds")
+control <- d |>
+  dplyr::group_by(fit) |>
+  dplyr::summarise(Rhat_max = max(rhat), ESS_bulk_min = min(ess_bulk),
+                   ESS_tail_min = min(ess_tail), .groups = "drop") |>
+  dplyr::left_join(nuts, by = "fit")
+tba(control, digits = 3, font_size = 20)
+```
+
+Use R-hat menor que 1,01 y ESS_bulk/ESS_tail de al menos 400 como guía para cuatro cadenas; complemente con trazas, error Monte Carlo, divergencias y profundidad del árbol.
+
+## Resumen de la sesión
+
+- La regresión modela la **media de $\log\delta_i$** con covariables estandarizadas; los efectos son **multiplicativos** sobre la densidad.
+- La condicional de $\boldsymbol\beta$ con previa normal es la **regresión ridge**: la previa encoge y estabiliza; su cercanía a MCO depende de la información del diseño y de las previas.
+- El **$R^2$ bayesiano** y el **chequeo predictivo** muestran que las covariables explican parte de la variabilidad y que la varianza difiere por zona.
+- Modelar $\log(Y_i/V_i)$ mezcla la variación real con el **ruido de conteo** de los segmentos pequeños: el paso siguiente es un modelo **Poisson** con exposición $V_i$.
+
+## Referencias
+
+::: {#refs}
+:::
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)

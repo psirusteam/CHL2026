@@ -1,0 +1,128 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+
+
+processing file: Bayes_multiparametrico.qmd
+1/71                         
+2/71 [setup]                 
+3/71                         
+4/71 [distribucion-delta]    
+5/71                         
+6/71 [unnamed-chunk-1]       
+7/71                         
+8/71 [unnamed-chunk-2]       
+9/71                         
+10/71 [normal-analitica]      
+11/71                         
+12/71 [unnamed-chunk-3]       
+13/71                         
+14/71 [unnamed-chunk-4]       
+15/71                         
+16/71 [normal-stan]           
+17/71                         
+18/71 [normal-resumen]        
+19/71                         
+20/71 [unnamed-chunk-5]       
+21/71                         
+22/71 [normal-conjunta]       
+23/71                         
+24/71 [unnamed-chunk-6]       
+25/71                         
+26/71 [normal-funciones]      
+27/71                         
+28/71 [unnamed-chunk-7]       
+29/71                         
+30/71 [normal-ppc]            
+31/71                         
+32/71 [unnamed-chunk-8]       
+33/71                         
+34/71 [unnamed-chunk-9]       
+35/71                         
+36/71 [multinomial-stan]      
+37/71                         
+38/71 [multinomial-resumen]   
+39/71                         
+40/71 [unnamed-chunk-10]      
+41/71                         
+42/71 [unnamed-chunk-11]      
+43/71                         
+44/71 [unnamed-chunk-12]      
+45/71                         
+46/71 [metropolis]            
+47/71                         
+48/71 [metropolis-cadenas]    
+49/71                         
+50/71 [unnamed-chunk-13]      
+51/71                         
+52/71 [metropolis-diagnostico]
+53/71                         
+54/71 [unnamed-chunk-14]      
+55/71                         
+56/71 [autocorrelacion]       
+57/71                         
+58/71 [unnamed-chunk-15]      
+59/71                         
+60/71 [tamano-paso]           
+61/71                         
+62/71 [unnamed-chunk-16]      
+63/71                         
+64/71 [comparacion-ess]       
+65/71                         
+66/71 [unnamed-chunk-17]      
+67/71                         
+68/71 [unnamed-chunk-18]      
+69/71                         
+70/71 [unnamed-chunk-19]      
+71/71                         
+output file: Bayes_multiparametrico.knit.md
+
+pandoc 
+  to: revealjs
+  output-file: Bayes_multiparametrico.html
+  standalone: true
+  wrap: none
+  default-image-extension: png
+  html-math-method:
+    method: mathjax
+    url: >-
+      https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full
+  slide-level: 2
+  css:
+    - styles.css
+  variables: {}
+  
+metadata
+  link-citations: true
+  width: 1600
+  height: 900
+  margin: 0.08
+  center: false
+  navigationMode: linear
+  controlsLayout: edges
+  controlsTutorial: false
+  hash: true
+  history: true
+  hashOneBasedIndex: false
+  fragmentInURL: false
+  transition: fade
+  backgroundTransition: none
+  pdfSeparateFragments: false
+  lang: es
+  auto-stretch: true
+  engines:
+    - path: C:\Program Files\RStudio\resources\app\bin\quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  title: Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
+  subtitle: 'Fundamentos de la inferencia bayesiana II: modelos multiparamétricos y MCMC'
+  author: Andrés Gutiérrez
+  institute: CEPAL · UNFPA América Latina y el Caribe · INE Chile
+  date: 23 de noviembre de 2026 · Día 1, sesión 3 · 14:30–16:00
+  bibliography:
+    - references.bib
+  theme: simple
+  slideNumber: true
+  
+Output created: Bayes_multiparametrico.html
+

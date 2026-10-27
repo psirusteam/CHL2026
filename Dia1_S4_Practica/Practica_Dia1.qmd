@@ -1,0 +1,402 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Práctica computacional en RStan: fundamentos de la inferencia bayesiana"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "23 de noviembre de 2026 · Día 1, sesión 4 · 16:30–18:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+bibliography: references.bib
+---
+
+```{r setup, include = FALSE}
+source("Rcode/utilidades.R")
+knitr::read_chunk("Rcode/Practica_Dia1.R")
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "", fig.align = "center", out.width = "92%")
+v <- leer_valores()
+```
+
+# Instrucciones
+
+## Objetivos de la práctica
+
+1. Replicar en Magallanes los modelos estudiados en D1S2 y D1S3.
+2. Comparar soluciones conjugadas con resúmenes de Stan.
+3. Obtener diferencias, razones e intervalos a partir de draws conjuntos.
+4. Revisar el muestreo y el ajuste antes de interpretar las estimaciones.
+
+
+Los ejercicios 4 y 5 se conservan como **extensiones** para grupos que avancen más rápido o trabajo posterior. La primera compilación de los modelos puede requerir tiempo adicional.
+
+## Producto de la práctica
+
+Por pareja, registre:
+
+- Una tabla de estimaciones, intervalos y probabilidades para los ejercicios principales.
+- Un diagnóstico de muestreo y un chequeo predictivo, con su interpretación.
+- Una conclusión sobre los límites de la densidad constante y una pregunta para el día 2.
+
+Las respuestas deben identificar el modelo, los datos usados y los supuestos de cada comparación.
+
+
+## Organización de la práctica
+
+::: {.caja}
+- Trabaje en parejas. Abra RStudio y fije el directorio de trabajo en la carpeta de esta sesión (`Dia1_S4_Practica`).
+- El script `Rcode/Practica_Dia1.R` contiene todas las soluciones, organizadas en bloques `## ---- nombre ----` que coinciden con los de esta presentación.
+- Cada ejercicio tiene un **enunciado**, un **recordatorio teórico** y la **solución**. Intente resolverlo antes de mirarla.
+:::
+
+| Ejercicio | Modelo | Tema |
+|---|---|---|
+| 1 | Bernoulli–Beta | Proporción de segmentos con viviendas colectivas; sensibilidad a la previa |
+| 2 | Poisson–Gamma | Densidad en dos regiones; posterior de una diferencia; sobredispersión |
+| 3 | Normal | Densidad por zona; razón de medianas; chequeo predictivo |
+| 4 | Multinomial–Dirichlet | Distribución de segmentos por zona |
+| 5 | Metropolis | Programar el algoritmo y evaluar la convergencia |
+
+## Repaso: los modelos de D1S2 y D1S3
+
+| Modelo | Previa | Posterior | Uso en la práctica |
+|---|---|---|---|
+| $Y_i \sim \text{Bernoulli}(\theta)$ | $\text{Beta}(a, b)$ | $\text{Beta}(a + s,\ b + n - s)$ | Proporción de segmentos con colectivas |
+| $Y_i \sim \text{Poisson}(\delta V_i)$ | $\text{Gamma}(a, b)$ | $\text{Gamma}(a + \sum Y_i,\ b + \sum V_i)$ | Personas por vivienda por región |
+| $\log\delta_i \sim N(\mu, \sigma^2)$ | $\mu \sim N(0, 10^2)$, $\sigma \sim \text{Cauchy}^+$ | Sin forma cerrada: Stan | Densidad por zona |
+| $\mathbf{y} \sim \text{Multinomial}(n, \boldsymbol\theta)$ | $\text{Dirichlet}(\boldsymbol\alpha)$ | $\text{Dirichlet}(\boldsymbol\alpha + \mathbf{y})$ | Segmentos por zona |
+
+::: {.caja}
+Con los **draws** de cada posterior se obtiene cualquier cantidad derivada: diferencias entre regiones, razones entre zonas o probabilidades de eventos.
+:::
+
+## Datos y programas
+
+- `data/segmentos_magallanes.rds`: segmentos de la región de Magallanes (región 12).
+- `data/segmentos_aysen.rds`: segmentos de Aysén, usados en las sesiones previas.
+- `stan/`: `bernoulli_beta.stan`, `poisson_gamma.stan`, `normal_media_varianza.stan`, `multinomial_dirichlet.stan`.
+
+```{r datos}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("glimpse_magallanes")
+```
+
+# Ejercicio 1: proporción de segmentos con viviendas colectivas
+
+## Ejercicio 1
+
+::: {.ejercicio}
+La variable `n_vc > 0` identifica segmentos con **viviendas colectivas** (hospitales, cuarteles, residencias). No debe confundirse automáticamente con `excluido_colectivo`, que es el indicador usado por el filtro del modelo.
+
+La proporción de este conjunto observado se calcula directamente; aquí se usa como ejemplo para inferir una probabilidad Bernoulli para segmentos comparables.
+
+1. Calcule la posterior de la proporción $\theta$ de segmentos de Magallanes con al menos una vivienda colectiva (`n_vc > 0`), con una previa $\text{Beta}(1, 1)$: primero en forma **analítica** y luego con `stan/bernoulli_beta.stan`.
+2. Reporte la media posterior y el intervalo de credibilidad al 95%.
+3. Repita con una previa $\text{Beta}(1, 99)$ (se espera cerca de 1% de segmentos). ¿Cambia la conclusión? ¿Por qué?
+:::
+
+## Recordatorio: Bernoulli–Beta
+
+$$
+\theta \mid \mathbf{y} \sim \text{Beta}(a + s,\ b + n - s), \qquad
+E(\theta \mid \mathbf{y}) = \frac{a + s}{a + b + n}.
+$$
+
+La previa $\text{Beta}(1, 99)$ tiene media $0{,}01$ y tiene concentración $a + b = 100$; esta analogía con pseudoconteos no representa observaciones reales. El peso de los datos es
+
+$$
+w = \frac{n}{a + b + n} = \frac{`r fmt(v$n_mag)`}{100 + `r fmt(v$n_mag)`} = `r fmt(v$n_mag / (100 + v$n_mag), 3)`.
+$$
+
+## Solución 1
+
+```{r ej1}
+```
+
+## Solución 1: resultados
+
+```{r ej1-resultado}
+```
+
+## Solución 1: comparación de posteriores
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("ej1", digits = 4)
+```
+
+Hay `r fmt(v$colectivos_mag)` segmentos con viviendas colectivas entre `r fmt(v$n_mag)`. Con tantos segmentos, la previa informativa apenas mueve la posterior: los datos pesan un `r fmt(100 * v$n_mag / (100 + v$n_mag), 1)`%.
+
+## Solución 1: discusión
+
+::: {.caja}
+- La previa $\text{Beta}(1, 99)$ suponía cerca de un 1% de segmentos con colectivas; los datos muestran cerca de un `r fmt(100 * v$colectivos_mag / v$n_mag, 0)`%. La media previa difiere de la proporción observada. Compare la sensibilidad: la media posterior cambia de `r fmt(readRDS("resultados/ej1.rds")$media[1], 4)` a `r fmt(readRDS("resultados/ej1.rds")$media[3], 4)`.
+- Con pocos segmentos (por ejemplo, una comuna pequeña) la misma previa sí dominaría la estimación: la elección de la previa importa cuando la información es escasa.
+- La presencia de colectivas requiere revisar la elegibilidad y distinguir población en viviendas particulares de población en viviendas colectivas. Este ejercicio no establece cómo estimar la población colectiva.
+:::
+
+# Ejercicio 2: personas por vivienda en dos regiones
+
+## Ejercicio 2
+
+::: {.ejercicio}
+1. Con los segmentos de **cobertura completa**, sin viviendas colectivas y con `n_vpo > 0`, ajuste el modelo Poisson–Gamma (`stan/poisson_gamma.stan`) para **Magallanes** y para **Aysén**.
+2. Con los draws de ambos ajustes, obtenga la posterior de la **diferencia** $\delta_{\text{Mag}} - \delta_{\text{Ays}}$. ¿Hay evidencia de que las densidades difieran?
+3. Calcule el índice de dispersión de Pearson en Magallanes. ¿Es adecuado el modelo Poisson con una única $\delta$?
+:::
+
+## Recordatorio: funciones de parámetros independientes
+
+La factorización siguiente supone **verosimilitudes independientes y previas independientes**, sin parámetros compartidos entre regiones. Tener datos distintos por sí solo no garantiza independencia posterior:
+
+$$
+p(\delta_M, \delta_A \mid \mathbf{Y}_M, \mathbf{Y}_A) = p(\delta_M \mid \mathbf{Y}_M)\,p(\delta_A \mid \mathbf{Y}_A).
+$$
+
+Si $\delta_M^{(s)}$ y $\delta_A^{(s)}$ son draws de cada posterior, $\Delta^{(s)} = \delta_M^{(s)} - \delta_A^{(s)}$ son draws de la posterior de la diferencia, y
+
+$$
+\Pr(\delta_M > \delta_A \mid \mathbf{Y}) \approx \frac{1}{S}\sum_{s=1}^S \mathbb{1}\big(\Delta^{(s)} > 0\big).
+$$
+
+Analíticamente, $E(\Delta) = \frac{a_M'}{b_M'} - \frac{a_A'}{b_A'}$ y $\text{Var}(\Delta) = \frac{a_M'}{b_M'^2} + \frac{a_A'}{b_A'^2}$.
+
+## Solución 2
+
+```{r ej2}
+```
+
+## Solución 2: la diferencia
+
+```{r ej2-resultado}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("ej2")
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "70%"}
+mostrar("grafico_ej2")
+```
+
+## Solución 2: ¿diferencia significativa o relevante?
+
+```{r, eval = TRUE, echo = FALSE}
+ej2 <- readRDS("resultados/ej2.rds")
+```
+
+::: {.caja}
+- La diferencia media es `r fmt(ej2$dif_media, 3)` personas por vivienda, con intervalo [`r fmt(ej2$q025, 3)`; `r fmt(ej2$q975, 3)`] y $\Pr(\delta_M > \delta_A \mid \mathbf{Y}) =$ `r fmt(ej2[["Pr(dif > 0)"]], 3)`.
+- La diferencia representa un `r fmt(100 * ej2$dif_media / ej2$delta_aysen, 1)`% de la densidad de Aysén. Su relevancia depende del uso y de la escala territorial; una posterior precisa bajo un modelo inadecuado puede resultar engañosa.
+- Con muchos datos, la posterior es muy precisa: conviene reportar el **tamaño** del efecto y su intervalo, no solo la probabilidad de que sea positivo.
+:::
+
+## Solución 2: sobredispersión
+
+```{r ej2-dispersion}
+```
+
+::: {.caja}
+El índice de dispersión en Magallanes es `r fmt(v$dispersion_mag, 2)`, claramente mayor que 1: la densidad varía entre segmentos más de lo que permite un modelo Poisson con una única $\delta$. Aunque las densidades medias difieran poco entre regiones, **dentro** de cada región hay heterogeneidad.
+:::
+
+# Ejercicio 3: densidad por zona
+
+## Ejercicio 3
+
+::: {.ejercicio}
+1. Con los segmentos **aptos**, de densidad positiva y finita, de Magallanes, ajuste el modelo Normal para $\log\delta_i$ (`stan/normal_media_varianza.stan`) por separado para la zona **urbana** y la **rural**.
+2. Obtenga la posterior de la razón de medianas $e^{\mu_{\text{urbana}}} / e^{\mu_{\text{rural}}}$. ¿En qué zona hay más personas por vivienda?
+3. Compare $\sigma$ entre zonas y calcule $\Pr(\sigma_{\text{rural}} > \sigma_{\text{urbana}} \mid \mathbf{y})$.
+4. Haga un chequeo predictivo con `ppc_dens_overlay()` para la zona urbana.
+:::
+
+## Recordatorio: la razón de medianas
+
+Como en el ejercicio 2, los ajustes por zona suponen verosimilitudes y previas independientes, sin parámetros compartidos.
+
+Si $\log\delta \sim N(\mu, \sigma^2)$, la mediana de $\delta$ es $e^{\mu}$. La razón de medianas entre zonas es
+
+$$
+\rho = \frac{e^{\mu_U}}{e^{\mu_R}} = e^{\mu_U - \mu_R},
+$$
+
+y sus draws son $\rho^{(s)} = e^{\mu_U^{(s)} - \mu_R^{(s)}}$.
+
+- $\rho > 1$: la **mediana modelada** de personas por vivienda es mayor en la zona urbana. No implica que todos sus segmentos superen a los rurales.
+- La transformación $e^{x}$ es monótona: los cuantiles de $\rho$ son $e^{(\text{cuantiles de } \mu_U - \mu_R)}$.
+
+## Solución 3
+
+```{r ej3}
+```
+
+## Solución 3: razón de medianas y dispersiones
+
+```{r ej3-resultado}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("ej3", digits = 3)
+```
+
+## Solución 3: interpretación
+
+```{r, eval = TRUE, echo = FALSE}
+ej3 <- readRDS("resultados/ej3.rds")
+```
+
+::: {.caja}
+- La mediana de personas por vivienda es un `r fmt(100 * (ej3$media[1] - 1), 0)`% mayor en la zona urbana que en la rural (intervalo: `r fmt(100 * (ej3$q025[1] - 1), 0)`% a `r fmt(100 * (ej3$q975[1] - 1), 0)`%).
+- La variabilidad entre segmentos es mayor en la zona rural ($\sigma \approx$ `r fmt(ej3$media[3], 2)`) que en la urbana ($\sigma \approx$ `r fmt(ej3$media[2], 2)`), con probabilidad posterior `r fmt(ej3$media[4], 2)`.
+- Los resultados motivan evaluar la **zona** como covariable y comparar estructuras de dispersión. La elección requiere revisar el ajuste y la capacidad predictiva, no solo contrastar estimaciones puntuales.
+:::
+
+## Solución 3: chequeo predictivo
+
+```{r ej3-ppc}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
+mostrar("grafico_ej3")
+```
+
+# Ejercicio 4 (extensión): segmentos por zona
+
+## Ejercicio 4
+
+::: {.ejercicio}
+Las proporciones observadas por zona son conocidas. El modelo multinomial describe probabilidades para segmentos comparables, bajo sus supuestos.
+
+1. Con `stan/multinomial_dirichlet.stan` y una previa $\text{Dirichlet}(1, 1, 1)$, estime la proporción de segmentos de Magallanes en cada zona (urbana, aldea, rural).
+2. Compare con la solución analítica $\text{Dirichlet}(1 + y_1, 1 + y_2, 1 + y_3)$, cuyas medias son $(1 + y_k) / (3 + n)$.
+3. ¿Cuál es la probabilidad posterior de que más del 75% de los segmentos sean urbanos?
+:::
+
+## Recordatorio: marginales de la Dirichlet
+
+Con $\boldsymbol\theta \mid \mathbf{y} \sim \text{Dirichlet}(\alpha'_1, \alpha'_2, \alpha'_3)$ y $\alpha'_0 = \sum_k \alpha'_k$:
+
+$$
+\theta_k \mid \mathbf{y} \sim \text{Beta}(\alpha'_k,\ \alpha'_0 - \alpha'_k),
+\qquad
+\Pr(\theta_{\text{urbana}} > 0{,}75 \mid \mathbf{y}) = 1 - F_{\text{Beta}(\alpha'_U,\ \alpha'_0 - \alpha'_U)}(0{,}75).
+$$
+
+Con draws: la proporción de draws con $\theta_{\text{urbana}}^{(s)} > 0{,}75$.
+
+## Solución 4
+
+```{r ej4}
+```
+
+```{r ej4-resultado}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("ej4", digits = 4)
+```
+
+Probabilidad simulada: `r fmt(v$prob_urbana, 3)`; probabilidad exacta de la marginal Beta: `r fmt(v$prob_urbana_exacta, 3)`. Redondear a 1 no equivale a demostrar certeza.
+
+## Solución 4: discusión
+
+::: {.caja}
+- Distinga la proporción de **segmentos** urbanos de la proporción de **personas** en áreas urbanas: sus denominadores son diferentes.
+- La zona **aldea** tiene muy pocos segmentos: cualquier parámetro específico de las aldeas (por ejemplo, su propia $\sigma$) se estimará con **mucha incertidumbre** en esta región. Es un argumento para compartir información entre regiones o entre zonas.
+- Compare Stan y la solución analítica teniendo en cuenta el error Monte Carlo. No se exige igualdad exacta ni un número fijo de decimales.
+:::
+
+# Ejercicio 5 (desafío): Metropolis para la densidad
+
+## Ejercicio 5
+
+::: {.ejercicio}
+1. Programe un algoritmo de **Metropolis** para el modelo Poisson–Gamma del ejercicio 2 (Magallanes). Trabaje con $u = \log\delta$ para evitar valores negativos: recuerde sumar el **jacobiano** a la log-posterior.
+2. Corra 4 cadenas de 5.000 iteraciones desde valores iniciales distintos y descarte las primeras 1.000.
+3. Compare la media posterior con la solución exacta $(a + \sum Y_i)/(b + \sum V_i)$ y calcule $\hat R$ y el ESS.
+4. Pruebe los tamaños de paso 0,001, 0,01 y 0,05. ¿Cómo cambian la tasa de aceptación y el ESS?
+:::
+
+## Recordatorio: el jacobiano
+
+Si se muestrea $u = \log\delta$ en lugar de $\delta$, la densidad de $u$ es
+
+$$
+p_U(u \mid \mathbf{Y}) = p_\delta\big(e^{u} \mid \mathbf{Y}\big)\left|\frac{d\delta}{du}\right| = p_\delta\big(e^{u} \mid \mathbf{Y}\big)\,e^{u},
+$$
+
+y en escala logarítmica
+
+$$
+\log p_U(u \mid \mathbf{Y}) = \log p(\mathbf{Y} \mid e^u) + \log p(e^u) + u + \text{constante}.
+$$
+
+Olvidar el término $+u$ produce una cadena que converge a una distribución **equivocada**.
+
+## Solución 5: el algoritmo
+
+```{r ej5}
+```
+
+## Solución 5: tamaño del paso
+
+```{r ej5-resultado}
+```
+
+## Solución 5: resultados y diagnóstico
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("ej5", digits = 4)
+```
+
+::: {.caja}
+Compare la tabla: un paso pequeño puede avanzar lentamente y uno grande puede producir muchos rechazos. Una aceptación alta no garantiza buena exploración. Se reportan ESS_bulk y ESS_tail y la aceptación de las cuatro cadenas retenidas; descartar 1.000 iteraciones no garantiza convergencia. Stan adapta su algoritmo durante el calentamiento.
+:::
+
+# Cierre
+
+## Control de los ajustes en Stan
+
+```{r, eval = TRUE, echo = FALSE}
+diagnostico <- readRDS("resultados/diagnostico_ajustes.rds")
+nuts <- readRDS("resultados/diagnostico_nuts.rds")
+control <- diagnostico |>
+  dplyr::group_by(fit) |>
+  dplyr::summarise(Rhat_max = max(rhat), ESS_bulk_min = min(ess_bulk),
+                   ESS_tail_min = min(ess_tail), .groups = "drop") |>
+  dplyr::left_join(nuts, by = "fit")
+tba(control, digits = 3, font_size = 20)
+```
+
+Para cuatro cadenas, use R-hat menor que 1,01 y ESS_bulk/ESS_tail de al menos 400 como guía, junto a trazas, error Monte Carlo y controles de NUTS. Estos diagnósticos evalúan el muestreo; el chequeo predictivo evalúa aspectos del ajuste.
+
+## Para llevar
+
+- Los modelos conjugados permiten **verificar** que Stan entrega la posterior correcta.
+- Las **funciones de parámetros** (diferencias, razones, probabilidades) se obtienen directamente de los draws.
+- Una única densidad por región **no reproduce** la variabilidad entre segmentos: hay **sobredispersión**.
+- La densidad y su variabilidad difieren entre **zonas**: la zona es una covariable natural del modelo.
+- Un algoritmo MCMC mal ajustado converge lento: hay que revisar $\hat R$, ESS y la tasa de aceptación.
+
+::: {.caja}
+**Mañana:** modelos de regresión bayesianos, primero para $\log\delta_i$ con covariables satelitales y luego un modelo Poisson con *offset* de viviendas.
+:::
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)
