@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="Bayes_uniparametrico_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Bayes_uniparametrico_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Bayes_uniparametrico_files/libs/quarto-html/popper.min.js"></script>
+<script src="Bayes_uniparametrico_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Bayes_uniparametrico_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Bayes_uniparametrico_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Bayes_uniparametrico_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.36">
+
+  <meta name="author" content="Andrés Gutiérrez · Stalyn Guerrero">
+  <title>Taller de fortalecimiento de capacidades en modelación estadística de población en Chile</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="Bayes_uniparametrico_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Bayes_uniparametrico_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+  <link rel="stylesheet" href="Bayes_uniparametrico_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link rel="stylesheet" href="styles.css">
+  <link href="Bayes_uniparametrico_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Bayes_uniparametrico_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Bayes_uniparametrico_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Bayes_uniparametrico_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <script src="Bayes_uniparametrico_files/libs/kePrint-0.0.1/kePrint.js"></script>
+
+  <link href="Bayes_uniparametrico_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Taller de fortalecimiento de capacidades en modelación estadística de población en Chile</h1>
+  <p class="subtitle">Fundamentos de la inferencia bayesiana I: modelos uniparamétricos</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Andrés Gutiérrez · Stalyn Guerrero 
+</div>
+        <p class="quarto-title-affiliation">
+            CEPAL · UNFPA América Latina y el Caribe · INE Chile
+          </p>
+    </div>
+</div>
+
+  <p class="date">Invalid Date</p>
+</section>
+<section id="qué-aprenderemos-en-esta-sesión" class="slide level2">
+<h2>Qué aprenderemos en esta sesión</h2>
+<ol type="1">
+<li>Identificar el parámetro, la verosimilitud y la previa.</li>
+<li>Derivar y resumir una posterior conjugada.</li>
+<li>Distinguir la incertidumbre del parámetro de la incertidumbre predictiva.</li>
+<li>Relacionar la solución analítica con una primera implementación en Stan.</li>
+</ol>
+<p><strong>Recorrido:</strong> proporciones → personas por vivienda → media de logaritmos.</p>
+<aside class="notes">
+<p>Las derivaciones extensas y el código Stan sirven de apoyo; la ejecución guiada se retoma en la práctica de la tarde.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section>
+<section id="la-regla-de-bayes" class="title-slide slide level1 center">
+<h1>La regla de Bayes</h1>
+
+</section>
+<section id="del-parámetro-a-los-datos-y-de-vuelta" class="slide level2">
+<h2>Del parámetro a los datos y de vuelta</h2>
+<p>Para inferir sobre un parámetro <span class="math inline">\(\theta\)</span> se define la distribución <strong>conjunta</strong> de los datos <span class="math inline">\(\mathbf{Y} = (Y_1, \dots, Y_n)\)</span> y del parámetro:</p>
+<p><span class="math display">\[
+p(\theta, \mathbf{Y}) = p(\theta)\, p(\mathbf{Y} \mid \theta).
+\]</span></p>
+<ul>
+<li><span class="math inline">\(p(\theta)\)</span>: <strong>distribución previa</strong>; lo que se sabe (o se supone) de <span class="math inline">\(\theta\)</span> antes de ver los datos.</li>
+<li><span class="math inline">\(p(\mathbf{Y} \mid \theta)\)</span>: <strong>verosimilitud</strong>; cómo se generan los datos si <span class="math inline">\(\theta\)</span> fuera conocido. Con observaciones independientes, <span class="math inline">\(p(\mathbf{Y} \mid \theta) = \prod_{i=1}^n p(Y_i \mid \theta)\)</span>.</li>
+</ul>
+<p>Condicionando en los datos observados:</p>
+<p><span class="math display">\[
+p(\theta \mid \mathbf{Y}) = \frac{p(\theta, \mathbf{Y})}{p(\mathbf{Y})} = \frac{p(\mathbf{Y} \mid \theta)\,p(\theta)}{\int p(\mathbf{Y} \mid \theta)\,p(\theta)\,d\theta}.
+\]</span></p>
+</section>
+<section id="proporcionalidad-y-núcleo" class="slide level2">
+<h2>Proporcionalidad y núcleo</h2>
+<p>El denominador <span class="math inline">\(p(\mathbf{Y})\)</span> no depende de <span class="math inline">\(\theta\)</span>: es la constante que hace que la posterior integre 1. Por eso se escribe</p>
+<p><span class="math display">\[
+p(\theta \mid \mathbf{Y}) \;\propto\; p(\mathbf{Y} \mid \theta)\,p(\theta).
+\]</span></p>
+<div class="caja">
+<p><strong>Estrategia de cálculo</strong>: se multiplican verosimilitud y previa, se eliminan los factores que no dependen de <span class="math inline">\(\theta\)</span> y se busca en la expresión que queda —el <strong>núcleo</strong>— la forma de una distribución conocida. Si la previa y la posterior son de la misma familia, la previa es <strong>conjugada</strong>.</p>
+</div>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Distribución</th>
+<th>Núcleo en <span class="math inline">\(\theta\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\text{Beta}(a, b)\)</span></td>
+<td><span class="math inline">\(\theta^{a-1}(1-\theta)^{b-1}\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\text{Gamma}(a, b)\)</span></td>
+<td><span class="math inline">\(\theta^{a-1}e^{-b\theta}\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(N(\mu, \tau^2)\)</span></td>
+<td><span class="math inline">\(\exp\!\big(-\tfrac{1}{2\tau^2}(\theta-\mu)^2\big)\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="resumir-la-posterior" class="slide level2">
+<h2>Resumir la posterior</h2>
+<p>La posterior es una distribución completa. Para reportar un valor puntual se elige el que minimiza la <strong>pérdida esperada posterior</strong>:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Pérdida <span class="math inline">\(L(\theta, \hat\theta)\)</span></th>
+<th>Estimador de Bayes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cuadrática: <span class="math inline">\((\theta - \hat\theta)^2\)</span></td>
+<td>Media posterior <span class="math inline">\(E(\theta \mid \mathbf{Y})\)</span></td>
+</tr>
+<tr class="even">
+<td>Absoluta: <span class="math inline">\(\lvert\theta - \hat\theta\rvert\)</span></td>
+<td>Mediana posterior</td>
+</tr>
+<tr class="odd">
+<td>0–1, parámetro discreto</td>
+<td>Moda posterior (máximo a posteriori)</td>
+</tr>
+</tbody>
+</table>
+<p>Por ejemplo, con pérdida cuadrática,</p>
+<p><span class="math display">\[
+\frac{d}{d\hat\theta}\,E\big[(\theta - \hat\theta)^2 \mid \mathbf{Y}\big] = -2\big(E(\theta \mid \mathbf{Y}) - \hat\theta\big) = 0
+\;\Rightarrow\; \hat\theta = E(\theta \mid \mathbf{Y}).
+\]</span></p>
+<p>Para un parámetro continuo, la pérdida 0–1 exacta no selecciona la moda: cada punto tiene probabilidad cero. El MAP se interpreta mediante vecindades pequeñas, bajo condiciones de regularidad.</p>
+</section>
+<section id="intervalos-de-credibilidad" class="slide level2">
+<h2>Intervalos de credibilidad</h2>
+<p>Un intervalo <span class="math inline">\([a, b]\)</span> con</p>
+<p><span class="math display">\[
+\Pr(a \le \theta \le b \mid \mathbf{Y}) = \int_a^b p(\theta \mid \mathbf{Y})\,d\theta = 1 - \alpha
+\]</span></p>
+<p>es un intervalo de credibilidad al <span class="math inline">\(100(1-\alpha)\%\)</span>.</p>
+<ul>
+<li><strong>Por cuantiles</strong>: <span class="math inline">\(a\)</span> y <span class="math inline">\(b\)</span> son los cuantiles <span class="math inline">\(\alpha/2\)</span> y <span class="math inline">\(1 - \alpha/2\)</span> de la posterior. Es el que se usa en el taller.</li>
+<li><strong>De máxima densidad</strong> (HPD): conjunto que reúne los valores de mayor densidad hasta acumular probabilidad <span class="math inline">\(1-\alpha\)</span>; puede ser disjunto si la posterior es multimodal.</li>
+</ul>
+<div class="caja">
+<p>A diferencia del intervalo de confianza, la afirmación es <strong>directa</strong>: dados los datos, la probabilidad de que <span class="math inline">\(\theta\)</span> esté en el intervalo es <span class="math inline">\(1 - \alpha\)</span>.</p>
+</div>
+</section>
+<section id="la-distribución-predictiva-posterior" class="slide level2">
+<h2>La distribución predictiva posterior</h2>
+<p>Para un dato nuevo <span class="math inline">\(\tilde Y\)</span>, independiente de <span class="math inline">\(\mathbf{Y}\)</span> dado <span class="math inline">\(\theta\)</span>:</p>
+<p><span class="math display">\[
+p(\tilde y \mid \mathbf{Y}) = \int p(\tilde y \mid \theta)\,p(\theta \mid \mathbf{Y})\,d\theta.
+\]</span></p>
+<ul>
+<li>Combina dos fuentes de incertidumbre: la del <strong>dato</strong> dado <span class="math inline">\(\theta\)</span> y la del <strong>parámetro</strong> dado lo observado.</li>
+<li>Con draws <span class="math inline">\(\theta^{(1)}, \dots, \theta^{(S)}\)</span> de la posterior se simula fácilmente: <span class="math inline">\(\tilde y^{(s)} \sim p(\tilde y \mid \theta^{(s)})\)</span>.</li>
+<li>Es la base de la <strong>predicción de población</strong> y del <strong>chequeo predictivo posterior</strong>: si el modelo es bueno, datos simulados con él deben parecerse a los observados.</li>
+</ul>
+</section>
+<section id="datos-de-la-sesión-segmentos-de-aysén" class="slide level2">
+<h2>Datos de la sesión: segmentos de Aysén</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>segmentos <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/segmentos_aysen.rds"</span>)</span>
+<span id="cb1-2"><a href=""></a></span>
+<span id="cb1-3"><a href=""></a>tabla_datos <span class="ot">&lt;-</span> segmentos <span class="sc">%&gt;%</span></span>
+<span id="cb1-4"><a href=""></a>  <span class="fu">count</span>(zona, clasificacion_cobertura) <span class="sc">%&gt;%</span></span>
+<span id="cb1-5"><a href=""></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> clasificacion_cobertura, <span class="at">values_from =</span> n)</span>
+<span id="cb1-6"><a href=""></a>tabla_datos</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">zona</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Completa</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Parcial</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Incompleta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">aldea</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">42</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rural</td>
+<td style="text-align: right;">164</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">205</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">urbana</td>
+<td style="text-align: right;">659</td>
+<td style="text-align: right;">556</td>
+<td style="text-align: right;">166</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li>2.085 segmentos censales de la región de Aysén.</li>
+<li><code>n_per</code>: personas censadas; <code>n_vpo</code>: viviendas particulares ocupadas; <code>delta</code> = <code>n_per / n_vpo</code>.</li>
+</ul>
+</section></section>
+<section>
+<section id="modelo-bernoullibeta" class="title-slide slide level1 center">
+<h1>Modelo Bernoulli–Beta</h1>
+
+</section>
+<section id="planteamiento" class="slide level2">
+<h2>Planteamiento</h2>
+<p><strong>Pregunta didáctica:</strong> ¿cómo aprender sobre una probabilidad común <span class="math inline">\(\theta\)</span> de cobertura completa bajo un modelo Bernoulli?</p>
+<p>La proporción de cobertura completa del conjunto observado de Aysén se calcula directamente. La posterior describe incertidumbre sobre el parámetro del modelo para segmentos comparables; no es incertidumbre sobre ese porcentaje ya observado.</p>
+<p>Sea <span class="math inline">\(Y_i = 1\)</span> si el segmento <span class="math inline">\(i\)</span> tuvo cobertura completa y <span class="math inline">\(0\)</span> en otro caso, con <span class="math inline">\(Y_i \mid \theta \sim \text{Bernoulli}(\theta)\)</span>:</p>
+<p><span class="math display">\[
+p(Y_i \mid \theta) = \theta^{Y_i}(1 - \theta)^{1 - Y_i}, \qquad Y_i \in \{0, 1\}.
+\]</span></p>
+<p>Con <span class="math inline">\(n\)</span> segmentos independientes y <span class="math inline">\(s = \sum_i Y_i\)</span> segmentos completos, la verosimilitud es</p>
+<p><span class="math display">\[
+p(\mathbf{Y} \mid \theta) = \prod_{i=1}^n \theta^{Y_i}(1 - \theta)^{1 - Y_i} = \theta^{s}(1 - \theta)^{n - s}.
+\]</span></p>
+<p>Solo depende de los datos a través de <span class="math inline">\(s\)</span>: <span class="math inline">\(s\)</span> es un <strong>estadístico suficiente</strong>.</p>
+</section>
+<section id="la-previa-beta" class="slide level2">
+<h2>La previa Beta</h2>
+<p><span class="math inline">\(\theta \in [0, 1]\)</span>, así que una previa natural es la Beta:</p>
+<p><span class="math display">\[
+p(\theta) = \frac{\theta^{a-1}(1-\theta)^{b-1}}{B(a, b)}, \qquad
+E(\theta) = \frac{a}{a+b}, \qquad
+\text{Var}(\theta) = \frac{ab}{(a+b)^2(a+b+1)}.
+\]</span></p>
+<ul>
+<li><span class="math inline">\(a/(a+b)\)</span> controla la media previa y <span class="math inline">\(a+b\)</span> su concentración. La analogía con pseudoconteos ayuda a entender la actualización; no son observaciones reales.</li>
+<li><span class="math inline">\(\text{Beta}(1, 1)\)</span> es la uniforme en <span class="math inline">\([0, 1]\)</span>: una previa uniforme en esta escala; no es neutral frente a toda reparametrización.</li>
+<li><span class="math inline">\(\text{Beta}(2, 8)\)</span> concentra la masa cerca de 0,2; <span class="math inline">\(\text{Beta}(8, 2)\)</span> cerca de 0,8.</li>
+</ul>
+</section>
+<section id="derivación-de-la-posterior" class="slide level2">
+<h2>Derivación de la posterior</h2>
+<p><span class="math display">\[
+\begin{aligned}
+p(\theta \mid \mathbf{Y}) &amp;\propto p(\mathbf{Y} \mid \theta)\,p(\theta) \\
+&amp;\propto \theta^{s}(1 - \theta)^{n - s} \cdot \theta^{a-1}(1-\theta)^{b-1} \\
+&amp;= \theta^{(a + s) - 1}(1-\theta)^{(b + n - s) - 1},
+\end{aligned}
+\]</span></p>
+<p>que es el núcleo de una Beta. Por lo tanto</p>
+<p><span class="math display">\[
+\theta \mid \mathbf{Y} \sim \text{Beta}\big(a + s,\; b + n - s\big).
+\]</span></p>
+<div class="caja">
+<p>La actualización es aritmética: se <strong>suman</strong> los éxitos observados a <span class="math inline">\(a\)</span> y los fracasos observados a <span class="math inline">\(b\)</span>.</p>
+</div>
+</section>
+<section id="la-media-posterior-es-un-promedio-ponderado" class="slide level2">
+<h2>La media posterior es un promedio ponderado</h2>
+<p><span class="math display">\[
+E(\theta \mid \mathbf{Y}) = \frac{a + s}{a + b + n}
+= \underbrace{\frac{a + b}{a + b + n}}_{\text{peso de la previa}}\cdot\frac{a}{a + b}
++ \underbrace{\frac{n}{a + b + n}}_{\text{peso de los datos}}\cdot\frac{s}{n}.
+\]</span></p>
+<ul>
+<li>Promedia la <strong>media previa</strong> <span class="math inline">\(a/(a+b)\)</span> y la <strong>proporción muestral</strong> <span class="math inline">\(s/n\)</span>.</li>
+<li>El peso de los datos, <span class="math inline">\(n/(a + b + n)\)</span>, tiende a 1 cuando <span class="math inline">\(n\)</span> crece: con muchos datos la previa pierde influencia.</li>
+<li>La varianza posterior decrece aproximadamente como <span class="math inline">\(\hat\theta(1-\hat\theta)/n\)</span>.</li>
+</ul>
+</section>
+<section id="solución-analítica" class="slide level2">
+<h2>Solución analítica</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a>y <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(segmentos<span class="sc">$</span>clasificacion_cobertura <span class="sc">==</span> <span class="st">"Completa"</span>)</span>
+<span id="cb2-2"><a href=""></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
+<span id="cb2-3"><a href=""></a>a <span class="ot">&lt;-</span> <span class="dv">1</span>; b <span class="ot">&lt;-</span> <span class="dv">1</span>                          <span class="co"># previa uniforme Beta(1, 1)</span></span>
+<span id="cb2-4"><a href=""></a></span>
+<span id="cb2-5"><a href=""></a>a_post <span class="ot">&lt;-</span> a <span class="sc">+</span> <span class="fu">sum</span>(y)</span>
+<span id="cb2-6"><a href=""></a>b_post <span class="ot">&lt;-</span> b <span class="sc">+</span> n <span class="sc">-</span> <span class="fu">sum</span>(y)</span>
+<span id="cb2-7"><a href=""></a></span>
+<span id="cb2-8"><a href=""></a>bern_analitica <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb2-9"><a href=""></a>  <span class="at">n =</span> n, <span class="at">completos =</span> <span class="fu">sum</span>(y),</span>
+<span id="cb2-10"><a href=""></a>  <span class="at">media_post =</span> a_post <span class="sc">/</span> (a_post <span class="sc">+</span> b_post),</span>
+<span id="cb2-11"><a href=""></a>  <span class="at">desv_post =</span> <span class="fu">sqrt</span>(a_post <span class="sc">*</span> b_post <span class="sc">/</span> ((a_post <span class="sc">+</span> b_post)<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (a_post <span class="sc">+</span> b_post <span class="sc">+</span> <span class="dv">1</span>))),</span>
+<span id="cb2-12"><a href=""></a>  <span class="at">ic_025 =</span> <span class="fu">qbeta</span>(<span class="fl">0.025</span>, a_post, b_post),</span>
+<span id="cb2-13"><a href=""></a>  <span class="at">ic_975 =</span> <span class="fu">qbeta</span>(<span class="fl">0.975</span>, a_post, b_post)</span>
+<span id="cb2-14"><a href=""></a>)</span>
+<span id="cb2-15"><a href=""></a>bern_analitica</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">n</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">completos</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media_post</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">desv_post</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ic_025</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ic_975</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2.085</td>
+<td style="text-align: right;">915</td>
+<td style="text-align: right;">0,4389</td>
+<td style="text-align: right;">0,0109</td>
+<td style="text-align: right;">0,4177</td>
+<td style="text-align: right;">0,4602</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="influencia-de-la-previa" class="slide level2">
+<h2>Influencia de la previa</h2>
+
+<img data-src="resultados/grafico_previas.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%"><p>Con 20 segmentos las tres previas llevan a posteriores distintas; con 2.085 segmentos las tres posteriores prácticamente coinciden.</p>
+</section>
+<section id="el-peso-de-los-datos" class="slide level2">
+<h2>El peso de los datos</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">previa</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">datos</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media_posterior</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">peso_datos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Beta(1, 1): uniforme</td>
+<td style="text-align: left;">20 segmentos</td>
+<td style="text-align: right;">0,364</td>
+<td style="text-align: right;">0,909</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Beta(1, 1): uniforme</td>
+<td style="text-align: left;">todos</td>
+<td style="text-align: right;">0,439</td>
+<td style="text-align: right;">0,999</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Beta(2, 8): pesimista</td>
+<td style="text-align: left;">20 segmentos</td>
+<td style="text-align: right;">0,300</td>
+<td style="text-align: right;">0,667</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Beta(2, 8): pesimista</td>
+<td style="text-align: left;">todos</td>
+<td style="text-align: right;">0,438</td>
+<td style="text-align: right;">0,995</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Beta(8, 2): optimista</td>
+<td style="text-align: left;">20 segmentos</td>
+<td style="text-align: right;">0,500</td>
+<td style="text-align: right;">0,667</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Beta(8, 2): optimista</td>
+<td style="text-align: left;">todos</td>
+<td style="text-align: right;">0,441</td>
+<td style="text-align: right;">0,995</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>El peso de los datos es <span class="math inline">\(n / (a + b + n)\)</span>: con 20 segmentos y la previa <span class="math inline">\(\text{Beta}(8, 2)\)</span> es 0,67; con todos los segmentos supera 0,99.</p>
+</section>
+<section id="el-mismo-modelo-en-stan" class="slide level2">
+<h2>El mismo modelo en Stan</h2>
+<p>Stan no necesita conjugación: se declaran datos, parámetros y modelo, y Stan obtiene <strong>muestras</strong> de la posterior con MCMC.</p>
+<div class="columns">
+<div class="column" style="width:46%;">
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb3-1"><a href=""></a><span class="co">// Modelo Bernoulli-Beta: proporcion theta de segmentos con cobertura completa</span></span>
+<span id="cb3-2"><a href=""></a><span class="kw">data</span> {</span>
+<span id="cb3-3"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n;                   <span class="co">// numero de segmentos</span></span>
+<span id="cb3-4"><a href=""></a>  <span class="dt">array</span>[n] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">1</span>&gt; y; <span class="co">// 1 = cobertura completa</span></span>
+<span id="cb3-5"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; a;                  <span class="co">// hiperparametros de la previa Beta(a, b)</span></span>
+<span id="cb3-6"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; b;</span>
+<span id="cb3-7"><a href=""></a>}</span>
+<span id="cb3-8"><a href=""></a><span class="kw">parameters</span> {</span>
+<span id="cb3-9"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">1</span>&gt; theta;</span>
+<span id="cb3-10"><a href=""></a>}</span>
+<span id="cb3-11"><a href=""></a><span class="kw">model</span> {</span>
+<span id="cb3-12"><a href=""></a>  theta ~ beta(a, b);   <span class="co">// distribucion previa</span></span>
+<span id="cb3-13"><a href=""></a>  y ~ bernoulli(theta); <span class="co">// verosimilitud</span></span>
+<span id="cb3-14"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div><div class="column" style="width:54%;">
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>modelo_bern <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/bernoulli_beta.stan"</span>)</span>
+<span id="cb4-2"><a href=""></a></span>
+<span id="cb4-3"><a href=""></a>datos_bern <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">n =</span> n, <span class="at">y =</span> y, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">b =</span> <span class="dv">1</span>)</span>
+<span id="cb4-4"><a href=""></a></span>
+<span id="cb4-5"><a href=""></a>fit_bern <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
+<span id="cb4-6"><a href=""></a>  modelo_bern, <span class="at">data =</span> datos_bern,</span>
+<span id="cb4-7"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb4-8"><a href=""></a>  <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="cb4-9"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div></div>
+</section>
+<section id="resultados-de-stan-frente-a-la-solución-exacta" class="slide level2">
+<h2>Resultados de Stan frente a la solución exacta</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>resumen_bern <span class="ot">&lt;-</span> <span class="fu">resumen_stan</span>(fit_bern, <span class="st">"theta"</span>)</span>
+<span id="cb5-2"><a href=""></a>resumen_bern</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">parametro</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">desv_est</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q2.5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mediana</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q97.5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n_eff</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Rhat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">theta</td>
+<td style="text-align: right;">0,4387</td>
+<td style="text-align: right;">0,0111</td>
+<td style="text-align: right;">0,417</td>
+<td style="text-align: right;">0,4388</td>
+<td style="text-align: right;">0,4602</td>
+<td style="text-align: right;">1.451</td>
+<td style="text-align: right;">1,0037</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<img data-src="resultados/grafico_bern.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"></section>
+<section id="predictiva-la-distribución-beta-binomial" class="slide level2">
+<h2>Predictiva: la distribución Beta-Binomial</h2>
+<p>¿Cuántos de <span class="math inline">\(m\)</span> segmentos <strong>nuevos</strong> tendrían cobertura completa? Con <span class="math inline">\(\tilde K \mid \theta \sim \text{Binomial}(m, \theta)\)</span> y la posterior <span class="math inline">\(\text{Beta}(a', b')\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+p(\tilde k \mid \mathbf{Y}) &amp;= \int_0^1 \binom{m}{\tilde k}\theta^{\tilde k}(1-\theta)^{m - \tilde k}\,\frac{\theta^{a'-1}(1-\theta)^{b'-1}}{B(a', b')}\,d\theta \\
+&amp;= \binom{m}{\tilde k}\frac{B(\tilde k + a',\; m - \tilde k + b')}{B(a', b')},
+\end{aligned}
+\]</span></p>
+<p>la distribución <strong>Beta-Binomial</strong>. Su varianza, <span class="math inline">\(m\bar\theta(1-\bar\theta)\,\frac{a' + b' + m}{a' + b' + 1}\)</span> con <span class="math inline">\(\bar\theta = a'/(a'+b')\)</span>, es <strong>mayor</strong> que la de una Binomial con <span class="math inline">\(\theta\)</span> fijo: incorpora la incertidumbre de <span class="math inline">\(\theta\)</span>.</p>
+</section>
+<section id="predictiva-exacta-y-simulada" class="slide level2">
+<h2>Predictiva: exacta y simulada</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="co"># Predictiva: numero de segmentos completos entre m = 20 segmentos nuevos.</span></span>
+<span id="cb6-2"><a href=""></a><span class="co"># Exacta: Beta-Binomial(m, a_post, b_post). Simulada: Binomial(m, theta_s).</span></span>
+<span id="cb6-3"><a href=""></a>m <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb6-4"><a href=""></a>dbetabinom <span class="ot">&lt;-</span> <span class="cf">function</span>(k, m, a, b) <span class="fu">exp</span>(<span class="fu">lchoose</span>(m, k) <span class="sc">+</span> <span class="fu">lbeta</span>(k <span class="sc">+</span> a, m <span class="sc">-</span> k <span class="sc">+</span> b) <span class="sc">-</span> <span class="fu">lbeta</span>(a, b))</span>
+<span id="cb6-5"><a href=""></a>predictiva <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">k =</span> <span class="dv">0</span><span class="sc">:</span>m,</span>
+<span id="cb6-6"><a href=""></a>                     <span class="at">exacta =</span> <span class="fu">dbetabinom</span>(<span class="dv">0</span><span class="sc">:</span>m, m, a_post, b_post),</span>
+<span id="cb6-7"><a href=""></a>                     <span class="at">simulada =</span> <span class="fu">as.numeric</span>(<span class="fu">table</span>(<span class="fu">factor</span>(<span class="fu">rbinom</span>(<span class="fu">length</span>(theta_draws), m, theta_draws),</span>
+<span id="cb6-8"><a href=""></a>                                                        <span class="at">levels =</span> <span class="dv">0</span><span class="sc">:</span>m))) <span class="sc">/</span> <span class="fu">length</span>(theta_draws))</span>
+<span id="cb6-9"><a href=""></a>grafico_predictiva <span class="ot">&lt;-</span> predictiva <span class="sc">%&gt;%</span></span>
+<span id="cb6-10"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(k)) <span class="sc">+</span></span>
+<span id="cb6-11"><a href=""></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">y =</span> simulada), <span class="at">fill =</span> <span class="st">"#9ecae1"</span>) <span class="sc">+</span></span>
+<span id="cb6-12"><a href=""></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> exacta), <span class="at">colour =</span> <span class="st">"#c00000"</span>, <span class="at">size =</span> <span class="fl">2.5</span>) <span class="sc">+</span></span>
+<span id="cb6-13"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Segmentos completos entre 20 nuevos"</span>, <span class="at">y =</span> <span class="st">"Probabilidad"</span>,</span>
+<span id="cb6-14"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"Barras: simulación con los draws · Puntos: Beta-Binomial exacta"</span>)</span>
+<span id="cb6-15"><a href=""></a><span class="fu">guardar_figura</span>(grafico_predictiva, <span class="st">"grafico_predictiva_bern"</span>, <span class="at">alto =</span> <span class="fl">4.5</span>)</span>
+<span id="cb6-16"><a href=""></a></span>
+<span id="cb6-17"><a href=""></a><span class="co"># =============================================================================</span></span>
+<span id="cb6-18"><a href=""></a><span class="co"># Modelo Poisson-Gamma con exposicion</span></span>
+<span id="cb6-19"><a href=""></a><span class="co"># =============================================================================</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+<img data-src="resultados/grafico_predictiva_bern.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"></section></section>
+<section>
+<section id="modelo-poissongamma-con-exposición" class="title-slide slide level1 center">
+<h1>Modelo Poisson–Gamma con exposición</h1>
+
+</section>
+<section id="planteamiento-personas-por-vivienda" class="slide level2">
+<h2>Planteamiento: personas por vivienda</h2>
+<p>El parámetro de interés es la <strong>densidad</strong> <span class="math inline">\(\delta\)</span>: personas por vivienda particular ocupada. En los segmentos con cobertura completa,</p>
+<p><span class="math display">\[
+Y_i \mid \delta \sim \text{Poisson}(\delta\, V_i), \qquad
+p(Y_i \mid \delta) = \frac{(\delta V_i)^{Y_i} e^{-\delta V_i}}{Y_i!}.
+\]</span></p>
+<ul>
+<li><span class="math inline">\(V_i\)</span> es la <strong>exposición</strong>: un segmento con el doble de viviendas espera el doble de personas.</li>
+<li><span class="math inline">\(E(Y_i \mid \delta) = \text{Var}(Y_i \mid \delta) = \delta V_i\)</span>.</li>
+<li>Es el modelo más simple de población: <strong>una sola densidad</strong> para toda la región.</li>
+</ul>
+</section>
+<section id="la-verosimilitud-y-su-estadístico-suficiente" class="slide level2">
+<h2>La verosimilitud y su estadístico suficiente</h2>
+<p><span class="math display">\[
+p(\mathbf{Y} \mid \delta) = \prod_{i=1}^n \frac{(\delta V_i)^{Y_i} e^{-\delta V_i}}{Y_i!}
+= \underbrace{\prod_{i=1}^n \frac{V_i^{Y_i}}{Y_i!}}_{\text{no depende de } \delta}\;
+\delta^{\sum_i Y_i}\, e^{-\delta \sum_i V_i}.
+\]</span></p>
+<p>Como función de <span class="math inline">\(\delta\)</span>:</p>
+<p><span class="math display">\[
+p(\mathbf{Y} \mid \delta) \propto \delta^{T_Y} e^{-\delta T_V}, \qquad T_Y = \sum_i Y_i, \quad T_V = \sum_i V_i.
+\]</span></p>
+<p>Toda la información de los datos sobre <span class="math inline">\(\delta\)</span> está en el <strong>total de personas</strong> y el <strong>total de viviendas</strong>. Derivando el logaritmo, <span class="math inline">\(T_Y/\delta - T_V = 0\)</span>: el estimador de máxima verosimilitud es <span class="math inline">\(\hat\delta = T_Y / T_V\)</span>.</p>
+</section>
+<section id="la-previa-gamma" class="slide level2">
+<h2>La previa Gamma</h2>
+<p><span class="math display">\[
+p(\delta) = \frac{b^a}{\Gamma(a)}\,\delta^{a-1}e^{-b\delta}, \qquad
+E(\delta) = \frac{a}{b}, \qquad \text{Var}(\delta) = \frac{a}{b^2}.
+\]</span></p>
+<ul>
+<li>Usamos Gamma(<strong>shape</strong> <span class="math inline">\(a\)</span>, <strong>rate</strong> <span class="math inline">\(b\)</span>): en R, <code>rate = b</code>; en Stan, el segundo argumento también es la tasa. La media previa es <span class="math inline">\(a/b\)</span>.</li>
+<li><span class="math inline">\(\text{Gamma}(0{,}01; 0{,}01)\)</span>: media 1 y varianza 100; concentra mucha masa cerca de cero y tiene una cola larga. Su gran varianza no garantiza poca influencia en cualquier aplicación.</li>
+<li><span class="math inline">\(\text{Gamma}(30; 10)\)</span>: media 3 y desviación 0,55, <strong>informativa</strong>.</li>
+</ul>
+</section>
+<section id="derivación-de-la-posterior-1" class="slide level2">
+<h2>Derivación de la posterior</h2>
+<p><span class="math display">\[
+p(\delta \mid \mathbf{Y}) \propto \delta^{T_Y} e^{-\delta T_V}\cdot\delta^{a-1}e^{-b\delta}
+= \delta^{(a + T_Y) - 1}\,e^{-(b + T_V)\delta},
+\]</span></p>
+<p>el núcleo de una Gamma:</p>
+<p><span class="math display">\[
+\delta \mid \mathbf{Y} \sim \text{Gamma}\big(a + T_Y,\; b + T_V\big).
+\]</span></p>
+<p>Media como promedio ponderado:</p>
+<p><span class="math display">\[
+E(\delta \mid \mathbf{Y}) = \frac{a + T_Y}{b + T_V}
+= \frac{b}{b + T_V}\cdot\frac{a}{b} + \frac{T_V}{b + T_V}\cdot\frac{T_Y}{T_V}.
+\]</span></p>
+<div class="caja">
+<p>Con una previa vaga (<span class="math inline">\(a, b \to 0\)</span>), la media posterior es <span class="math inline">\(T_Y/T_V\)</span>: <strong>el total de personas sobre el total de viviendas</strong>. Es la semilla del modelo de población.</p>
+</div>
+</section>
+<section id="solución-analítica-1" class="slide level2">
+<h2>Solución analítica</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>completos <span class="ot">&lt;-</span> segmentos <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href=""></a>  <span class="fu">filter</span>(clasificacion_cobertura <span class="sc">==</span> <span class="st">"Completa"</span>, <span class="sc">!</span>excluido_colectivo, n_vpo <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb7-3"><a href=""></a></span>
+<span id="cb7-4"><a href=""></a>a <span class="ot">&lt;-</span> <span class="fl">0.01</span>; b <span class="ot">&lt;-</span> <span class="fl">0.01</span>                  <span class="co"># previa vaga: media 1, varianza 100</span></span>
+<span id="cb7-5"><a href=""></a>a_post <span class="ot">&lt;-</span> a <span class="sc">+</span> <span class="fu">sum</span>(completos<span class="sc">$</span>n_per)</span>
+<span id="cb7-6"><a href=""></a>b_post <span class="ot">&lt;-</span> b <span class="sc">+</span> <span class="fu">sum</span>(completos<span class="sc">$</span>n_vpo)</span>
+<span id="cb7-7"><a href=""></a></span>
+<span id="cb7-8"><a href=""></a>pg_analitica <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb7-9"><a href=""></a>  <span class="at">segmentos =</span> <span class="fu">nrow</span>(completos),</span>
+<span id="cb7-10"><a href=""></a>  <span class="at">personas =</span> <span class="fu">sum</span>(completos<span class="sc">$</span>n_per), <span class="at">viviendas =</span> <span class="fu">sum</span>(completos<span class="sc">$</span>n_vpo),</span>
+<span id="cb7-11"><a href=""></a>  <span class="at">media_post =</span> a_post <span class="sc">/</span> b_post, <span class="at">desv_post =</span> <span class="fu">sqrt</span>(a_post) <span class="sc">/</span> b_post,</span>
+<span id="cb7-12"><a href=""></a>  <span class="at">ic_025 =</span> <span class="fu">qgamma</span>(<span class="fl">0.025</span>, a_post, b_post),</span>
+<span id="cb7-13"><a href=""></a>  <span class="at">ic_975 =</span> <span class="fu">qgamma</span>(<span class="fl">0.975</span>, a_post, b_post)</span>
+<span id="cb7-14"><a href=""></a>)</span>
+<span id="cb7-15"><a href=""></a>pg_analitica</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">segmentos</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">personas</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">viviendas</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media_post</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">desv_post</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ic_025</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ic_975</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">694</td>
+<td style="text-align: right;">33.068</td>
+<td style="text-align: right;">13.224</td>
+<td style="text-align: right;">2,5006</td>
+<td style="text-align: right;">0,0138</td>
+<td style="text-align: right;">2,4737</td>
+<td style="text-align: right;">2,5276</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="sensibilidad-a-la-previa" class="slide level2">
+<h2>Sensibilidad a la previa</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>sensibilidad <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">previa =</span> <span class="fu">c</span>(<span class="st">"Gamma(0,01; 0,01): vaga"</span>, <span class="st">"Gamma(30; 10): media 3"</span>,</span>
+<span id="cb8-2"><a href=""></a>                                  <span class="st">"Gamma(300; 100): media 3, muy informativa"</span>, <span class="st">"Gamma(2; 1): media 2"</span>),</span>
+<span id="cb8-3"><a href=""></a>                       <span class="at">a =</span> <span class="fu">c</span>(<span class="fl">0.01</span>, <span class="dv">30</span>, <span class="dv">300</span>, <span class="dv">2</span>), <span class="at">b =</span> <span class="fu">c</span>(<span class="fl">0.01</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">media_previa =</span> a <span class="sc">/</span> b,</span>
+<span id="cb8-5"><a href=""></a>         <span class="at">media_posterior =</span> (a <span class="sc">+</span> <span class="fu">sum</span>(completos<span class="sc">$</span>n_per)) <span class="sc">/</span> (b <span class="sc">+</span> <span class="fu">sum</span>(completos<span class="sc">$</span>n_vpo)),</span>
+<span id="cb8-6"><a href=""></a>         <span class="at">peso_datos =</span> <span class="fu">sum</span>(completos<span class="sc">$</span>n_vpo) <span class="sc">/</span> (b <span class="sc">+</span> <span class="fu">sum</span>(completos<span class="sc">$</span>n_vpo)))</span>
+<span id="cb8-7"><a href=""></a><span class="fu">guardar</span>(<span class="fu">select</span>(sensibilidad, <span class="sc">-</span>a, <span class="sc">-</span>b), <span class="st">"tabla_sensibilidad"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">previa</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media_previa</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media_posterior</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">peso_datos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Gamma(0,01; 0,01): vaga</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2,5006</td>
+<td style="text-align: right;">1,0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gamma(30; 10): media 3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2,5010</td>
+<td style="text-align: right;">0,9992</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gamma(300; 100): media 3, muy informativa</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2,5044</td>
+<td style="text-align: right;">0,9925</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gamma(2; 1): media 2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2,5006</td>
+<td style="text-align: right;">0,9999</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Compare las medias posteriores y el peso de los datos en la tabla. La influencia de cada previa depende de su tasa relativa al total de viviendas observadas.</p>
+</section>
+<section id="ajuste-en-stan" class="slide level2">
+<h2>Ajuste en Stan</h2>
+<div class="columns">
+<div class="column" style="width:48%;">
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb9-1"><a href=""></a><span class="co">// Modelo Poisson-Gamma con exposicion: personas por vivienda ocupada</span></span>
+<span id="cb9-2"><a href=""></a><span class="kw">data</span> {</span>
+<span id="cb9-3"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n;              <span class="co">// numero de segmentos</span></span>
+<span id="cb9-4"><a href=""></a>  <span class="dt">array</span>[n] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; y;     <span class="co">// personas censadas</span></span>
+<span id="cb9-5"><a href=""></a>  <span class="dt">vector</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt;[n] v;        <span class="co">// viviendas particulares ocupadas (exposicion)</span></span>
+<span id="cb9-6"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; a;             <span class="co">// previa Gamma(a, b) para delta</span></span>
+<span id="cb9-7"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; b;</span>
+<span id="cb9-8"><a href=""></a>}</span>
+<span id="cb9-9"><a href=""></a><span class="kw">parameters</span> {</span>
+<span id="cb9-10"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; delta;         <span class="co">// personas por vivienda</span></span>
+<span id="cb9-11"><a href=""></a>}</span>
+<span id="cb9-12"><a href=""></a><span class="kw">model</span> {</span>
+<span id="cb9-13"><a href=""></a>  delta ~ gamma(a, b);</span>
+<span id="cb9-14"><a href=""></a>  y ~ poisson(delta * v);      <span class="co">// E(Y_i) = delta * V_i</span></span>
+<span id="cb9-15"><a href=""></a>}</span>
+<span id="cb9-16"><a href=""></a><span class="kw">generated quantities</span> {</span>
+<span id="cb9-17"><a href=""></a>  <span class="co">// Prediccion para un segmento nuevo de 50 viviendas</span></span>
+<span id="cb9-18"><a href=""></a>  <span class="dt">int</span> y_nuevo = poisson_rng(delta * <span class="dv">50</span>);</span>
+<span id="cb9-19"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div><div class="column" style="width:52%;">
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>modelo_pg <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/poisson_gamma.stan"</span>)</span>
+<span id="cb10-2"><a href=""></a></span>
+<span id="cb10-3"><a href=""></a>datos_pg <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb10-4"><a href=""></a>  <span class="at">n =</span> <span class="fu">nrow</span>(completos),</span>
+<span id="cb10-5"><a href=""></a>  <span class="at">y =</span> completos<span class="sc">$</span>n_per,</span>
+<span id="cb10-6"><a href=""></a>  <span class="at">v =</span> completos<span class="sc">$</span>n_vpo,</span>
+<span id="cb10-7"><a href=""></a>  <span class="at">a =</span> <span class="fl">0.01</span>, <span class="at">b =</span> <span class="fl">0.01</span></span>
+<span id="cb10-8"><a href=""></a>)</span>
+<span id="cb10-9"><a href=""></a></span>
+<span id="cb10-10"><a href=""></a>fit_pg <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
+<span id="cb10-11"><a href=""></a>  modelo_pg, <span class="at">data =</span> datos_pg,</span>
+<span id="cb10-12"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb10-13"><a href=""></a>  <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="cb10-14"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>resumen_pg <span class="ot">&lt;-</span> <span class="fu">resumen_stan</span>(fit_pg, <span class="fu">c</span>(<span class="st">"delta"</span>, <span class="st">"y_nuevo"</span>))</span>
+<span id="cb11-2"><a href=""></a>resumen_pg</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="font-size: 17px; width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">parametro</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">desv_est</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q2.5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mediana</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q97.5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n_eff</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Rhat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">delta</td>
+<td style="text-align: right;">2,501</td>
+<td style="text-align: right;">0,013</td>
+<td style="text-align: right;">2,475</td>
+<td style="text-align: right;">2,501</td>
+<td style="text-align: right;">2,527</td>
+<td style="text-align: right;">1.178</td>
+<td style="text-align: right;">1,001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">y_nuevo</td>
+<td style="text-align: right;">125,159</td>
+<td style="text-align: right;">11,177</td>
+<td style="text-align: right;">104,000</td>
+<td style="text-align: right;">125,000</td>
+<td style="text-align: right;">148,000</td>
+<td style="text-align: right;">3.905</td>
+<td style="text-align: right;">0,999</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div></div>
+</section>
+<section id="predictiva-la-distribución-binomial-negativa" class="slide level2">
+<h2>Predictiva: la distribución Binomial Negativa</h2>
+<p>Para un segmento nuevo con <span class="math inline">\(\tilde V\)</span> viviendas, <span class="math inline">\(\tilde Y \mid \delta \sim \text{Poisson}(\delta\tilde V)\)</span> y <span class="math inline">\(\delta \mid \mathbf{Y} \sim \text{Gamma}(a', b')\)</span>:</p>
+<p><span class="math display">\[
+p(\tilde y \mid \mathbf{Y}) = \int_0^\infty \frac{(\delta\tilde V)^{\tilde y}e^{-\delta\tilde V}}{\tilde y!}\,\frac{b'^{a'}}{\Gamma(a')}\delta^{a'-1}e^{-b'\delta}\,d\delta
+= \frac{\Gamma(a' + \tilde y)}{\tilde y!\,\Gamma(a')}\left(\frac{b'}{b' + \tilde V}\right)^{a'}\left(\frac{\tilde V}{b' + \tilde V}\right)^{\tilde y},
+\]</span></p>
+<p>una <strong>Binomial Negativa</strong> con</p>
+<p><span class="math display">\[
+E(\tilde Y \mid \mathbf{Y}) = \tilde V\frac{a'}{b'}, \qquad
+\text{Var}(\tilde Y \mid \mathbf{Y}) = \underbrace{\tilde V\frac{a'}{b'}}_{\text{Poisson}} + \underbrace{\tilde V^2\frac{a'}{b'^2}}_{\text{incertidumbre de } \delta}.
+\]</span></p>
+<p>La razón entre el segundo término y el primero es <span class="math inline">\(\tilde V/b'\)</span>: la incertidumbre del parámetro es pequeña cuando la exposición nueva es pequeña respecto de <span class="math inline">\(b'\)</span>.</p>
+</section>
+<section id="predicción-un-segmento-nuevo-de-50-viviendas" class="slide level2">
+<h2>Predicción: un segmento nuevo de 50 viviendas</h2>
+<p>El bloque <code>generated quantities</code> simula <span class="math inline">\(\tilde Y \sim \text{Poisson}(\delta^{(s)} \times 50)\)</span> en cada draw:</p>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>y_nuevo <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fit_pg)<span class="sc">$</span>y_nuevo</span>
+<span id="cb12-2"><a href=""></a></span>
+<span id="cb12-3"><a href=""></a><span class="co"># Predictiva exacta: Binomial Negativa con r = a_post y p = b_post / (b_post + 50)</span></span>
+<span id="cb12-4"><a href=""></a>prediccion <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">y =</span> <span class="dv">60</span><span class="sc">:</span><span class="dv">200</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-5"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">exacta =</span> <span class="fu">dnbinom</span>(y, <span class="at">size =</span> a_post, <span class="at">prob =</span> b_post <span class="sc">/</span> (b_post <span class="sc">+</span> <span class="dv">50</span>)))</span>
+<span id="cb12-6"><a href=""></a></span>
+<span id="cb12-7"><a href=""></a>grafico_prediccion <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb12-8"><a href=""></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(y_nuevo, <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">2</span>, <span class="at">fill =</span> <span class="st">"#2e75b6"</span>, <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb12-9"><a href=""></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(y, exacta), <span class="at">data =</span> prediccion, <span class="at">colour =</span> <span class="st">"#c00000"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
+<span id="cb12-10"><a href=""></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">175</span>)) <span class="sc">+</span></span>
+<span id="cb12-11"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Personas en un segmento nuevo de 50 viviendas"</span>, <span class="at">y =</span> <span class="st">"Densidad"</span>,</span>
+<span id="cb12-12"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"Histograma: generated quantities · Línea roja: Binomial Negativa exacta"</span>)</span>
+<span id="cb12-13"><a href=""></a><span class="fu">guardar_figura</span>(grafico_prediccion, <span class="st">"grafico_prediccion"</span>, <span class="at">alto =</span> <span class="fl">4.5</span>)</span>
+<span id="cb12-14"><a href=""></a><span class="fu">guardar</span>(<span class="fu">tibble</span>(<span class="at">cuantil =</span> <span class="fu">c</span>(<span class="st">"2,5%"</span>, <span class="st">"50%"</span>, <span class="st">"97,5%"</span>), <span class="at">y_nuevo =</span> <span class="fu">quantile</span>(y_nuevo, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>))),</span>
+<span id="cb12-15"><a href=""></a>        <span class="st">"cuantiles_y_nuevo"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="la-predictiva-simulada-y-la-exacta" class="slide level2">
+<h2>La predictiva simulada y la exacta</h2>
+<div class="columns">
+<div class="column" style="width:72%;">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="resultados/grafico_prediccion.png" class="quarto-figure quarto-figure-center" style="width:92.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:28%;">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">cuantil</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">y_nuevo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2,5%</td>
+<td style="text-align: right;">104</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">50%</td>
+<td style="text-align: right;">125</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">97,5%</td>
+<td style="text-align: right;">148</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Los draws de <code>generated quantities</code> reproducen la Binomial Negativa exacta.</p>
+</div></div>
+</section>
+<section id="reproduce-el-modelo-la-variabilidad-entre-segmentos" class="slide level2">
+<h2>¿Reproduce el modelo la variabilidad entre segmentos?</h2>
+<p>Un <strong>chequeo predictivo posterior</strong>: con cada draw de <span class="math inline">\(\delta\)</span> se replican los conteos observados, <span class="math inline">\(Y_i^{rep} \sim \text{Poisson}(\delta V_i)\)</span>, y se compara un estadístico <span class="math inline">\(T\)</span> en los datos y en las réplicas. Aquí, el <strong>índice de dispersión de Pearson</strong>:</p>
+<p><span class="math display">\[
+\phi = \frac{1}{n-1}\sum_{i=1}^n \frac{(Y_i - \hat\delta V_i)^2}{\hat\delta V_i}.
+\]</span></p>
+<p>Si los datos son Poisson, <span class="math inline">\(E\big[(Y_i - \delta V_i)^2\big] = \delta V_i\)</span> y <span class="math inline">\(\phi \approx 1\)</span>. El <strong>valor <span class="math inline">\(p\)</span> bayesiano</strong> es</p>
+<p><span class="math display">\[
+p_B = \Pr\big(T(\mathbf{Y}^{rep}) \ge T(\mathbf{Y}) \mid \mathbf{Y}\big) \approx \frac{1}{S}\sum_{s=1}^{S} \mathbb{1}\big(T(\mathbf{Y}^{rep,(s)}) \ge T(\mathbf{Y})\big).
+\]</span></p>
+</section>
+<section id="el-chequeo-en-r" class="slide level2">
+<h2>El chequeo en R</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>delta_draws <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fit_pg)<span class="sc">$</span>delta</span>
+<span id="cb13-2"><a href=""></a>dispersion <span class="ot">&lt;-</span> <span class="cf">function</span>(y, mu) <span class="fu">sum</span>((y <span class="sc">-</span> mu)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> mu) <span class="sc">/</span> (<span class="fu">length</span>(y) <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb13-3"><a href=""></a></span>
+<span id="cb13-4"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb13-5"><a href=""></a>phi_rep <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(<span class="fu">sample</span>(delta_draws, <span class="dv">500</span>), <span class="cf">function</span>(d) {</span>
+<span id="cb13-6"><a href=""></a>  mu <span class="ot">&lt;-</span> d <span class="sc">*</span> completos<span class="sc">$</span>n_vpo</span>
+<span id="cb13-7"><a href=""></a>  <span class="fu">dispersion</span>(<span class="fu">rpois</span>(<span class="fu">length</span>(mu), mu), mu)</span>
+<span id="cb13-8"><a href=""></a>})</span>
+<span id="cb13-9"><a href=""></a>phi_obs <span class="ot">&lt;-</span> <span class="fu">dispersion</span>(completos<span class="sc">$</span>n_per, <span class="fu">mean</span>(delta_draws) <span class="sc">*</span> completos<span class="sc">$</span>n_vpo)</span>
+<span id="cb13-10"><a href=""></a></span>
+<span id="cb13-11"><a href=""></a><span class="fu">c</span>(<span class="at">observado =</span> phi_obs, <span class="at">replicas_q95 =</span> <span class="fu">quantile</span>(phi_rep, <span class="fl">0.95</span>),</span>
+<span id="cb13-12"><a href=""></a>  <span class="at">p_bayes =</span> <span class="fu">mean</span>(phi_rep <span class="sc">&gt;=</span> phi_obs))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+<img data-src="resultados/grafico_ppc.png" class="quarto-figure quarto-figure-center r-stretch" style="width:70.0%"><p>La dispersión observada es 1,70, mientras que el 95% de las réplicas queda bajo 1,08. La proporción de réplicas que igualan o superan el valor observado se calcula en el script; cero réplicas extremas no demuestra una probabilidad exactamente nula.</p>
+</section>
+<section id="dónde-está-la-variabilidad-adicional" class="slide level2">
+<h2>¿Dónde está la variabilidad adicional?</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a>d_hat <span class="ot">&lt;-</span> <span class="fu">mean</span>(delta_draws)</span>
+<span id="cb14-2"><a href=""></a>tabla_tamano <span class="ot">&lt;-</span> completos <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">viviendas =</span> <span class="fu">cut</span>(n_vpo, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">60</span>, <span class="cn">Inf</span>),</span>
+<span id="cb14-4"><a href=""></a>                         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"1–10"</span>, <span class="st">"11–30"</span>, <span class="st">"31–60"</span>, <span class="st">"más de 60"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-5"><a href=""></a>  <span class="fu">group_by</span>(viviendas) <span class="sc">%&gt;%</span></span>
+<span id="cb14-6"><a href=""></a>  <span class="fu">summarise</span>(<span class="at">segmentos =</span> <span class="fu">n</span>(),</span>
+<span id="cb14-7"><a href=""></a>            <span class="at">de_observada =</span> <span class="fu">sd</span>(n_per <span class="sc">/</span> n_vpo),</span>
+<span id="cb14-8"><a href=""></a>            <span class="at">de_poisson =</span> <span class="fu">mean</span>(<span class="fu">sqrt</span>(d_hat <span class="sc">/</span> n_vpo))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-9"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">razon =</span> de_observada <span class="sc">/</span> de_poisson)</span>
+<span id="cb14-10"><a href=""></a>tabla_tamano</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="columns">
+<div class="column" style="width:55%;">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">viviendas</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">segmentos</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">de_observada</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">de_poisson</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">razon</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1&lt;U+2013&gt;10</td>
+<td style="text-align: right;">201</td>
+<td style="text-align: right;">0,63</td>
+<td style="text-align: right;">0,60</td>
+<td style="text-align: right;">1,06</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">11&lt;U+2013&gt;30</td>
+<td style="text-align: right;">392</td>
+<td style="text-align: right;">0,49</td>
+<td style="text-align: right;">0,38</td>
+<td style="text-align: right;">1,30</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">31&lt;U+2013&gt;60</td>
+<td style="text-align: right;">91</td>
+<td style="text-align: right;">0,38</td>
+<td style="text-align: right;">0,26</td>
+<td style="text-align: right;">1,47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">m&lt;U+00E1&gt;s de 60</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0,40</td>
+<td style="text-align: right;">0,17</td>
+<td style="text-align: right;">2,29</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><code>de_poisson</code>: desviación de <span class="math inline">\(Y_i/V_i\)</span> que implica el modelo, <span class="math inline">\(\sqrt{\delta / V_i}\)</span>.</p>
+</div><div class="column" style="width:45%;">
+<div class="caja">
+<ul>
+<li>En segmentos pequeños domina el ruido Poisson; en los <strong>grandes</strong> la densidad observada varía hasta el doble de lo que permite una única <span class="math inline">\(\delta\)</span>.</li>
+<li>La densidad <strong>varía entre segmentos</strong>: esta <strong>sobredispersión</strong> motiva modelar <span class="math inline">\(\delta_i\)</span> con covariables y un término aleatorio (días 2 y 3).</li>
+</ul>
+</div>
+</div></div>
+</section></section>
+<section>
+<section id="modelo-normal-con-varianza-conocida" class="title-slide slide level1 center">
+<h1>Modelo Normal con varianza conocida</h1>
+
+</section>
+<section id="planteamiento-1" class="slide level2">
+<h2>Planteamiento</h2>
+<p>Sea <span class="math inline">\(y_i = \log\delta_i\)</span> el logaritmo de las personas por vivienda en los segmentos aptos. Para ilustrar un modelo de un solo parámetro, fijamos <span class="math inline">\(\sigma\)</span> en la desviación estándar observada. Es una aproximación didáctica: no propaga la incertidumbre de estimar <span class="math inline">\(\sigma\)</span>. En D1S3 se estudiará el caso de media y varianza desconocidas.</p>
+<p><span class="math display">\[
+y_i \mid \mu \sim N(\mu, \sigma^2), \qquad \mu \sim N(\mu_0, \tau_0^2).
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\mu\)</span>: nivel típico de <span class="math inline">\(\log\delta\)</span>; <span class="math inline">\(e^{\mu}\)</span> es la <strong>mediana</strong> de personas por vivienda.</li>
+<li><span class="math inline">\(\mu_0 = \log 3\)</span> y <span class="math inline">\(\tau_0 = 0{,}5\)</span>: a priori, la mediana está entre <span class="math inline">\(3e^{-1} \approx 1{,}1\)</span> y <span class="math inline">\(3e^{1} \approx 8{,}2\)</span> con probabilidad 0,95.</li>
+</ul>
+</section>
+<section id="derivación-completar-el-cuadrado" class="slide level2">
+<h2>Derivación: completar el cuadrado</h2>
+<p><span class="math display">\[
+\begin{aligned}
+p(\mu \mid \mathbf{y}) &amp;\propto \exp\!\Big(-\frac{1}{2\sigma^2}\sum_{i}(y_i - \mu)^2\Big)\exp\!\Big(-\frac{1}{2\tau_0^2}(\mu - \mu_0)^2\Big) \\
+&amp;\propto \exp\!\Big(-\frac{1}{2}\Big[\mu^2\Big(\frac{n}{\sigma^2} + \frac{1}{\tau_0^2}\Big) - 2\mu\Big(\frac{n\bar y}{\sigma^2} + \frac{\mu_0}{\tau_0^2}\Big)\Big]\Big) \\
+&amp;\propto \exp\!\Big(-\frac{1}{2\tau_n^2}(\mu - \mu_n)^2\Big),
+\end{aligned}
+\]</span></p>
+<p>con</p>
+<p><span class="math display">\[
+\frac{1}{\tau_n^2} = \frac{1}{\tau_0^2} + \frac{n}{\sigma^2}, \qquad
+\mu_n = \tau_n^2\Big(\frac{\mu_0}{\tau_0^2} + \frac{n\bar y}{\sigma^2}\Big).
+\]</span></p>
+<p>Por lo tanto <span class="math inline">\(\mu \mid \mathbf{y} \sim N(\mu_n, \tau_n^2)\)</span>.</p>
+</section>
+<section id="precisiones-que-se-suman" class="slide level2">
+<h2>Precisiones que se suman</h2>
+<p>Con la <strong>precisión</strong> (inverso de la varianza):</p>
+<p><span class="math display">\[
+\underbrace{\frac{1}{\tau_n^2}}_{\text{posterior}} = \underbrace{\frac{1}{\tau_0^2}}_{\text{previa}} + \underbrace{\frac{n}{\sigma^2}}_{\text{datos}},
+\qquad
+\mu_n = w\,\bar y + (1 - w)\,\mu_0, \quad w = \frac{n/\sigma^2}{1/\tau_0^2 + n/\sigma^2}.
+\]</span></p>
+<div class="caja">
+<ul>
+<li>La precisión posterior es la suma de la precisión previa y la de los datos.</li>
+<li>La media posterior “encoge” la media muestral hacia la media previa, con un peso que depende de la precisión relativa. Esta idea reaparece en los modelos jerárquicos: el <strong>encogimiento</strong> de la densidad de cada segmento hacia la predicción de las covariables.</li>
+</ul>
+</div>
+</section>
+<section id="solución-analítica-y-en-stan" class="slide level2">
+<h2>Solución analítica y en Stan</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>aptos <span class="ot">&lt;-</span> segmentos <span class="sc">%&gt;%</span> <span class="fu">filter</span>(apto_modelo)</span>
+<span id="cb15-2"><a href=""></a>y_log <span class="ot">&lt;-</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta)</span>
+<span id="cb15-3"><a href=""></a>sigma <span class="ot">&lt;-</span> <span class="fu">sd</span>(y_log)                        <span class="co"># aproximacion didactica: se fija, no es conocida externamente</span></span>
+<span id="cb15-4"><a href=""></a>mu0 <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="dv">3</span>); tau0 <span class="ot">&lt;-</span> <span class="fl">0.5</span>                <span class="co"># previa: alrededor de 3 personas por vivienda</span></span>
+<span id="cb15-5"><a href=""></a></span>
+<span id="cb15-6"><a href=""></a>prec_n <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> tau0<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">length</span>(y_log) <span class="sc">/</span> sigma<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb15-7"><a href=""></a>mu_n <span class="ot">&lt;-</span> (mu0 <span class="sc">/</span> tau0<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">sum</span>(y_log) <span class="sc">/</span> sigma<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> prec_n</span>
+<span id="cb15-8"><a href=""></a>normal_analitica <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">media_post =</span> mu_n, <span class="at">desv_post =</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> prec_n),</span>
+<span id="cb15-9"><a href=""></a>                           <span class="at">media_muestral =</span> <span class="fu">mean</span>(y_log), <span class="at">n =</span> <span class="fu">length</span>(y_log), <span class="at">sigma =</span> sigma)</span>
+<span id="cb15-10"><a href=""></a>normal_analitica</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">media_post</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">desv_post</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media_muestral</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sigma</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0,8443</td>
+<td style="text-align: right;">0,0059</td>
+<td style="text-align: right;">0,8443</td>
+<td style="text-align: right;">1.455</td>
+<td style="text-align: right;">0,2265</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a>modelo_normal <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/normal_media.stan"</span>)</span>
+<span id="cb16-2"><a href=""></a>fit_normal <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
+<span id="cb16-3"><a href=""></a>  modelo_normal,</span>
+<span id="cb16-4"><a href=""></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">length</span>(y_log), <span class="at">y =</span> y_log, <span class="at">sigma =</span> sigma, <span class="at">mu0 =</span> mu0, <span class="at">tau0 =</span> tau0),</span>
+<span id="cb16-5"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="cb16-6"><a href=""></a>)</span>
+<span id="cb16-7"><a href=""></a>resumen_normal <span class="ot">&lt;-</span> <span class="fu">resumen_stan</span>(fit_normal, <span class="st">"mu"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">parametro</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">media</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">desv_est</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q2.5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mediana</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q97.5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n_eff</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Rhat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">mu</td>
+<td style="text-align: right;">0,8444</td>
+<td style="text-align: right;">0,006</td>
+<td style="text-align: right;">0,8322</td>
+<td style="text-align: right;">0,8444</td>
+<td style="text-align: right;">0,8558</td>
+<td style="text-align: right;">1.386</td>
+<td style="text-align: right;">1,0007</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="el-peso-de-la-previa-según-el-tamaño-de-muestra" class="slide level2">
+<h2>El peso de la previa según el tamaño de muestra</h2>
+
+<img data-src="resultados/grafico_contraccion.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%"><p>Las etiquetas muestran el peso de los datos para la <span class="math inline">\(\sigma\)</span> fijada en este ejemplo. Las submuestras se seleccionan por separado: la figura ilustra distintos tamaños, no una actualización secuencial.</p>
+</section></section>
+<section>
+<section id="resumen" class="title-slide slide level1 center">
+<h1>Resumen</h1>
+
+</section>
+<section id="familias-conjugadas" class="slide level2">
+<h2>Familias conjugadas</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Modelo</th>
+<th>Verosimilitud</th>
+<th>Previa conjugada</th>
+<th>Posterior</th>
+<th>Predictiva</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Proporción</td>
+<td><span class="math inline">\(\text{Bernoulli}(\theta)\)</span></td>
+<td><span class="math inline">\(\text{Beta}(a, b)\)</span></td>
+<td><span class="math inline">\(\text{Beta}(a + s,\ b + n - s)\)</span></td>
+<td>Beta-Binomial</td>
+</tr>
+<tr class="even">
+<td>Tasa con exposición</td>
+<td><span class="math inline">\(\text{Poisson}(\delta V_i)\)</span></td>
+<td><span class="math inline">\(\text{Gamma}(a, b)\)</span></td>
+<td><span class="math inline">\(\text{Gamma}(a + \sum Y,\ b + \sum V)\)</span></td>
+<td>Binomial Negativa</td>
+</tr>
+<tr class="odd">
+<td>Media</td>
+<td><span class="math inline">\(N(\mu, \sigma^2)\)</span>, <span class="math inline">\(\sigma\)</span> conocida</td>
+<td><span class="math inline">\(N(\mu_0, \tau_0^2)\)</span></td>
+<td><span class="math inline">\(N(\mu_n, \tau_n^2)\)</span></td>
+<td><span class="math inline">\(N(\mu_n, \sigma^2 + \tau_n^2)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>En los tres casos la media posterior es un <strong>promedio ponderado</strong> entre la media previa y el estimador de máxima verosimilitud.</p>
+</section>
+<section id="y-si-no-hay-información-previa" class="slide level2">
+<h2>¿Y si no hay información previa?</h2>
+<ul>
+<li><strong>La escala importa</strong>: una Beta(1,1) es uniforme en la probabilidad; no lo es en el logit. Una Gamma con forma y tasa pequeñas no es plana. Una Normal amplia puede asignar masa a valores poco plausibles.</li>
+<li><strong>Previa de Jeffreys</strong>: <span class="math inline">\(p(\theta) \propto \sqrt{I(\theta)}\)</span>, con <span class="math inline">\(I(\theta)\)</span> la información de Fisher; es invariante a reparametrizaciones. Para la Bernoulli, <span class="math inline">\(I(\theta) = 1/[\theta(1-\theta)]\)</span> y la previa es <span class="math inline">\(\text{Beta}(1/2, 1/2)\)</span>.</li>
+<li><strong>Previas débilmente informativas</strong> <span class="citation" data-cites="gelman2013">(<a href="#/referencias" role="doc-biblioref" onclick="">Gelman et&nbsp;al. 2013</a>)</span>: descartan valores absurdos sin dominar a los datos. Son las que se usan en el modelo de población (por ejemplo, <span class="math inline">\(\beta_k \sim N(0, 1)\)</span> con covariables estandarizadas).</li>
+</ul>
+<div class="caja">
+<p>En estos ejemplos, compare el peso de la previa con la información de los datos. Un gran número de segmentos no garantiza poca sensibilidad si hay dependencia, problemas de identificación o poca información por parámetro.</p>
+</div>
+</section>
+<section id="resumen-de-la-sesión" class="slide level2">
+<h2>Resumen de la sesión</h2>
+<ul>
+<li>La posterior se obtiene multiplicando verosimilitud y previa e identificando el <strong>núcleo</strong>.</li>
+<li>Con previas <strong>conjugadas</strong> la posterior es analítica, y su media es un promedio ponderado entre la previa y los datos.</li>
+<li>La <strong>predictiva posterior</strong> (Beta-Binomial, Binomial Negativa) incorpora la incertidumbre del parámetro.</li>
+<li>Stan reproduce las soluciones exactas y <strong>no necesita conjugación</strong>.</li>
+<li>Una única densidad común <strong>no explica</strong> la variabilidad entre segmentos: hay sobredispersión.</li>
+</ul>
+</section>
+<section id="referencias" class="slide level2 smaller scrollable">
+<h2>Referencias</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-gelman2013" class="csl-entry" role="listitem">
+Gelman, Andrew, John B. Carlin, Hal S. Stern, David B. Dunson, Aki Vehtari, y Donald B. Rubin. 2013. <em>Bayesian Data Analysis</em>. 3rd ed. Chapman; Hall/CRC.
+</div>
+</div>
+</section>
+<section id="muchas-gracias" class="slide level2">
+<h2>Muchas gracias</h2>
+<p><strong>Andrés Gutiérrez · Stalyn Guerrero</strong></p>
+<p><strong>Contacto: Andrés Gutiérrez</strong><br>
+<a href="mailto:andres.gutierrez@cepal.org">andres.gutierrez@cepal.org</a></p>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="Bayes_uniparametrico_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Bayes_uniparametrico_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1600,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 8.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <div class="logos-institucionales" aria-label="CEPAL y UNFPA">
+      <img src="img/logoCepal.jpg" alt="CEPAL">
+      <img src="img/UNFPA_logo.svg" alt="UNFPA, Fondo de Población de las Naciones Unidas">
+    </div>
+
+    
+
+    <script>
+
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+
+      // slide changes (different for each slide format).
+
+      (function () {
+
+        // dispatch for htmlwidgets
+
+        function fireSlideEnter() {
+
+          const event = window.document.createEvent("Event");
+
+          event.initEvent("slideenter", true, true);
+
+          window.document.dispatchEvent(event);
+
+        }
+
+    
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+
+          fireSlideEnter();
+
+    
+
+          // dispatch for shiny
+
+          if (window.jQuery) {
+
+            if (previousSlide) {
+
+              window.jQuery(previousSlide).trigger("hidden");
+
+            }
+
+            if (currentSlide) {
+
+              window.jQuery(currentSlide).trigger("shown");
+
+            }
+
+          }
+
+        }
+
+    
+
+        // hookup for slidy
+
+        if (window.w3c_slidy) {
+
+          window.w3c_slidy.add_observer(function (slide_num) {
+
+            // slide_num starts at position 1
+
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+
+          });
+
+        }
+
+    
+
+      })();
+
+    </script>
+
+    
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copiado");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copiado");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

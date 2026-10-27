@@ -1,0 +1,591 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Fundamentos de la inferencia bayesiana I: modelos uniparamétricos"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "23 de noviembre de 2026 · Día 1, sesión 2 · 11:30–13:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+bibliography: references.bib
+---
+
+```{r setup, include = FALSE}
+source("Rcode/utilidades.R")
+knitr::read_chunk("Rcode/Bayes_uniparametrico.R")
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "", fig.align = "center", out.width = "92%")
+v <- leer_valores()
+```
+
+## Qué aprenderemos en esta sesión
+
+1. Identificar el parámetro, la verosimilitud y la previa.
+2. Derivar y resumir una posterior conjugada.
+3. Distinguir la incertidumbre del parámetro de la incertidumbre predictiva.
+4. Relacionar la solución analítica con una primera implementación en Stan.
+
+**Recorrido:** proporciones → personas por vivienda → media de logaritmos.
+
+::: {.notes}
+Las derivaciones extensas y el código Stan sirven de apoyo; la ejecución guiada se retoma en la práctica de la tarde.
+:::
+
+# La regla de Bayes
+
+## Del parámetro a los datos y de vuelta
+
+Para inferir sobre un parámetro $\theta$ se define la distribución **conjunta** de los datos $\mathbf{Y} = (Y_1, \dots, Y_n)$ y del parámetro:
+
+$$
+p(\theta, \mathbf{Y}) = p(\theta)\, p(\mathbf{Y} \mid \theta).
+$$
+
+- $p(\theta)$: **distribución previa**; lo que se sabe (o se supone) de $\theta$ antes de ver los datos.
+- $p(\mathbf{Y} \mid \theta)$: **verosimilitud**; cómo se generan los datos si $\theta$ fuera conocido. Con observaciones independientes, $p(\mathbf{Y} \mid \theta) = \prod_{i=1}^n p(Y_i \mid \theta)$.
+
+Condicionando en los datos observados:
+
+$$
+p(\theta \mid \mathbf{Y}) = \frac{p(\theta, \mathbf{Y})}{p(\mathbf{Y})} = \frac{p(\mathbf{Y} \mid \theta)\,p(\theta)}{\int p(\mathbf{Y} \mid \theta)\,p(\theta)\,d\theta}.
+$$
+
+## Proporcionalidad y núcleo
+
+El denominador $p(\mathbf{Y})$ no depende de $\theta$: es la constante que hace que la posterior integre 1. Por eso se escribe
+
+$$
+p(\theta \mid \mathbf{Y}) \;\propto\; p(\mathbf{Y} \mid \theta)\,p(\theta).
+$$
+
+::: {.caja}
+**Estrategia de cálculo**: se multiplican verosimilitud y previa, se eliminan los factores que no dependen de $\theta$ y se busca en la expresión que queda —el **núcleo**— la forma de una distribución conocida. Si la previa y la posterior son de la misma familia, la previa es **conjugada**.
+:::
+
+| Distribución | Núcleo en $\theta$ |
+|---|---|
+| $\text{Beta}(a, b)$ | $\theta^{a-1}(1-\theta)^{b-1}$ |
+| $\text{Gamma}(a, b)$ | $\theta^{a-1}e^{-b\theta}$ |
+| $N(\mu, \tau^2)$ | $\exp\!\big(-\tfrac{1}{2\tau^2}(\theta-\mu)^2\big)$ |
+
+## Resumir la posterior
+
+La posterior es una distribución completa. Para reportar un valor puntual se elige el que minimiza la **pérdida esperada posterior**:
+
+| Pérdida $L(\theta, \hat\theta)$ | Estimador de Bayes |
+|---|---|
+| Cuadrática: $(\theta - \hat\theta)^2$ | Media posterior $E(\theta \mid \mathbf{Y})$ |
+| Absoluta: $\lvert\theta - \hat\theta\rvert$ | Mediana posterior |
+| 0–1, parámetro discreto | Moda posterior (máximo a posteriori) |
+
+Por ejemplo, con pérdida cuadrática,
+
+$$
+\frac{d}{d\hat\theta}\,E\big[(\theta - \hat\theta)^2 \mid \mathbf{Y}\big] = -2\big(E(\theta \mid \mathbf{Y}) - \hat\theta\big) = 0
+\;\Rightarrow\; \hat\theta = E(\theta \mid \mathbf{Y}).
+$$
+
+Para un parámetro continuo, la pérdida 0–1 exacta no selecciona la moda: cada punto tiene probabilidad cero. El MAP se interpreta mediante vecindades pequeñas, bajo condiciones de regularidad.
+
+## Intervalos de credibilidad
+
+Un intervalo $[a, b]$ con
+
+$$
+\Pr(a \le \theta \le b \mid \mathbf{Y}) = \int_a^b p(\theta \mid \mathbf{Y})\,d\theta = 1 - \alpha
+$$
+
+es un intervalo de credibilidad al $100(1-\alpha)\%$.
+
+- **Por cuantiles**: $a$ y $b$ son los cuantiles $\alpha/2$ y $1 - \alpha/2$ de la posterior. Es el que se usa en el taller.
+- **De máxima densidad** (HPD): conjunto que reúne los valores de mayor densidad hasta acumular probabilidad $1-\alpha$; puede ser disjunto si la posterior es multimodal.
+
+::: {.caja}
+A diferencia del intervalo de confianza, la afirmación es **directa**: dados los datos, la probabilidad de que $\theta$ esté en el intervalo es $1 - \alpha$.
+:::
+
+## La distribución predictiva posterior
+
+Para un dato nuevo $\tilde Y$, independiente de $\mathbf{Y}$ dado $\theta$:
+
+$$
+p(\tilde y \mid \mathbf{Y}) = \int p(\tilde y \mid \theta)\,p(\theta \mid \mathbf{Y})\,d\theta.
+$$
+
+- Combina dos fuentes de incertidumbre: la del **dato** dado $\theta$ y la del **parámetro** dado lo observado.
+- Con draws $\theta^{(1)}, \dots, \theta^{(S)}$ de la posterior se simula fácilmente: $\tilde y^{(s)} \sim p(\tilde y \mid \theta^{(s)})$.
+- Es la base de la **predicción de población** y del **chequeo predictivo posterior**: si el modelo es bueno, datos simulados con él deben parecerse a los observados.
+
+## Datos de la sesión: segmentos de Aysén
+
+```{r datos}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_datos")
+```
+
+- `r fmt(v$n_segmentos)` segmentos censales de la región de Aysén.
+- `n_per`: personas censadas; `n_vpo`: viviendas particulares ocupadas; `delta` = `n_per / n_vpo`.
+
+# Modelo Bernoulli–Beta
+
+## Planteamiento
+
+**Pregunta didáctica:** ¿cómo aprender sobre una probabilidad común $\theta$ de cobertura completa bajo un modelo Bernoulli?
+
+La proporción de cobertura completa del conjunto observado de Aysén se calcula directamente. La posterior describe incertidumbre sobre el parámetro del modelo para segmentos comparables; no es incertidumbre sobre ese porcentaje ya observado.
+
+Sea $Y_i = 1$ si el segmento $i$ tuvo cobertura completa y $0$ en otro caso, con $Y_i \mid \theta \sim \text{Bernoulli}(\theta)$:
+
+$$
+p(Y_i \mid \theta) = \theta^{Y_i}(1 - \theta)^{1 - Y_i}, \qquad Y_i \in \{0, 1\}.
+$$
+
+Con $n$ segmentos independientes y $s = \sum_i Y_i$ segmentos completos, la verosimilitud es
+
+$$
+p(\mathbf{Y} \mid \theta) = \prod_{i=1}^n \theta^{Y_i}(1 - \theta)^{1 - Y_i} = \theta^{s}(1 - \theta)^{n - s}.
+$$
+
+Solo depende de los datos a través de $s$: $s$ es un **estadístico suficiente**.
+
+## La previa Beta
+
+$\theta \in [0, 1]$, así que una previa natural es la Beta:
+
+$$
+p(\theta) = \frac{\theta^{a-1}(1-\theta)^{b-1}}{B(a, b)}, \qquad
+E(\theta) = \frac{a}{a+b}, \qquad
+\text{Var}(\theta) = \frac{ab}{(a+b)^2(a+b+1)}.
+$$
+
+- $a/(a+b)$ controla la media previa y $a+b$ su concentración. La analogía con pseudoconteos ayuda a entender la actualización; no son observaciones reales.
+- $\text{Beta}(1, 1)$ es la uniforme en $[0, 1]$: una previa uniforme en esta escala; no es neutral frente a toda reparametrización.
+- $\text{Beta}(2, 8)$ concentra la masa cerca de 0,2; $\text{Beta}(8, 2)$ cerca de 0,8.
+
+## Derivación de la posterior
+
+$$
+\begin{aligned}
+p(\theta \mid \mathbf{Y}) &\propto p(\mathbf{Y} \mid \theta)\,p(\theta) \\
+&\propto \theta^{s}(1 - \theta)^{n - s} \cdot \theta^{a-1}(1-\theta)^{b-1} \\
+&= \theta^{(a + s) - 1}(1-\theta)^{(b + n - s) - 1},
+\end{aligned}
+$$
+
+que es el núcleo de una Beta. Por lo tanto
+
+$$
+\theta \mid \mathbf{Y} \sim \text{Beta}\big(a + s,\; b + n - s\big).
+$$
+
+::: {.caja}
+La actualización es aritmética: se **suman** los éxitos observados a $a$ y los fracasos observados a $b$.
+:::
+
+## La media posterior es un promedio ponderado
+
+$$
+E(\theta \mid \mathbf{Y}) = \frac{a + s}{a + b + n}
+= \underbrace{\frac{a + b}{a + b + n}}_{\text{peso de la previa}}\cdot\frac{a}{a + b}
++ \underbrace{\frac{n}{a + b + n}}_{\text{peso de los datos}}\cdot\frac{s}{n}.
+$$
+
+- Promedia la **media previa** $a/(a+b)$ y la **proporción muestral** $s/n$.
+- El peso de los datos, $n/(a + b + n)$, tiende a 1 cuando $n$ crece: con muchos datos la previa pierde influencia.
+- La varianza posterior decrece aproximadamente como $\hat\theta(1-\hat\theta)/n$.
+
+## Solución analítica
+
+```{r bernoulli-analitica}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("bern_analitica", digits = 4)
+```
+
+## Influencia de la previa
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_previas")
+```
+
+Con 20 segmentos las tres previas llevan a posteriores distintas; con `r fmt(v$n_segmentos)` segmentos las tres posteriores prácticamente coinciden.
+
+## El peso de los datos
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_previas", digits = 3)
+```
+
+El peso de los datos es $n / (a + b + n)$: con 20 segmentos y la previa $\text{Beta}(8, 2)$ es 0,67; con todos los segmentos supera 0,99.
+
+## El mismo modelo en Stan
+
+Stan no necesita conjugación: se declaran datos, parámetros y modelo, y Stan obtiene **muestras** de la posterior con MCMC.
+
+::: {.columns}
+::: {.column width="46%"}
+```{r, eval = TRUE, echo = FALSE, class.output = "stan"}
+cat(readLines("stan/bernoulli_beta.stan"), sep = "\n")
+```
+:::
+::: {.column width="54%"}
+```{r bernoulli-stan}
+```
+:::
+:::
+
+## Resultados de Stan frente a la solución exacta
+
+```{r bernoulli-resumen}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("resumen_bern", digits = 4)
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "75%"}
+mostrar("grafico_bern")
+```
+
+## Predictiva: la distribución Beta-Binomial
+
+¿Cuántos de $m$ segmentos **nuevos** tendrían cobertura completa? Con $\tilde K \mid \theta \sim \text{Binomial}(m, \theta)$ y la posterior $\text{Beta}(a', b')$:
+
+$$
+\begin{aligned}
+p(\tilde k \mid \mathbf{Y}) &= \int_0^1 \binom{m}{\tilde k}\theta^{\tilde k}(1-\theta)^{m - \tilde k}\,\frac{\theta^{a'-1}(1-\theta)^{b'-1}}{B(a', b')}\,d\theta \\
+&= \binom{m}{\tilde k}\frac{B(\tilde k + a',\; m - \tilde k + b')}{B(a', b')},
+\end{aligned}
+$$
+
+la distribución **Beta-Binomial**. Su varianza,
+$m\bar\theta(1-\bar\theta)\,\frac{a' + b' + m}{a' + b' + 1}$ con $\bar\theta = a'/(a'+b')$, es **mayor** que la de una Binomial con $\theta$ fijo: incorpora la incertidumbre de $\theta$.
+
+## Predictiva: exacta y simulada
+
+```{r bernoulli-predictiva}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "75%"}
+mostrar("grafico_predictiva_bern")
+```
+
+# Modelo Poisson–Gamma con exposición
+
+## Planteamiento: personas por vivienda
+
+El parámetro de interés es la **densidad** $\delta$: personas por vivienda particular ocupada. En los segmentos con cobertura completa,
+
+$$
+Y_i \mid \delta \sim \text{Poisson}(\delta\, V_i), \qquad
+p(Y_i \mid \delta) = \frac{(\delta V_i)^{Y_i} e^{-\delta V_i}}{Y_i!}.
+$$
+
+- $V_i$ es la **exposición**: un segmento con el doble de viviendas espera el doble de personas.
+- $E(Y_i \mid \delta) = \text{Var}(Y_i \mid \delta) = \delta V_i$.
+- Es el modelo más simple de población: **una sola densidad** para toda la región.
+
+## La verosimilitud y su estadístico suficiente
+
+$$
+p(\mathbf{Y} \mid \delta) = \prod_{i=1}^n \frac{(\delta V_i)^{Y_i} e^{-\delta V_i}}{Y_i!}
+= \underbrace{\prod_{i=1}^n \frac{V_i^{Y_i}}{Y_i!}}_{\text{no depende de } \delta}\;
+\delta^{\sum_i Y_i}\, e^{-\delta \sum_i V_i}.
+$$
+
+Como función de $\delta$:
+
+$$
+p(\mathbf{Y} \mid \delta) \propto \delta^{T_Y} e^{-\delta T_V}, \qquad T_Y = \sum_i Y_i, \quad T_V = \sum_i V_i.
+$$
+
+Toda la información de los datos sobre $\delta$ está en el **total de personas** y el **total de viviendas**. Derivando el logaritmo, $T_Y/\delta - T_V = 0$: el estimador de máxima verosimilitud es $\hat\delta = T_Y / T_V$.
+
+## La previa Gamma
+
+$$
+p(\delta) = \frac{b^a}{\Gamma(a)}\,\delta^{a-1}e^{-b\delta}, \qquad
+E(\delta) = \frac{a}{b}, \qquad \text{Var}(\delta) = \frac{a}{b^2}.
+$$
+
+- Usamos Gamma(**shape** $a$, **rate** $b$): en R, `rate = b`; en Stan, el segundo argumento también es la tasa. La media previa es $a/b$.
+- $\text{Gamma}(0{,}01; 0{,}01)$: media 1 y varianza 100; concentra mucha masa cerca de cero y tiene una cola larga. Su gran varianza no garantiza poca influencia en cualquier aplicación.
+- $\text{Gamma}(30; 10)$: media 3 y desviación 0,55, **informativa**.
+
+## Derivación de la posterior
+
+$$
+p(\delta \mid \mathbf{Y}) \propto \delta^{T_Y} e^{-\delta T_V}\cdot\delta^{a-1}e^{-b\delta}
+= \delta^{(a + T_Y) - 1}\,e^{-(b + T_V)\delta},
+$$
+
+el núcleo de una Gamma:
+
+$$
+\delta \mid \mathbf{Y} \sim \text{Gamma}\big(a + T_Y,\; b + T_V\big).
+$$
+
+Media como promedio ponderado:
+
+$$
+E(\delta \mid \mathbf{Y}) = \frac{a + T_Y}{b + T_V}
+= \frac{b}{b + T_V}\cdot\frac{a}{b} + \frac{T_V}{b + T_V}\cdot\frac{T_Y}{T_V}.
+$$
+
+::: {.caja}
+Con una previa vaga ($a, b \to 0$), la media posterior es $T_Y/T_V$: **el total de personas sobre el total de viviendas**. Es la semilla del modelo de población.
+:::
+
+## Solución analítica
+
+```{r poisson-datos}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("pg_analitica", digits = 4)
+```
+
+## Sensibilidad a la previa
+
+```{r poisson-sensibilidad}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_sensibilidad", digits = 4)
+```
+
+Compare las medias posteriores y el peso de los datos en la tabla. La influencia de cada previa depende de su tasa relativa al total de viviendas observadas.
+
+## Ajuste en Stan
+
+::: {.columns}
+::: {.column width="48%"}
+```{r, eval = TRUE, echo = FALSE, class.output = "stan"}
+cat(readLines("stan/poisson_gamma.stan"), sep = "\n")
+```
+:::
+::: {.column width="52%"}
+```{r poisson-stan}
+```
+
+```{r poisson-resumen}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("resumen_pg", digits = 3, font_size = 17)
+```
+:::
+:::
+
+## Predictiva: la distribución Binomial Negativa
+
+Para un segmento nuevo con $\tilde V$ viviendas, $\tilde Y \mid \delta \sim \text{Poisson}(\delta\tilde V)$ y $\delta \mid \mathbf{Y} \sim \text{Gamma}(a', b')$:
+
+$$
+p(\tilde y \mid \mathbf{Y}) = \int_0^\infty \frac{(\delta\tilde V)^{\tilde y}e^{-\delta\tilde V}}{\tilde y!}\,\frac{b'^{a'}}{\Gamma(a')}\delta^{a'-1}e^{-b'\delta}\,d\delta
+= \frac{\Gamma(a' + \tilde y)}{\tilde y!\,\Gamma(a')}\left(\frac{b'}{b' + \tilde V}\right)^{a'}\left(\frac{\tilde V}{b' + \tilde V}\right)^{\tilde y},
+$$
+
+una **Binomial Negativa** con
+
+$$
+E(\tilde Y \mid \mathbf{Y}) = \tilde V\frac{a'}{b'}, \qquad
+\text{Var}(\tilde Y \mid \mathbf{Y}) = \underbrace{\tilde V\frac{a'}{b'}}_{\text{Poisson}} + \underbrace{\tilde V^2\frac{a'}{b'^2}}_{\text{incertidumbre de } \delta}.
+$$
+
+La razón entre el segundo término y el primero es $\tilde V/b'$: la incertidumbre del parámetro es pequeña cuando la exposición nueva es pequeña respecto de $b'$.
+
+## Predicción: un segmento nuevo de 50 viviendas
+
+El bloque `generated quantities` simula $\tilde Y \sim \text{Poisson}(\delta^{(s)} \times 50)$ en cada draw:
+
+```{r poisson-prediccion}
+```
+
+## La predictiva simulada y la exacta
+
+::: {.columns}
+::: {.column width="72%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_prediccion")
+```
+:::
+::: {.column width="28%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("cuantiles_y_nuevo", digits = 0)
+```
+
+Los draws de `generated quantities` reproducen la Binomial Negativa exacta.
+:::
+:::
+
+## ¿Reproduce el modelo la variabilidad entre segmentos?
+
+Un **chequeo predictivo posterior**: con cada draw de $\delta$ se replican los conteos observados, $Y_i^{rep} \sim \text{Poisson}(\delta V_i)$, y se compara un estadístico $T$ en los datos y en las réplicas. Aquí, el **índice de dispersión de Pearson**:
+
+$$
+\phi = \frac{1}{n-1}\sum_{i=1}^n \frac{(Y_i - \hat\delta V_i)^2}{\hat\delta V_i}.
+$$
+
+Si los datos son Poisson, $E\big[(Y_i - \delta V_i)^2\big] = \delta V_i$ y $\phi \approx 1$. El **valor $p$ bayesiano** es
+
+$$
+p_B = \Pr\big(T(\mathbf{Y}^{rep}) \ge T(\mathbf{Y}) \mid \mathbf{Y}\big) \approx \frac{1}{S}\sum_{s=1}^{S} \mathbb{1}\big(T(\mathbf{Y}^{rep,(s)}) \ge T(\mathbf{Y})\big).
+$$
+
+## El chequeo en R
+
+```{r poisson-ppc}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "70%"}
+mostrar("grafico_ppc")
+```
+
+La dispersión observada es `r fmt(v$phi_obs, 2)`, mientras que el 95% de las réplicas queda bajo `r fmt(v$phi_rep_q95, 2)`. La proporción de réplicas que igualan o superan el valor observado se calcula en el script; cero réplicas extremas no demuestra una probabilidad exactamente nula.
+
+## ¿Dónde está la variabilidad adicional?
+
+```{r poisson-tamano}
+```
+
+::: {.columns}
+::: {.column width="55%"}
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_tamano", digits = 2)
+```
+`de_poisson`: desviación de $Y_i/V_i$ que implica el modelo, $\sqrt{\delta / V_i}$.
+:::
+::: {.column width="45%"}
+::: {.caja}
+- En segmentos pequeños domina el ruido Poisson; en los **grandes** la densidad observada varía hasta el doble de lo que permite una única $\delta$.
+- La densidad **varía entre segmentos**: esta **sobredispersión** motiva modelar $\delta_i$ con covariables y un término aleatorio (días 2 y 3).
+:::
+:::
+:::
+
+# Modelo Normal con varianza conocida
+
+## Planteamiento
+
+Sea $y_i = \log\delta_i$ el logaritmo de las personas por vivienda en los segmentos aptos. Para ilustrar un modelo de un solo parámetro, fijamos $\sigma$ en la desviación estándar observada. Es una aproximación didáctica: no propaga la incertidumbre de estimar $\sigma$. En D1S3 se estudiará el caso de media y varianza desconocidas.
+
+$$
+y_i \mid \mu \sim N(\mu, \sigma^2), \qquad \mu \sim N(\mu_0, \tau_0^2).
+$$
+
+- $\mu$: nivel típico de $\log\delta$; $e^{\mu}$ es la **mediana** de personas por vivienda.
+- $\mu_0 = \log 3$ y $\tau_0 = 0{,}5$: a priori, la mediana está entre $3e^{-1} \approx 1{,}1$ y $3e^{1} \approx 8{,}2$ con probabilidad 0,95.
+
+## Derivación: completar el cuadrado
+
+$$
+\begin{aligned}
+p(\mu \mid \mathbf{y}) &\propto \exp\!\Big(-\frac{1}{2\sigma^2}\sum_{i}(y_i - \mu)^2\Big)\exp\!\Big(-\frac{1}{2\tau_0^2}(\mu - \mu_0)^2\Big) \\
+&\propto \exp\!\Big(-\frac{1}{2}\Big[\mu^2\Big(\frac{n}{\sigma^2} + \frac{1}{\tau_0^2}\Big) - 2\mu\Big(\frac{n\bar y}{\sigma^2} + \frac{\mu_0}{\tau_0^2}\Big)\Big]\Big) \\
+&\propto \exp\!\Big(-\frac{1}{2\tau_n^2}(\mu - \mu_n)^2\Big),
+\end{aligned}
+$$
+
+con
+
+$$
+\frac{1}{\tau_n^2} = \frac{1}{\tau_0^2} + \frac{n}{\sigma^2}, \qquad
+\mu_n = \tau_n^2\Big(\frac{\mu_0}{\tau_0^2} + \frac{n\bar y}{\sigma^2}\Big).
+$$
+
+Por lo tanto $\mu \mid \mathbf{y} \sim N(\mu_n, \tau_n^2)$.
+
+## Precisiones que se suman
+
+Con la **precisión** (inverso de la varianza):
+
+$$
+\underbrace{\frac{1}{\tau_n^2}}_{\text{posterior}} = \underbrace{\frac{1}{\tau_0^2}}_{\text{previa}} + \underbrace{\frac{n}{\sigma^2}}_{\text{datos}},
+\qquad
+\mu_n = w\,\bar y + (1 - w)\,\mu_0, \quad w = \frac{n/\sigma^2}{1/\tau_0^2 + n/\sigma^2}.
+$$
+
+::: {.caja}
+- La precisión posterior es la suma de la precisión previa y la de los datos.
+- La media posterior "encoge" la media muestral hacia la media previa, con un peso que depende de la precisión relativa. Esta idea reaparece en los modelos jerárquicos: el **encogimiento** de la densidad de cada segmento hacia la predicción de las covariables.
+:::
+
+## Solución analítica y en Stan
+
+```{r normal-analitica}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("normal_analitica", digits = 4)
+```
+
+```{r normal-stan}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("resumen_normal", digits = 4)
+```
+
+## El peso de la previa según el tamaño de muestra
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_contraccion")
+```
+
+Las etiquetas muestran el peso de los datos para la $\sigma$ fijada en este ejemplo. Las submuestras se seleccionan por separado: la figura ilustra distintos tamaños, no una actualización secuencial.
+
+# Resumen
+
+## Familias conjugadas
+
+| Modelo | Verosimilitud | Previa conjugada | Posterior | Predictiva |
+|---|---|---|---|---|
+| Proporción | $\text{Bernoulli}(\theta)$ | $\text{Beta}(a, b)$ | $\text{Beta}(a + s,\ b + n - s)$ | Beta-Binomial |
+| Tasa con exposición | $\text{Poisson}(\delta V_i)$ | $\text{Gamma}(a, b)$ | $\text{Gamma}(a + \sum Y,\ b + \sum V)$ | Binomial Negativa |
+| Media | $N(\mu, \sigma^2)$, $\sigma$ conocida | $N(\mu_0, \tau_0^2)$ | $N(\mu_n, \tau_n^2)$ | $N(\mu_n, \sigma^2 + \tau_n^2)$ |
+
+En los tres casos la media posterior es un **promedio ponderado** entre la media previa y el estimador de máxima verosimilitud.
+
+## ¿Y si no hay información previa?
+
+- **La escala importa**: una Beta(1,1) es uniforme en la probabilidad; no lo es en el logit. Una Gamma con forma y tasa pequeñas no es plana. Una Normal amplia puede asignar masa a valores poco plausibles.
+- **Previa de Jeffreys**: $p(\theta) \propto \sqrt{I(\theta)}$, con $I(\theta)$ la información de Fisher; es invariante a reparametrizaciones. Para la Bernoulli, $I(\theta) = 1/[\theta(1-\theta)]$ y la previa es $\text{Beta}(1/2, 1/2)$.
+- **Previas débilmente informativas** [@gelman2013]: descartan valores absurdos sin dominar a los datos. Son las que se usan en el modelo de población (por ejemplo, $\beta_k \sim N(0, 1)$ con covariables estandarizadas).
+
+::: {.caja}
+En estos ejemplos, compare el peso de la previa con la información de los datos. Un gran número de segmentos no garantiza poca sensibilidad si hay dependencia, problemas de identificación o poca información por parámetro.
+:::
+
+## Resumen de la sesión
+
+- La posterior se obtiene multiplicando verosimilitud y previa e identificando el **núcleo**.
+- Con previas **conjugadas** la posterior es analítica, y su media es un promedio ponderado entre la previa y los datos.
+- La **predictiva posterior** (Beta-Binomial, Binomial Negativa) incorpora la incertidumbre del parámetro.
+- Stan reproduce las soluciones exactas y **no necesita conjugación**.
+- Una única densidad común **no explica** la variabilidad entre segmentos: hay sobredispersión.
+
+## Referencias
+
+::: {#refs}
+:::
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)

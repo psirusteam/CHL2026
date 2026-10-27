@@ -1,0 +1,126 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+
+
+processing file: Bayes_uniparametrico.qmd
+1/69                       
+2/69 [setup]               
+3/69                       
+4/69 [datos]               
+5/69                       
+6/69 [unnamed-chunk-1]     
+7/69                       
+8/69 [bernoulli-analitica] 
+9/69                       
+10/69 [unnamed-chunk-2]     
+11/69                       
+12/69 [unnamed-chunk-3]     
+13/69                       
+14/69 [unnamed-chunk-4]     
+15/69                       
+16/69 [unnamed-chunk-5]     
+17/69                       
+18/69 [bernoulli-stan]      
+19/69                       
+20/69 [bernoulli-resumen]   
+21/69                       
+22/69 [unnamed-chunk-6]     
+23/69                       
+24/69 [unnamed-chunk-7]     
+25/69                       
+26/69 [bernoulli-predictiva]
+27/69                       
+28/69 [unnamed-chunk-8]     
+29/69                       
+30/69 [poisson-datos]       
+31/69                       
+32/69 [unnamed-chunk-9]     
+33/69                       
+34/69 [poisson-sensibilidad]
+35/69                       
+36/69 [unnamed-chunk-10]    
+37/69                       
+38/69 [unnamed-chunk-11]    
+39/69                       
+40/69 [poisson-stan]        
+41/69                       
+42/69 [poisson-resumen]     
+43/69                       
+44/69 [unnamed-chunk-12]    
+45/69                       
+46/69 [poisson-prediccion]  
+47/69                       
+48/69 [unnamed-chunk-13]    
+49/69                       
+50/69 [unnamed-chunk-14]    
+51/69                       
+52/69 [poisson-ppc]         
+53/69                       
+54/69 [unnamed-chunk-15]    
+55/69                       
+56/69 [poisson-tamano]      
+57/69                       
+58/69 [unnamed-chunk-16]    
+59/69                       
+60/69 [normal-analitica]    
+61/69                       
+62/69 [unnamed-chunk-17]    
+63/69                       
+64/69 [normal-stan]         
+65/69                       
+66/69 [unnamed-chunk-18]    
+67/69                       
+68/69 [unnamed-chunk-19]    
+69/69                       
+output file: Bayes_uniparametrico.knit.md
+
+pandoc 
+  to: revealjs
+  output-file: Bayes_uniparametrico.html
+  standalone: true
+  wrap: none
+  default-image-extension: png
+  html-math-method:
+    method: mathjax
+    url: >-
+      https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full
+  slide-level: 2
+  css:
+    - styles.css
+  variables: {}
+  
+metadata
+  link-citations: true
+  width: 1600
+  height: 900
+  margin: 0.08
+  center: false
+  navigationMode: linear
+  controlsLayout: edges
+  controlsTutorial: false
+  hash: true
+  history: true
+  hashOneBasedIndex: false
+  fragmentInURL: false
+  transition: fade
+  backgroundTransition: none
+  pdfSeparateFragments: false
+  lang: es
+  auto-stretch: true
+  engines:
+    - path: C:\Program Files\RStudio\resources\app\bin\quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  title: Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
+  subtitle: 'Fundamentos de la inferencia bayesiana I: modelos uniparamétricos'
+  author: Andrés Gutiérrez
+  institute: CEPAL · UNFPA América Latina y el Caribe · INE Chile
+  date: 23 de noviembre de 2026 · Día 1, sesión 2 · 11:30–13:00
+  bibliography:
+    - references.bib
+  theme: simple
+  slideNumber: true
+  
+Output created: Bayes_uniparametrico.html
+
