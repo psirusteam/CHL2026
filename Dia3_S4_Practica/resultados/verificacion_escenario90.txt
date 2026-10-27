@@ -1,0 +1,10 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+[1] "English_United States.utf8"
+              viviendas  mediana inferior superior
+base              58116 144228.0 142750.8 145732.3
+cobertura_090     64557 160197.5 158541.0 161859.5
+Escenario modificado y universos agregados: correctos

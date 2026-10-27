@@ -1,0 +1,224 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Práctica en Stan: modelo de población en Magallanes"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "25 de noviembre de 2026 · Día 3, sesión 4 · 16:30–18:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+    embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::read_chunk("Rcode/Practica_Dia3.R")
+knitr::opts_chunk$set(eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE,
+  comment="", fig.align="center", out.width="90%")
+res <- readRDS("resultados/resumen.rds")
+```
+
+# Ajustar, interpretar y justificar
+
+## Lo que deben lograr en esta práctica
+
+Cada pareja debe **compilar y ajustar en Stan** el modelo presentado en D3S3, ahora con datos de Magallanes.
+
+1. Preparar los datos y comprobar las matrices de zona, covariables y comuna.
+2. Ejecutar el ajuste y revisar todos sus coeficientes y escalas.
+3. Interpretar una asociación y calcular totales por comuna.
+4. Cambiar un supuesto de exposición sin volver a ajustar el modelo.
+
+Los bloques están preparados. Ustedes deben ejecutarlos, revisar las salidas y justificar las decisiones con su conocimiento del censo.
+
+
+Mientras compila y ajusta Stan, avancen con las preguntas sobre unidades, matrices y alcance.
+
+## Abrir solo los archivos de esta sesión
+
+Sitúen el directorio de trabajo de RStudio en `Dia3_S4_Practica` y abran:
+
+- `Rcode/Practica_Dia3.R`: ejecutar por bloques, en orden.
+- `stan/modelo_poblacion_v02.stan`: localizar los datos, parámetros y modelo.
+
+```{r practica-paquetes}
+```
+
+RStan y su compilador deben estar verificados antes de la sesión. Si un equipo falla, trabajen en pareja en un equipo operativo con apoyo del docente. **Las tablas preparadas sirven de referencia; no sustituyen ejecutar el ajuste.**
+
+# Ejercicio 1: preparar y ajustar
+
+## Definir el universo antes de modelar
+
+Ejecuten el bloque `practica-datos` y respondan:
+
+1. ¿Qué representa una fila y qué identifican `edid` y `fid`?
+2. ¿Cuántos segmentos hay en la base, cuántos son aptos y cuántos están en el destino de predicción?
+3. ¿Por qué se exige `n_vpo > 0` para este ajuste?
+4. ¿Por qué el destino excluye segmentos con colectivas o sin viviendas ocupadas?
+
+**Completen una ficha:** región, unidad, personas observadas, exposición, criterios de ajuste y universo de predicción.
+
+::: {.notes}
+Se respeta apto_modelo tal como viene preparado; no se redefine como cobertura completa. El destino es un subconjunto de Magallanes: sin colectivas y con VPO positiva. Deben explicitar qué población queda fuera y qué tratamiento requeriría. No usar sus totales como toda la región ni como población nacional. La base original queda conservada.
+:::
+
+## Comprobar las matrices X y Z
+
+Ejecuten `practica-matrices`.
+
+| Matriz | Qué representa |
+|---|---|
+| `X_obs`, `X_tot` | Intercepto, zona y dos covariables satelitales estandarizadas |
+| `Z_obs`, `Z_tot` | Indicadores de comuna con un único diccionario de columnas |
+
+1. Identifiquen las columnas de zona y su categoría de referencia.
+2. Lean el número de aptos por comuna. ¿Todas tienen la misma información?
+3. Comprueben que cada fila de `Z` suma uno y que sus columnas mantienen el orden entre ajuste y predicción.
+
+**Pregunta:** ¿qué error produciría intercambiar dos columnas de comuna al predecir?
+
+## Entregar los datos a Stan {.smaller}
+
+```{r practica-lista}
+```
+
+Expliquen con sus palabras la diferencia entre `Y_obs`, `V_obs` y `V_tot`. En este ajuste base la exposición predictiva no se amplía por cobertura.
+
+## Localizar el modelo que van a ejecutar
+
+En el archivo Stan identifiquen:
+
+```stan
+lp = X_obs * beta + Z_obs * gamma;
+Y_obs ~ poisson(lambda);
+densidad ~ lognormal(lp, sigma);
+```
+
+1. ¿Qué parte representa características del segmento y cuál diferencias entre comunas?
+2. ¿Qué permite que dos segmentos de una misma comuna y zona tengan diferente densidad?
+3. Localicen las distribuciones previas y los límites de intensidad y densidad.
+
+No cambien esas líneas durante el ajuste inicial. El archivo es una copia del programa del proyecto utilizado en D3S3; la selección de covariables de la práctica es más corta que la nacional.
+
+## Compilar y ajustar en su computador {.smaller}
+
+```{r practica-ajuste}
+```
+
+**Tarea obligatoria:** ejecutar `stan_model()` y `sampling()`. Anoten semilla, cadenas, iteraciones y calentamiento. Identifiquen qué objeto contiene el ajuste.
+
+::: {.notes}
+Los valores iniciales se obtienen de una regresión auxiliar y de las densidades observadas; no sustituyen las previas. No interpretar la regresión auxiliar como el resultado bayesiano. No lanzar el proyecto nacional ni instalar dependencias automáticamente. El docente acompaña el código y adapta el tiempo de espera a cada equipo.
+:::
+
+# Ejercicio 2: revisar e interpretar
+
+## Revisar el cálculo antes de usar resultados
+
+Ejecuten `practica-diagnostico` y completen:
+
+| Control | Guía para esta práctica |
+|---|---|
+| R-hat máximo | Menor de 1,01 y cercano a uno |
+| ESS bulk y tail mínimos | Al menos 400 |
+| Divergencias | Cero |
+| Llegadas al límite de profundidad | Cero |
+
+No excluyan del diagnóstico intercepto, efectos de comuna ni escalas. Si `revisar` es verdadero, soliciten ayuda al docente y no utilicen las predicciones para concluir sobre población.
+
+**Pregunta:** ¿por qué terminar sin un error de programación no basta para aprobar el ajuste?
+
+## Interpretar una covariable
+
+Ejecuten `practica-resultados` y `practica-figuras`. Elijan luces nocturnas o cobertura urbana y registren la mediana y el intervalo de `exp(beta)`.
+
+Completen:
+
+«Por una desviación estándar nacional adicional en ___, el modelo asocia un factor de ___ en la mediana de personas por vivienda, manteniendo zona, comuna y las demás entradas. Su intervalo del 95 % va de ___ a ___.»
+
+1. ¿El factor indica aumento o disminución respecto de uno?
+2. ¿Por qué no se interpreta directamente como personas adicionales?
+3. ¿Por qué esta asociación no demuestra causalidad?
+
+::: {.notes}
+Leer factores antes de aplicar pisos y topes predictivos. La mediana condicional de densidad es exp(eta), no su media marginal. La unidad de covariable es una DE nacional; no reestandarizar en Magallanes. Los intervalos no deben usarse mecánicamente como una prueba formal de selección de covariables.
+:::
+
+# Ejercicio 3: del segmento a la comuna
+
+## Sumar dentro de cada simulación
+
+Ejecuten `practica-agregados`.
+
+```r
+# Para una comuna elegida, primero sumar; despues resumir.
+comuna_elegida <- "12101"
+columnas <- as.character(destino$cut) == comuna_elegida
+stopifnot(any(columnas))
+total_comuna <- rowSums(y_tot[, columnas, drop = FALSE])
+quantile(total_comuna, c(0.025, 0.5, 0.975))
+```
+
+1. Cambien el código por el de otra comuna presente en el destino.
+2. Registren segmentos, personas censadas del mismo subconjunto, mediana e intervalo predictivo.
+3. ¿Por qué no deben sumar los extremos de los intervalos individuales de los segmentos?
+
+## Comparar con el censo del mismo subconjunto
+
+Lean `por_comuna` y `por_cobertura`.
+
+1. Elijan una comuna y una clasificación de cobertura.
+2. Describan la diferencia entre predicción y conteo censal, indicando su universo.
+3. Mencionen dos explicaciones posibles además de omisión censal.
+
+La clasificación de cobertura se utiliza aquí para **describir** resultados. No transforma automáticamente una banda en una tasa exacta ni modifica la exposición del ajuste base.
+
+::: {.notes}
+Posibles explicaciones: selección de aptos, covariables insuficientes, transferencia a no aptos, generación de nueva densidad de segmento, pisos y techo, errores de exposición, universo incompleto. La predicción del programa genera nueva densidad incluso para segmentos aptos; no es reconstrucción condicionada en su densidad latente particular. Las simulaciones comparten beta, gamma y escalas: preservar esa dependencia sumando por draw.
+:::
+
+# Ejercicio 4: cambiar la exposición
+
+## Un escenario que no requiere otro ajuste
+
+El bloque de apoyo `practica-escenario-funcion` reproduce en R la regla predictiva del archivo Stan, usando los efectos de **todas las comunas**.
+
+Ejecútenlo una vez. Después ejecuten:
+
+```{r practica-escenarios}
+```
+
+1. Comparen viviendas, mediana e intervalo entre base y escenario con $c=0,95$.
+2. Cambien solo `c_hipotetica` a **0,90** y repitan este bloque.
+3. ¿Qué cambió y qué permaneció fijo en el modelo?
+
+## Explicar los supuestos del escenario
+
+La transformación es $V^{tot}=\operatorname{round}(VPO/c)$; el resto de la especificación permanece fijo.
+
+- Los valores 0,95 y 0,90 son **hipotéticos**: no son estimaciones de la cobertura real de Magallanes.
+- Se supone que la relación aprendida de personas/vivienda es aplicable a las viviendas añadidas.
+- Las cifras de cobertura se tratan como fijas: el intervalo no incorpora incertidumbre sobre ellas.
+
+**Justifiquen:** ¿qué evidencia censal o de terreno necesitarían para defender ese escenario en una aplicación real?
+
+::: {.notes}
+La función usa 1000 simulaciones posteriores repartidas por el ajuste para limitar memoria, genera nueva densidad, aplica techo y pisos y usa Z_tot %*% gamma. La referencia base regenerada puede diferir del resultado de Stan por variación Monte Carlo y por emplear un subconjunto de draws; no exigir igualdad exacta. Se fija la misma semilla por escenario como ayuda a la comparación; el aumento del conteo simulado no tiene que ser proporcional exacto por redondeo y variación predictiva. Cambios de muestra o entradas del ajuste, covariables, agrupamiento o previas requieren volver a ajustar.
+:::
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)
