@@ -1,0 +1,454 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Modelo Poisson con vínculo loglineal"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "24 de noviembre de 2026 · Día 2, sesión 3 · 14:30–16:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+bibliography: references.bib
+---
+
+```{r setup, include = FALSE}
+source("Rcode/utilidades.R")
+knitr::read_chunk("Rcode/Modelo_Poisson.R")
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "", fig.align = "center", out.width = "92%")
+v <- leer_valores()
+```
+
+## De la regresión de densidad al modelo de conteos
+
+D2S1 y D2S2 modelaron log(personas por vivienda). Ahora modelamos el conteo de personas, incorporando las viviendas como **exposición**.
+
+1. Interpretar el vínculo logarítmico y el offset de coeficiente fijo 1.
+2. Ajustar un modelo Poisson y evaluar su dispersión predictiva.
+3. Introducir heterogeneidad entre segmentos mediante Poisson–lognormal.
+4. Distinguir réplicas con densidades nuevas, inferencia de densidades existentes y encogimiento.
+
+::: {.notes}
+Derivaciones IRLS y de mezclas como apoyo docente. D2S4 retoma la práctica de modelos de conteos.
+:::
+
+# Modelos lineales generalizados
+
+## Del logaritmo de una razón al conteo
+
+En la sesión anterior se modeló $\log(Y_i / V_i)$ como una variable continua. Dos problemas:
+
+- $Y_i$ es un **conteo**: entero y no negativo. El modelo debe especificar su distribución y cómo depende la varianza de la media.
+- Con pocas viviendas, $Y_i/V_i$ es muy ruidosa, y el modelo lineal le da el **mismo peso** que a un segmento grande.
+
+Un **modelo lineal generalizado** (GLM) modela directamente la distribución del conteo [@mccullagh1989]. Tiene tres componentes:
+
+| Componente | En el modelo Poisson |
+|---|---|
+| Distribución de la respuesta | $Y_i \sim \text{Poisson}(\lambda_i)$ |
+| Predictor lineal | $\eta_i = \mathbf{x}_i^\top\boldsymbol\beta$ |
+| Función de vínculo | $\log\lambda_i = \log V_i + \eta_i$ |
+
+## La distribución Poisson
+
+$$
+p(y \mid \lambda) = \frac{\lambda^y e^{-\lambda}}{y!}, \qquad y = 0, 1, 2, \dots
+$$
+
+- $E(Y) = \text{Var}(Y) = \lambda$: la varianza **crece** con la media.
+- Se obtiene como límite de una Binomial cuando $n\to\infty$, $p\to0$ y $np\to\lambda$. Esa identidad matemática no demuestra que el proceso de conteo censal cumpla los supuestos Poisson.
+- Pertenece a la **familia exponencial**: $\log p(y \mid \lambda) = y\log\lambda - \lambda - \log y!$, con parámetro natural $\log\lambda$. Por eso el vínculo **logarítmico** es el vínculo canónico.
+
+## El *offset*: personas por vivienda
+
+Con $\log\lambda_i = \log V_i + \mathbf{x}_i^\top\boldsymbol\beta$:
+
+$$
+\lambda_i = V_i \times \underbrace{e^{\mathbf{x}_i^\top\boldsymbol\beta}}_{\delta_i}
+\qquad\Longrightarrow\qquad
+E\!\left(\frac{Y_i}{V_i}\right) = \delta_i.
+$$
+
+::: {.caja}
+- El modelo sigue siendo para la **densidad** $\delta_i$, con efectos multiplicativos: $e^{\beta_k}$ es la razón de **densidades esperadas** ante una desviación estándar de una covariable continua; para zona es un cambio de categoría. En el modelo Normal previo, $e^{\eta_i}$ era una mediana condicional: no se deben equiparar sus estimaciones sin revisar las especificaciones.
+- La verosimilitud es la de los **conteos**: un segmento de 200 viviendas aporta mucha más información que uno de 5.
+- El código exige $V_i>0$ para calcular el offset y usa los segmentos **aptos**. En el modelo de conteos, exposición cero implica $Y_i=0$ con probabilidad uno; sería incompatible con personas positivas. Los conteos cero con exposición positiva sí son admisibles en Poisson.
+:::
+
+## ¿Por qué fijar el coeficiente de $\log V_i$ en 1?
+
+Si se estima libremente, $\log\lambda_i = \alpha + \gamma\log V_i$, y $\gamma = 1$ significa que las personas son **proporcionales** a las viviendas:
+
+```{r datos}
+```
+
+```{r offset}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_offset", digits = 4)
+```
+
+## Personas y viviendas en escala logarítmica
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_offset")
+```
+
+La pendiente es una exploración agregada sin todas las covariables. Se muestran errores estándar Poisson y cuasi-Poisson; la sobredispersión puede alterar su precisión. Su cercanía a 1 no prueba proporcionalidad condicional: el offset también expresa un supuesto sustantivo sobre personas por vivienda.
+
+# Estimación del modelo Poisson
+
+## La verosimilitud
+
+Con $\mu_i = V_i e^{\mathbf{x}_i^\top\boldsymbol\beta}$:
+
+$$
+\ell(\boldsymbol\beta) = \log p(\mathbf{y} \mid \boldsymbol\beta)
+= \sum_{i=1}^n \Big[y_i\big(\log V_i + \mathbf{x}_i^\top\boldsymbol\beta\big) - V_i e^{\mathbf{x}_i^\top\boldsymbol\beta} - \log y_i!\Big].
+$$
+
+Derivando:
+
+$$
+\frac{\partial\ell}{\partial\boldsymbol\beta} = \sum_{i=1}^n \mathbf{x}_i\,(y_i - \mu_i) = \mathbf{X}^\top(\mathbf{y} - \boldsymbol\mu),
+\qquad
+\frac{\partial^2\ell}{\partial\boldsymbol\beta\,\partial\boldsymbol\beta^\top} = -\mathbf{X}^\top\mathbf{W}\mathbf{X}, \quad \mathbf{W} = \text{diag}(\mu_i).
+$$
+
+- Las **ecuaciones de estimación** $\mathbf{X}^\top(\mathbf{y} - \hat{\boldsymbol\mu}) = \mathbf{0}$: con intercepto, en el GLM sin penalización y con solución finita, el total observado es igual al ajustado. Esa identidad no se exige a cada draw de una posterior regularizada.
+- La información de Fisher $\mathbf{X}^\top\mathbf{W}\mathbf{X}$ pondera cada segmento por su $\mu_i$: los segmentos **grandes** informan más.
+
+## Máxima verosimilitud: mínimos cuadrados reponderados
+
+El máximo no tiene solución cerrada. `glm()` usa Newton–Raphson, que para el vínculo canónico es **mínimos cuadrados iterativamente reponderados** (IRLS):
+
+$$
+\boldsymbol\beta^{(t+1)} = \big(\mathbf{X}^\top\mathbf{W}^{(t)}\mathbf{X}\big)^{-1}\mathbf{X}^\top\mathbf{W}^{(t)}\mathbf{z}^{(t)},
+\qquad
+z_i^{(t)} = \mathbf{x}_i^\top\boldsymbol\beta^{(t)} + \frac{y_i - \mu_i^{(t)}}{\mu_i^{(t)}}.
+$$
+
+Cada paso es una regresión ponderada de una respuesta "linealizada" con pesos $\mu_i$. En el enfoque bayesiano, con previas $\beta_k \sim N(0, 1)$, una aproximación local de Laplace tiene centro en la moda posterior y covarianza $(\mathbf{X}^\top\mathbf{W}\mathbf{X} + \mathbf{I})^{-1}$, con $\mathbf W$ evaluada allí. La cercanía a máxima verosimilitud depende de la información y de la previa.
+
+## Matriz de diseño y GLM clásico
+
+Se utiliza el indicador operativo `apto_modelo`, heredado de la preparación. La selección basada en información observada y la extrapolación a no aptos requieren evaluación; la verosimilitud de esta sesión no modela explícitamente ese mecanismo de selección.
+
+```{r x-glm}
+```
+
+## El programa Stan
+
+::: {.columns}
+::: {.column width="55%"}
+```{r, eval = TRUE, echo = FALSE, class.output = "stan"}
+cat(readLines("stan/poisson_offset.stan"), sep = "\n")
+```
+:::
+::: {.column width="45%"}
+- `poisson_log(eta)` es la Poisson parametrizada en $\log\lambda$: más estable que `poisson(exp(eta))`.
+- `log_v` se calcula en R y entra como dato.
+- `log_lik` guarda la log-verosimilitud de cada segmento para LOO.
+- `poisson_log_rng` requiere log-tasa menor que $30\log 2$. No se recorta la tasa: se registra `rng_out_of_range` y se marca la réplica inválida con -1. El script exige cero casos inválidos en los draws retenidos antes de usar las réplicas.
+:::
+:::
+
+## Ajuste
+
+```{r ajuste-poisson}
+```
+
+```{r resultado-poisson}
+```
+
+Los inicios se sitúan cerca del GLM, con valores distintos entre cadenas, y el Poisson usa una métrica densa para la correlación de coeficientes. Esto facilita la exploración; no sustituye su verificación.
+
+## Stan frente a `glm()`
+
+```{r, eval = TRUE, echo = FALSE}
+tabla <- readRDS("resultados/resultado_poisson.rds")
+tba(dplyr::select(tabla, termino, glm, error_glm, mean, sd), digits = 3, font_size = 20)
+```
+
+Compare las medias y desviaciones posteriores con los estimadores y errores estándar GLM. Las diferencias pueden deberse a la regularización y al error Monte Carlo; la cercanía no valida por sí sola el muestreo ni el modelo.
+
+# Sobredispersión
+
+## ¿Reproduce el modelo la variabilidad de los conteos?
+
+Si los datos son Poisson, $\text{Var}(Y_i) = E(Y_i)$ y los **residuos de Pearson**
+
+$$
+r_i = \frac{y_i - \hat\mu_i}{\sqrt{\hat\mu_i}}
+$$
+
+tienen varianza cercana a 1. El **índice de dispersión**
+
+$$
+\hat\phi = \frac{1}{n - p}\sum_{i=1}^n r_i^2
+$$
+
+debe ser cercano a 1. Para `glm()` en Aysén: $\hat\phi =$ `r fmt(v$dispersion_glm, 2)`.
+
+```{r ppc-poisson}
+```
+
+## Chequeo predictivo del índice de dispersión
+
+```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
+mostrar("grafico_ppc_poisson")
+```
+
+La dispersión observada es `r fmt(v$phi_obs, 2)`; el 95% de las réplicas Poisson queda bajo `r fmt(v$phi_rep_q95, 2)`.
+
+## Consecuencias de la sobredispersión
+
+::: {.caja}
+- Las covariables no explican toda la variación de la densidad: con la misma zona y covariables, dos segmentos tienen densidades distintas (tamaño y composición de los hogares, uso de las viviendas...).
+- Ignorar heterogeneidad puede producir intervalos demasiado estrechos. El factor $\sqrt{\hat\phi}$ corresponde a una corrección cuasi-Poisson de dispersión común; no es una corrección universal para cualquier modelo.
+- Una predicción de población con el modelo Poisson **subestimaría la incertidumbre**.
+:::
+
+Soluciones habituales:
+
+1. **Cuasi-Poisson**: multiplicar la varianza por $\hat\phi$ (sin modelo de probabilidad completo).
+2. **Binomial negativa**: mezcla Poisson–Gamma.
+3. **Poisson–lognormal**: un efecto aleatorio por segmento en $\log\delta_i$ [@aitchison1989]. Es la opción del modelo de población.
+
+## La Binomial negativa como mezcla
+
+Si $Y_i \mid u_i \sim \text{Poisson}(\mu_i u_i)$ con $u_i \sim \text{Gamma}(\phi, \phi)$ ($E(u_i) = 1$, $\text{Var}(u_i) = 1/\phi$):
+
+$$
+p(y_i) = \int_0^\infty \frac{(\mu_i u)^{y_i}e^{-\mu_i u}}{y_i!}\frac{\phi^\phi}{\Gamma(\phi)}u^{\phi - 1}e^{-\phi u}\,du
+= \frac{\Gamma(y_i + \phi)}{y_i!\,\Gamma(\phi)}\Big(\frac{\phi}{\phi + \mu_i}\Big)^{\phi}\Big(\frac{\mu_i}{\phi + \mu_i}\Big)^{y_i},
+$$
+
+con
+
+$$
+E(Y_i) = \mu_i, \qquad \text{Var}(Y_i) = \mu_i + \frac{\mu_i^2}{\phi}.
+$$
+
+El término $\mu_i^2/\phi$ es la sobredispersión; con $\phi \to \infty$ se recupera la Poisson. Comparte la forma algebraica de la predictiva del día 1, pero cambia la interpretación: aquí cada segmento tiene un efecto Gamma propio; antes se integraba la incertidumbre de una tasa común.
+
+# Modelo Poisson–lognormal
+
+## Un efecto por segmento
+
+$$
+Y_i \mid \delta_i \sim \text{Poisson}(V_i\,\delta_i), \qquad
+\log\delta_i = \mathbf{x}_i^\top\boldsymbol\beta + \varepsilon_i, \qquad
+\varepsilon_i \sim N(0, \sigma^2).
+$$
+
+- Es un modelo **jerárquico**: cada segmento tiene su propia densidad $\delta_i$, que se "encoge" hacia $e^{\mathbf{x}_i^\top\boldsymbol\beta}$.
+- $\sigma$ representa heterogeneidad latente adicional al componente Poisson, bajo los supuestos del modelo. No es una medición directa de toda la variabilidad real ni una separación empírica automática.
+- Hay un parámetro latente por segmento: miles de parámetros además de $\boldsymbol\beta$ y $\sigma$. HMC/NUTS es una opción computacional para ajustarlo; su desempeño se evalúa con diagnósticos.
+
+## Momentos marginales del Poisson–lognormal
+
+Con $\eta_i = \mathbf{x}_i^\top\boldsymbol\beta$ y $E(e^{\varepsilon_i}) = e^{\sigma^2/2}$, $E(e^{2\varepsilon_i}) = e^{2\sigma^2}$:
+
+$$
+E(Y_i) = E\big[E(Y_i \mid \delta_i)\big] = V_i\,E(\delta_i) = V_i\,e^{\eta_i + \sigma^2/2},
+$$
+
+$$
+\text{Var}(Y_i) = E\big[\text{Var}(Y_i \mid \delta_i)\big] + \text{Var}\big[E(Y_i \mid \delta_i)\big]
+= E(Y_i) + V_i^2 e^{2\eta_i}\big(e^{2\sigma^2} - e^{\sigma^2}\big),
+$$
+
+es decir,
+
+$$
+\text{Var}(Y_i) = E(Y_i) + E(Y_i)^2\big(e^{\sigma^2} - 1\big).
+$$
+
+::: {.caja}
+La misma forma que la Binomial negativa, con $1/\phi = e^{\sigma^2} - 1$: la varianza extra crece con el **cuadrado** de la media. Con $\sigma = 0{,}1$, $e^{\sigma^2} - 1 \approx 0{,}01$: en un segmento de 250 personas, la desviación pasa de 16 (Poisson) a 30.
+:::
+
+## Parametrización no centrada
+
+Dos formas equivalentes de escribir el mismo modelo:
+
+::: {.columns}
+::: {.column width="50%"}
+**Centrada**
+
+$$
+\log\delta_i \sim N(\mathbf{x}_i^\top\boldsymbol\beta, \sigma^2)
+$$
+
+el parámetro es $\log\delta_i$.
+:::
+::: {.column width="50%"}
+**No centrada**
+
+$$
+z_i \sim N(0, 1), \quad \log\delta_i = \mathbf{x}_i^\top\boldsymbol\beta + \sigma z_i
+$$
+
+el parámetro es $z_i$.
+:::
+:::
+
+- En la centrada, la escala de $\log\delta_i$ depende de $\sigma$: si los datos informan poco a cada segmento, la posterior tiene forma de **embudo** que NUTS explora mal.
+- En la no centrada, $z_i$ y $\sigma$ son a priori independientes; la geometría es más simple [@betancourt2017].
+- Cuál es mejor depende de cuánto informan los datos a cada $\delta_i$ (práctica del día 2).
+
+## El programa Stan
+
+```{r, eval = TRUE, echo = FALSE, class.output = "stan"}
+cat(readLines("stan/poisson_lognormal.stan"), sep = "\n")
+```
+
+## Ajuste
+
+```{r ajuste-pln}
+```
+
+```{r resultado-pln}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("diagnostico_pln")
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("resumen_pln", digits = 3)
+```
+
+## Dos dispersiones de modelos distintos
+
+| Modelo | $\sigma$ | Interpretación |
+|---|---|---|
+| Regresión lineal de $\log(Y/V)$ (sesión 1) | `r fmt(v$sigma_lineal, 3)` | variabilidad de $\log(Y/V)$: densidad + ruido de conteo |
+| Poisson–lognormal | `r fmt(v$sigma_pln, 3)` | heterogeneidad latente de log-densidad bajo el modelo |
+
+::: {.caja}
+- Las dispersiones se estiman en dos verosimilitudes distintas. Su cociente no identifica qué porcentaje de la varianza es ruido de conteo. La aproximación delta ayuda a interpretar componentes para conteos suficientemente grandes, pero no convierte esta comparación en una descomposición formal.
+- El Poisson–lognormal representa explícitamente variación Poisson y heterogeneidad latente. Su interpretación depende de la especificación, la elegibilidad y la calidad del ajuste.
+:::
+
+## Los momentos teóricos y las réplicas
+
+La tabla promedia los momentos predictivos de cada segmento, manteniendo su diseño y exposición; no es la varianza de todos los segmentos mezclados como si fueran intercambiables.
+
+```{r momentos-pln}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_momentos", digits = 3)
+```
+
+La tabla compara las réplicas con momentos **predictivos posteriores**. Se promedian las medias y varianzas por draw y se añade la varianza de la media entre draws: $\operatorname{Var}(Y\mid\mathbf y)=E[\operatorname{Var}(Y\mid\beta,\sigma)\mid\mathbf y]+\operatorname{Var}[E(Y\mid\beta,\sigma)\mid\mathbf y]$. No se sustituyen los parámetros por sus medias antes de aplicar las fórmulas.
+
+## Chequeo predictivo: dispersión
+
+Ambos modelos se comparan mediante el mismo estadístico de discrepancia, usando como referencia fija las medias del Poisson. No es un índice de dispersión recalibrado específicamente para el Poisson–lognormal.
+
+```{r ppc-pln}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
+mostrar("grafico_ppc_pln")
+```
+
+## Chequeo predictivo: la densidad por segmento
+
+Las réplicas del Poisson–lognormal usan una **densidad nueva** para cada segmento: simulan segmentos con las mismas covariables y viviendas. Este chequeo es **mixto**, distinto de replicar los conteos condicionando en las densidades latentes ya aprendidas de cada segmento.
+
+```{r ppc-densidad}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("grafico_ppc_densidad")
+```
+
+La figura anterior muestra la ventana de 1 a 4,5 personas por vivienda. La evaluación completa debe revisar también los valores fuera de ese rango y recordar el filtro de elegibilidad de los datos.
+
+## Encogimiento: la densidad de cada segmento
+
+La posterior de $\log\delta_i$ combina su dato con la predicción de las covariables. Aproximando la verosimilitud de $\log\delta_i$ por una normal con media $\log(Y_i/V_i)$ y varianza $1/Y_i$ (método delta, $Y_i>0$ y suficientemente grande), manteniendo $\boldsymbol\beta$ y $\sigma$ fijos:
+
+$$
+E(\log\delta_i \mid \mathbf{y},\boldsymbol\beta,\sigma) \approx w_i\log\frac{Y_i}{V_i} + (1 - w_i)\,\mathbf{x}_i^\top\boldsymbol\beta,
+\qquad
+w_i = \frac{\sigma^2}{\sigma^2 + 1/Y_i}.
+$$
+
+- Segmento con muchas personas: $1/Y_i$ pequeño, $w_i \to 1$, domina su dato.
+- Segmento con pocas personas: $w_i$ pequeño, domina la predicción de las covariables.
+- Es el mismo promedio ponderado por precisiones del modelo Normal del día 1.
+
+## Encogimiento: la aproximación frente a Stan
+
+`ratio_implicito_stan` es un cociente descriptivo construido con medias posteriores, no un peso posterior exacto ni necesariamente un valor entre cero y uno. Se omiten denominadores cercanos a cero para evitar inestabilidad.
+
+```{r encogimiento}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_encogimiento", digits = 3)
+```
+
+## Encogimiento: gráfico
+
+```{r, eval = TRUE, echo = FALSE, out.width = "85%"}
+mostrar("grafico_encogimiento")
+```
+
+El gráfico usa la **mediana posterior** de $\delta_i$, calculada como exponencial de la mediana de sus draws de log-densidad. Examine cómo se relaciona el alejamiento de la diagonal con la exposición; no todo alejamiento implica el mismo grado de encogimiento.
+
+# Resumen
+
+## Diagnósticos de muestreo y simulación
+
+```{r, eval = TRUE, echo = FALSE}
+d <- readRDS("resultados/diagnostico_completo.rds")
+nuts <- readRDS("resultados/diagnostico_nuts.rds")
+control <- d |>
+  dplyr::group_by(model) |>
+  dplyr::summarise(Rhat_max = max(rhat), ESS_bulk_min = min(ess_bulk),
+                   ESS_tail_min = min(ess_tail), .groups = "drop") |>
+  dplyr::left_join(nuts, by = "model")
+tba(control, digits = 3, font_size = 18)
+```
+
+Se revisan coeficientes y parámetros latentes. R-hat menor que 1,01 y ESS_bulk/ESS_tail de al menos 400 son guías para cuatro cadenas; complemente con trazas y error Monte Carlo. La profundidad máxima de estas ejecuciones es 12. Las réplicas solo se usan si `invalid_replications` es cero.
+
+## Resumen de la sesión
+
+- El **GLM Poisson** con *offset* $\log V_i$ modela los conteos de personas con la densidad $\delta_i = e^{\mathbf{x}_i^\top\boldsymbol\beta}$; el coeficiente fijo 1 es un supuesto de proporcionalidad que debe evaluarse.
+- La información de Fisher $\mathbf{X}^\top\mathbf{W}\mathbf{X}$ pondera cada segmento por su tamaño.
+- Los conteos presentan **sobredispersión**: ignorarla subestima la incertidumbre.
+- El **Poisson–lognormal** tiene $\text{Var}(Y) = E(Y) + E(Y)^2(e^{\sigma^2} - 1)$; representa variación Poisson y heterogeneidad latente, y permite **encogimiento** de las densidades.
+- En Stan se evalúan parametrización, diagnósticos y validez de las réplicas; un límite numérico del generador no debe introducir un recorte silencioso de la distribución.
+
+::: {.caja}
+**Próxima práctica:** comparación con binomial negativa y parametrizaciones. El día 3 comienza con dos sesiones de variables satelitales y continúa con el modelo de Chile. Este modelo, $Y_i \sim \text{Poisson}(V_i\delta_i)$ con $\log\delta_i \sim N(\mathbf{x}_i^\top\boldsymbol\beta, \sigma^2)$, es una **base didáctica para el modelo de población**. Falta predecir en los segmentos no aptos y corregir la exposición por cobertura.
+:::
+
+## Referencias
+
+::: {#refs}
+:::
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)

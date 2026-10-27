@@ -1,0 +1,112 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+
+
+processing file: Modelo_Poisson.qmd
+1/55                    
+2/55 [setup]            
+3/55                    
+4/55 [datos]            
+5/55                    
+6/55 [offset]           
+7/55                    
+8/55 [unnamed-chunk-1]  
+9/55                    
+10/55 [unnamed-chunk-2]  
+11/55                    
+12/55 [x-glm]            
+13/55                    
+14/55 [unnamed-chunk-3]  
+15/55                    
+16/55 [ajuste-poisson]   
+17/55                    
+18/55 [resultado-poisson]
+19/55                    
+20/55 [unnamed-chunk-4]  
+21/55                    
+22/55 [ppc-poisson]      
+23/55                    
+24/55 [unnamed-chunk-5]  
+25/55                    
+26/55 [unnamed-chunk-6]  
+27/55                    
+28/55 [ajuste-pln]       
+29/55                    
+30/55 [resultado-pln]    
+31/55                    
+32/55 [unnamed-chunk-7]  
+33/55                    
+34/55 [unnamed-chunk-8]  
+35/55                    
+36/55 [momentos-pln]     
+37/55                    
+38/55 [unnamed-chunk-9]  
+39/55                    
+40/55 [ppc-pln]          
+41/55                    
+42/55 [unnamed-chunk-10] 
+43/55                    
+44/55 [ppc-densidad]     
+45/55                    
+46/55 [unnamed-chunk-11] 
+47/55                    
+48/55 [encogimiento]     
+49/55                    
+50/55 [unnamed-chunk-12] 
+51/55                    
+52/55 [unnamed-chunk-13] 
+53/55                    
+54/55 [unnamed-chunk-14] 
+55/55                    
+output file: Modelo_Poisson.knit.md
+
+pandoc 
+  to: revealjs
+  output-file: Modelo_Poisson.html
+  standalone: true
+  wrap: none
+  default-image-extension: png
+  html-math-method:
+    method: mathjax
+    url: >-
+      https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full
+  slide-level: 2
+  css:
+    - styles.css
+  variables: {}
+  
+metadata
+  link-citations: true
+  width: 1600
+  height: 900
+  margin: 0.08
+  center: false
+  navigationMode: linear
+  controlsLayout: edges
+  controlsTutorial: false
+  hash: true
+  history: true
+  hashOneBasedIndex: false
+  fragmentInURL: false
+  transition: fade
+  backgroundTransition: none
+  pdfSeparateFragments: false
+  lang: es
+  auto-stretch: true
+  engines:
+    - path: C:\Program Files\RStudio\resources\app\bin\quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  title: Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
+  subtitle: Modelo Poisson con vínculo loglineal
+  author: Andrés Gutiérrez
+  institute: CEPAL · UNFPA América Latina y el Caribe · INE Chile
+  date: 24 de noviembre de 2026 · Día 2, sesión 3 · 14:30–16:00
+  bibliography:
+    - references.bib
+  theme: simple
+  slideNumber: true
+  
+Output created: Modelo_Poisson.html
+
