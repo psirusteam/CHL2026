@@ -1,0 +1,375 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Práctica computacional en RStan: regresión bayesiana de la densidad"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "24 de noviembre de 2026 · Día 2, sesión 2 · 11:30–13:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+bibliography: references.bib
+---
+
+```{r setup, include = FALSE}
+source("Rcode/utilidades.R")
+knitr::read_chunk("Rcode/Practica_Dia2_lineal.R")
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "", fig.align = "center", out.width = "92%")
+v <- leer_valores()
+leer <- function(nombre) readRDS(ruta_resultado(nombre))
+```
+
+# Instrucciones
+
+## Objetivos de la práctica
+
+1. Comparar regiones sin confundir cambios de signo con diferencias demostradas.
+2. Evaluar predicción con PSIS-LOO y revisar sus diagnósticos.
+3. Explorar una dispersión distinta por zona.
+4. Revisar las implicaciones de las previas antes de adoptar una especificación.
+
+El ejercicio 4 se conserva como extensión y puente al modelo de conteos.
+
+**Producto por pareja:** una comparación de modelos con su diagnóstico, una conclusión predictiva y una propuesta de revisión de las previas.
+
+
+## Organización de la práctica
+
+::: {.caja}
+- Trabaje en parejas, con el directorio de trabajo en la carpeta de esta sesión (`Dia2_S2_Practica`).
+- El script `Rcode/Practica_Dia2_lineal.R` contiene las soluciones, en bloques `## ---- nombre ----` iguales a los de esta presentación.
+- Cada ejercicio tiene un **enunciado**, un **recordatorio teórico** y la **solución**.
+:::
+
+| Ejercicio | Tema |
+|---|---|
+| 1 | ¿Los efectos de las covariables son iguales en otra región? |
+| 2 | Comparación de modelos con validación cruzada LOO |
+| 3 | Una varianza distinta por zona |
+| 4 | Densidad y población en segmentos de cobertura incompleta |
+| 5 | Chequeo predictivo previo |
+
+## Preparación
+
+Programas Stan en `stan/`: `regresion_lineal.stan` (el de la sesión anterior) y `regresion_sigma_zona.stan` (ejercicio 3).
+
+```{r datos}
+```
+
+# Ejercicio 1: ¿los efectos son iguales en otra región?
+
+## Ejercicio 1
+
+::: {.ejercicio}
+1. Ajuste el modelo de regresión de $\log\delta_i$ con los segmentos **aptos de Magallanes**, con las mismas covariables de la sesión anterior.
+2. Ajuste el mismo modelo en **Aysén**.
+3. Grafique los intervalos de credibilidad al 95% de los coeficientes de ambas regiones en un mismo gráfico. ¿Qué covariables tienen efectos parecidos? ¿Cuáles cambian de signo?
+4. ¿Qué implica esto para un modelo nacional?
+:::
+
+## Recordatorio: modelos independientes y modelo común
+
+Con un modelo **por región** $r$:
+
+$$
+\log\delta_{ir} = \mathbf{x}_{ir}^\top\boldsymbol\beta_r + \varepsilon_{ir}, \qquad \varepsilon_{ir} \sim N(0, \sigma_r^2),
+$$
+
+cada región tiene sus propios $\boldsymbol\beta_r$ y $\sigma_r$. Un modelo **común** impone $\boldsymbol\beta_r = \boldsymbol\beta$ para todas.
+
+Entre ambos extremos está el modelo **jerárquico**: $\boldsymbol\beta_r \sim N(\boldsymbol\beta, \boldsymbol\Sigma)$, que comparte información entre regiones y deja que difieran. La comparación de los $\boldsymbol\beta_r$ ajustados por separado orienta hipótesis para comparar modelos; no basta para elegir una estructura nacional.
+
+## Solución 1: ajustes
+
+```{r ej1}
+```
+
+## Solución 1: comparación de coeficientes
+
+```{r ej1-grafico}
+```
+
+## Solución 1: gráfico
+
+```{r, eval = TRUE, echo = FALSE, out.width = "85%"}
+mostrar("grafico_ej1")
+```
+
+## Solución 1: discusión
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("signos", digits = 3, font_size = 19)
+```
+
+::: {.caja}
+Mantienen el signo: `r with(leer("signos"), paste(termino[mismo_signo], collapse = ", "))`. Cambian de signo: `r with(leer("signos"), paste(termino[!mismo_signo], collapse = ", "))`. Estos signos corresponden a medias posteriores de dos regiones. No prueban una diferencia entre efectos ni justifican por sí solos una especificación para todo el país.
+:::
+
+## Diferencias posteriores entre regiones
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("diferencias_region", digits = 3, font_size = 18)
+```
+
+Las diferencias se calculan como Magallanes menos Aysén, suponiendo previas y verosimilitudes independientes entre regiones. Revise intervalos y probabilidades, la colinealidad y la información disponible; el solapamiento de intervalos individuales tampoco es una prueba formal de igualdad.
+
+# Ejercicio 2: comparación de modelos
+
+## Ejercicio 2
+
+::: {.ejercicio}
+En Aysén, compare dos modelos:
+
+- **Modelo A**: solo intercepto y zona.
+- **Modelo B**: intercepto, zona y las 10 covariables satelitales.
+
+1. Ajuste ambos y compare su $\sigma$ posterior.
+2. Calcule en R la **log-verosimilitud puntual** $\log p(y_i \mid \boldsymbol\beta^{(s)}, \sigma^{(s)})$ y compare los modelos con **LOO** [@vehtari2017loo] usando `loo()` y `loo_compare()`.
+3. Revise Pareto-k antes de interpretar diferencias de elpd. Si hay casos señalados, indique cómo comprobaría la comparación mediante reajustes exactos o K-fold.
+:::
+
+## Recordatorio: validación cruzada dejando uno fuera
+
+La capacidad predictiva fuera de muestra se mide con la **densidad predictiva logarítmica esperada**:
+
+$$
+\text{elpd}_{\text{loo}} = \sum_{i=1}^n \log p(y_i \mid \mathbf{y}_{-i}),
+\qquad
+p(y_i \mid \mathbf{y}_{-i}) = \int p(y_i \mid \boldsymbol\theta)\,p(\boldsymbol\theta \mid \mathbf{y}_{-i})\,d\boldsymbol\theta.
+$$
+
+Reajustar el modelo $n$ veces puede ser costoso; **PSIS-LOO** lo aproxima con los draws de un solo ajuste mediante muestreo por importancia:
+
+$$
+p(y_i \mid \mathbf{y}_{-i}) \approx \frac{\sum_s w_i^{(s)}\,p(y_i \mid \boldsymbol\theta^{(s)})}{\sum_s w_i^{(s)}}, \qquad
+w_i^{(s)} \propto \frac{1}{p(y_i \mid \boldsymbol\theta^{(s)})},
+$$
+
+con pesos suavizados por una distribución de Pareto. El umbral de Pareto-k depende del número de draws: $\min(1-1/\log_{10}S,\ 0{,}7)$. Revise las observaciones señaladas y, si procede, use reajustes LOO exactos o validación cruzada K-fold antes de adoptar el ranking.
+
+## Solución 2: ajustes
+
+```{r ej2}
+```
+
+## Solución 2: LOO
+
+```{r ej2-loo}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("comparacion_loo")
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("tabla_loo", digits = 3)
+```
+
+## Antes de interpretar LOO
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("diagnostico_loo", digits = 3)
+```
+
+En esta ejecución, el modelo B tiene un Pareto-k superior a 1: la aproximación por importancia es problemática para ese segmento. Las diferencias de elpd mostradas son **provisionales y no justifican adoptar el ranking**. Primero hay que comprobar el caso con un reajuste LOO exacto o una estrategia alternativa de validación.
+
+## Solución 2: interpretación
+
+::: {.caja}
+- `elpd_diff` es la diferencia en capacidad predictiva fuera de muestra; el mejor modelo aparece con 0.
+- La diferencia **B menos A** es `r fmt(v$elpd_diff, 1)` unidades de elpd, con error estándar `r fmt(v$se_diff, 1)`. El signo indica la dirección; interprete la magnitud respecto de su incertidumbre y los diagnósticos PSIS.
+- Esta validación deja fuera un segmento del conjunto apto de Aysén. No evalúa directamente predicción en otra región, en no aptos o en bloques espaciales; esas tareas requieren una partición adecuada.
+- `p_loo` mide complejidad efectiva y puede diferir del número de coeficientes; valores inusuales motivan revisar el ajuste y las observaciones influyentes.
+:::
+
+# Ejercicio 3: una $\sigma$ por zona
+
+## Ejercicio 3
+
+::: {.ejercicio}
+El chequeo de D2S1 permite explorar discrepancias en la variabilidad por zona. Aquí se evalúa una especificación alternativa, sin dar por demostrado que resuelva todos los problemas.
+
+1. Revise `stan/regresion_sigma_zona.stan`: ¿cómo se indexa `sigma[zona]`?
+2. Ajuste el modelo en Aysén con la zona codificada como 1 = rural, 2 = aldea, 3 = urbana.
+3. Compare las tres $\sigma$ posteriores.
+4. Repita `ppc_stat_grouped(..., stat = "sd")`. ¿Mejoró?
+5. Compare con el modelo B mediante LOO.
+:::
+
+## Recordatorio: heterocedasticidad por grupo
+
+$$
+y_i \mid \boldsymbol\beta, \boldsymbol\sigma \sim N\big(\mathbf{x}_i^\top\boldsymbol\beta,\ \sigma^2_{z[i]}\big), \qquad z[i] \in \{1, 2, 3\}.
+$$
+
+En Stan, `sigma[zona]` construye un vector con la $\sigma$ de la zona de cada segmento (**indexación múltiple**):
+
+```{r, eval = TRUE, echo = FALSE, class.output = "stan"}
+cat(readLines("stan/regresion_sigma_zona.stan"), sep = "\n")
+```
+
+## Solución 3
+
+```{r ej3}
+```
+
+```{r ej3-resultado}
+```
+
+## Solución 3: resultados
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("sigmas_zona", digits = 3)
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("comparacion_sz")
+```
+
+## Solución 3: chequeo predictivo
+
+```{r ej3-ppc}
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "85%"}
+mostrar("grafico_ej3")
+```
+
+Compare la desviación observada con las réplicas por zona. Reproducir ese estadístico no garantiza adecuación en colas, medias, otros subgrupos o dependencia espacial.
+
+# Ejercicio 4 (extensión): población implícita con viviendas observadas
+
+## Ejercicio 4
+
+::: {.ejercicio}
+1. Con el modelo B ajustado en Aysén, simule la predictiva posterior de $\delta_i$ para **todos** los segmentos, aptos y no aptos.
+2. Calcule en cada draw la población implícita $\hat Y_i = \hat\delta_i \times V_i$ con las viviendas ocupadas **observadas**, y súmela por clasificación de cobertura.
+3. Compare con las personas censadas. ¿Dónde aumenta o disminuye el total implícito? ¿Qué supuestos condicionan esa diferencia?
+4. ¿Qué pasa con los segmentos con $V_i = 0$? ¿Qué información faltaría para corregir la **subcobertura de viviendas**?
+:::
+
+## Recordatorio: totales por draw
+
+Para un conjunto de segmentos $A$:
+
+$$
+T_A^{(s)} = \sum_{i \in A} \hat\delta_i^{(s)} V_i, \qquad
+\hat\delta_i^{(s)} = \exp\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)} + \sigma^{(s)}\varepsilon_i^{(s)}\big).
+$$
+
+- Se suma **dentro** de cada draw y luego se resumen los $T_A^{(s)}$.
+- Estos son totales implícitos continuos bajo un modelo de densidad. No incluyen una nueva simulación Poisson de personas ni constituyen una estimación validada de omisión censal.
+- Si $V_i = 0$, $\hat Y_i = 0$ en todos los draws: la fórmula aporta una densidad modelada, pero no identifica las **viviendas** faltantes.
+
+## Solución 4
+
+```{r ej4}
+```
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("ej4", digits = 0)
+```
+
+## Solución 4: discusión
+
+::: {.caja}
+- Con $\hat Y_i = \hat\delta_i V_i$ y las viviendas **observadas**, se obtiene un total condicionado a esas viviendas: la diferencia con el censo no demuestra una corrección válida de omisión.
+- Los segmentos con $V_i = 0$ quedan con población predicha 0.
+- Para corregir la subcobertura hace falta **ajustar la exposición**: $V_i^{tot} = V_i / c_i$, con $c_i$ la cobertura de viviendas del segmento. La división requiere cobertura positiva y una definición operativa validada; con cobertura cero hace falta otra fuente de exposición. Su uso se revisará en el modelo de Chile (días 3 y 4).
+:::
+
+# Ejercicio 5: chequeo predictivo previo
+
+## Ejercicio 5
+
+::: {.ejercicio}
+Antes de ver los datos, ¿qué densidades considera plausibles el modelo?
+
+1. Simule 200 valores de $\boldsymbol\beta$ desde la previa $N(0, 1)$ y de $\sigma$ desde una $\text{Cauchy}^+(0; 2{,}5)$.
+2. Para cada simulación, calcule $\delta_i = \exp(\mathbf{x}_i^\top\boldsymbol\beta + \sigma\varepsilon_i)$ en los segmentos de Aysén.
+3. ¿Qué proporción de los $\delta_i$ simulados es mayor que 20 o menor que 1 persona por vivienda?
+4. Repita con $\beta_k \sim N(0; 0{,}2^2)$, $\beta_0 \sim N(\log 2{,}5;\ 0{,}5^2)$ y $\sigma \sim N^+(0; 0{,}5^2)$.
+:::
+
+## Recordatorio: la predictiva previa
+
+$$
+p(\mathbf{y}) = \int p(\mathbf{y} \mid \boldsymbol\theta)\,p(\boldsymbol\theta)\,d\boldsymbol\theta.
+$$
+
+Simular de la **predictiva previa** (primero $\boldsymbol\theta \sim p(\boldsymbol\theta)$, luego $\mathbf{y} \sim p(\mathbf{y} \mid \boldsymbol\theta)$) muestra qué datos considera plausibles el modelo **antes** de observarlos [@gabry2019].
+
+- Con 13 coeficientes $N(0, 1)$ y covariables estandarizadas, $\text{Var}(\mathbf{x}_i^\top\boldsymbol\beta) = \sum_k x_{ik}^2$: el predictor lineal puede ser enorme en segmentos con covariables extremas.
+- Una previa que implica densidades de miles de personas por vivienda es **poco realista**, y su influencia posterior debe comprobarse, sin descartarla solo por tener muchos segmentos.
+
+## Solución 5
+
+```{r ej5}
+```
+
+## Solución 5: resultados
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("ej5", digits = 1)
+```
+
+```{r, eval = TRUE, echo = FALSE, out.width = "75%"}
+mostrar("grafico_ej5")
+```
+
+Las probabilidades de superar umbrales se calculan en **escala logarítmica**, sin exponentiar valores extremos. `pct_overflow` indica qué porcentaje desbordaría al exponentiar y `pct_plot_omitted` qué porcentaje no se muestra en el gráfico. Los límites 1 y 6 son referencias ilustrativas, no límites universales de plausibilidad.
+
+El chequeo se realiza condicionado al diseño observado, antes de usar la respuesta. Las alternativas de previa son propuestas para evaluación; no se adoptan automáticamente por producir menos extremos.
+
+# Cierre
+
+## Diagnósticos PSIS-LOO
+
+```{r, eval = TRUE, echo = FALSE}
+mostrar("diagnostico_loo", digits = 3)
+```
+
+Si `n_flagged` es mayor que cero, la comparación es **provisional** hasta revisar los casos influyentes y comprobar la aproximación. Un Pareto-k favorable tampoco demuestra que el modelo sea adecuado para otra población o tarea predictiva.
+
+## Diagnósticos de muestreo
+
+```{r, eval = TRUE, echo = FALSE}
+d <- leer("diagnostico_ajustes")
+control <- d |>
+  dplyr::group_by(fit) |>
+  dplyr::summarise(Rhat_max = max(rhat), ESS_bulk_min = min(ess_bulk),
+                   ESS_tail_min = min(ess_tail), .groups = "drop") |>
+  dplyr::left_join(leer("diagnostico_nuts"), by = "fit")
+tba(control, digits = 3, font_size = 20)
+```
+
+Use R-hat menor que 1,01 y ESS_bulk/ESS_tail de al menos 400 como guías para cuatro cadenas, junto con trazas, error Monte Carlo y diagnósticos NUTS. Estos controles son distintos de la evaluación predictiva.
+
+## Para llevar
+
+- Las diferencias entre regiones se evalúan mediante distribuciones de diferencias y comparación predictiva; un cambio de signo no impone un modelo por región.
+- **LOO** compara modelos por su capacidad de **predecir segmentos nuevos**; revise los $\hat k$ de Pareto.
+- La variabilidad no explicada puede depender de la **zona**; la indexación `sigma[zona]` en Stan lo permite.
+- Predecir $\delta_i$ no basta: con $V_i$ observado no se corrige la **subcobertura de viviendas**.
+- Revise siempre qué implican las **previas** en la escala de los datos.
+
+::: {.caja}
+**Próxima sesión:** un modelo de **conteos** para $Y_i$ con exposición $V_i$ (Poisson loglineal).
+:::
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)

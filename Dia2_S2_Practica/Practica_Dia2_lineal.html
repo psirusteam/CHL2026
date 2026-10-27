@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="Practica_Dia2_lineal_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Practica_Dia2_lineal_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Practica_Dia2_lineal_files/libs/quarto-html/popper.min.js"></script>
+<script src="Practica_Dia2_lineal_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Practica_Dia2_lineal_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Practica_Dia2_lineal_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Practica_Dia2_lineal_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.36">
+
+  <meta name="author" content="Andrés Gutiérrez · Stalyn Guerrero">
+  <title>Taller de fortalecimiento de capacidades en modelación estadística de población en Chile</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="Practica_Dia2_lineal_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Practica_Dia2_lineal_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+  <link rel="stylesheet" href="Practica_Dia2_lineal_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link rel="stylesheet" href="styles.css">
+  <link href="Practica_Dia2_lineal_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Practica_Dia2_lineal_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Practica_Dia2_lineal_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Practica_Dia2_lineal_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <script src="Practica_Dia2_lineal_files/libs/kePrint-0.0.1/kePrint.js"></script>
+
+  <link href="Practica_Dia2_lineal_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Taller de fortalecimiento de capacidades en modelación estadística de población en Chile</h1>
+  <p class="subtitle">Práctica computacional en RStan: regresión bayesiana de la densidad</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Andrés Gutiérrez · Stalyn Guerrero 
+</div>
+        <p class="quarto-title-affiliation">
+            CEPAL · UNFPA América Latina y el Caribe · INE Chile
+          </p>
+    </div>
+</div>
+
+  <p class="date">Invalid Date</p>
+</section>
+<section>
+<section id="instrucciones" class="title-slide slide level1 center">
+<h1>Instrucciones</h1>
+
+</section>
+<section id="objetivos-de-la-práctica" class="slide level2">
+<h2>Objetivos de la práctica</h2>
+<ol type="1">
+<li>Comparar regiones sin confundir cambios de signo con diferencias demostradas.</li>
+<li>Evaluar predicción con PSIS-LOO y revisar sus diagnósticos.</li>
+<li>Explorar una dispersión distinta por zona.</li>
+<li>Revisar las implicaciones de las previas antes de adoptar una especificación.</li>
+</ol>
+<p>El ejercicio 4 se conserva como extensión y puente al modelo de conteos.</p>
+<p><strong>Producto por pareja:</strong> una comparación de modelos con su diagnóstico, una conclusión predictiva y una propuesta de revisión de las previas.</p>
+</section>
+<section id="organización-de-la-práctica" class="slide level2">
+<h2>Organización de la práctica</h2>
+<div class="caja">
+<ul>
+<li>Trabaje en parejas, con el directorio de trabajo en la carpeta de esta sesión (<code>Dia2_S2_Practica</code>).</li>
+<li>El script <code>Rcode/Practica_Dia2_lineal.R</code> contiene las soluciones, en bloques <code>## ---- nombre ----</code> iguales a los de esta presentación.</li>
+<li>Cada ejercicio tiene un <strong>enunciado</strong>, un <strong>recordatorio teórico</strong> y la <strong>solución</strong>.</li>
+</ul>
+</div>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Ejercicio</th>
+<th>Tema</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>¿Los efectos de las covariables son iguales en otra región?</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Comparación de modelos con validación cruzada LOO</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Una varianza distinta por zona</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Densidad y población en segmentos de cobertura incompleta</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Chequeo predictivo previo</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="preparación" class="slide level2">
+<h2>Preparación</h2>
+<p>Programas Stan en <code>stan/</code>: <code>regresion_lineal.stan</code> (el de la sesión anterior) y <code>regresion_sigma_zona.stan</code> (ejercicio 3).</p>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>magallanes <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/segmentos_magallanes.rds"</span>)</span>
+<span id="cb1-2"><a href=""></a>aysen <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/segmentos_aysen.rds"</span>)</span>
+<span id="cb1-3"><a href=""></a></span>
+<span id="cb1-4"><a href=""></a>covariables <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"_std$"</span>, <span class="fu">names</span>(magallanes), <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-5"><a href=""></a></span>
+<span id="cb1-6"><a href=""></a>construir_X <span class="ot">&lt;-</span> <span class="cf">function</span>(datos) {</span>
+<span id="cb1-7"><a href=""></a>  <span class="fu">cbind</span>(<span class="at">intercepto  =</span> <span class="dv">1</span>,</span>
+<span id="cb1-8"><a href=""></a>        <span class="at">zona_urbana =</span> <span class="fu">as.numeric</span>(datos<span class="sc">$</span>zona <span class="sc">==</span> <span class="st">"urbana"</span>),</span>
+<span id="cb1-9"><a href=""></a>        <span class="at">zona_aldea  =</span> <span class="fu">as.numeric</span>(datos<span class="sc">$</span>zona <span class="sc">==</span> <span class="st">"aldea"</span>),</span>
+<span id="cb1-10"><a href=""></a>        <span class="fu">as.matrix</span>(datos[, covariables]))</span>
+<span id="cb1-11"><a href=""></a>}</span>
+<span id="cb1-12"><a href=""></a></span>
+<span id="cb1-13"><a href=""></a>modelo_lineal <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/regresion_lineal.stan"</span>)</span>
+<span id="cb1-14"><a href=""></a></span>
+<span id="cb1-15"><a href=""></a><span class="co"># =============================================================================</span></span>
+<span id="cb1-16"><a href=""></a><span class="co"># Ejercicio 1: efectos en dos regiones</span></span>
+<span id="cb1-17"><a href=""></a><span class="co"># =============================================================================</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section></section>
+<section>
+<section id="ejercicio-1-los-efectos-son-iguales-en-otra-región" class="title-slide slide level1 center">
+<h1>Ejercicio 1: ¿los efectos son iguales en otra región?</h1>
+
+</section>
+<section id="ejercicio-1" class="slide level2">
+<h2>Ejercicio 1</h2>
+<div class="ejercicio">
+<ol type="1">
+<li>Ajuste el modelo de regresión de <span class="math inline">\(\log\delta_i\)</span> con los segmentos <strong>aptos de Magallanes</strong>, con las mismas covariables de la sesión anterior.</li>
+<li>Ajuste el mismo modelo en <strong>Aysén</strong>.</li>
+<li>Grafique los intervalos de credibilidad al 95% de los coeficientes de ambas regiones en un mismo gráfico. ¿Qué covariables tienen efectos parecidos? ¿Cuáles cambian de signo?</li>
+<li>¿Qué implica esto para un modelo nacional?</li>
+</ol>
+</div>
+</section>
+<section id="recordatorio-modelos-independientes-y-modelo-común" class="slide level2">
+<h2>Recordatorio: modelos independientes y modelo común</h2>
+<p>Con un modelo <strong>por región</strong> <span class="math inline">\(r\)</span>:</p>
+<p><span class="math display">\[
+\log\delta_{ir} = \mathbf{x}_{ir}^\top\boldsymbol\beta_r + \varepsilon_{ir}, \qquad \varepsilon_{ir} \sim N(0, \sigma_r^2),
+\]</span></p>
+<p>cada región tiene sus propios <span class="math inline">\(\boldsymbol\beta_r\)</span> y <span class="math inline">\(\sigma_r\)</span>. Un modelo <strong>común</strong> impone <span class="math inline">\(\boldsymbol\beta_r = \boldsymbol\beta\)</span> para todas.</p>
+<p>Entre ambos extremos está el modelo <strong>jerárquico</strong>: <span class="math inline">\(\boldsymbol\beta_r \sim N(\boldsymbol\beta, \boldsymbol\Sigma)\)</span>, que comparte información entre regiones y deja que difieran. La comparación de los <span class="math inline">\(\boldsymbol\beta_r\)</span> ajustados por separado orienta hipótesis para comparar modelos; no basta para elegir una estructura nacional.</p>
+</section>
+<section id="solución-1-ajustes" class="slide level2">
+<h2>Solución 1: ajustes</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a>ajustar_lineal <span class="ot">&lt;-</span> <span class="cf">function</span>(datos, seed) {</span>
+<span id="cb2-2"><a href=""></a>  aptos <span class="ot">&lt;-</span> datos <span class="sc">%&gt;%</span> <span class="fu">filter</span>(apto_modelo)</span>
+<span id="cb2-3"><a href=""></a>  X <span class="ot">&lt;-</span> <span class="fu">construir_X</span>(aptos)</span>
+<span id="cb2-4"><a href=""></a>  <span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(X)), <span class="fu">all</span>(<span class="fu">is.finite</span>(aptos<span class="sc">$</span>delta)), <span class="fu">all</span>(aptos<span class="sc">$</span>delta <span class="sc">&gt;</span> <span class="dv">0</span>),</span>
+<span id="cb2-5"><a href=""></a>            <span class="fu">nrow</span>(X) <span class="sc">&gt;</span> <span class="fu">ncol</span>(X), <span class="fu">qr</span>(X)<span class="sc">$</span>rank <span class="sc">==</span> <span class="fu">ncol</span>(X))</span>
+<span id="cb2-6"><a href=""></a>  fit <span class="ot">&lt;-</span> <span class="fu">sampling</span>(modelo_lineal,</span>
+<span id="cb2-7"><a href=""></a>                  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">nrow</span>(X), <span class="at">p =</span> <span class="fu">ncol</span>(X), <span class="at">X =</span> X, <span class="at">y =</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta), <span class="at">sd_beta =</span> <span class="dv">1</span>),</span>
+<span id="cb2-8"><a href=""></a>                  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">seed =</span> seed, <span class="at">refresh =</span> <span class="dv">0</span>, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"beta"</span>, <span class="st">"sigma"</span>))</span>
+<span id="cb2-9"><a href=""></a>  fit</span>
+<span id="cb2-10"><a href=""></a>}</span>
+<span id="cb2-11"><a href=""></a>fit_mag <span class="ot">&lt;-</span> <span class="fu">ajustar_lineal</span>(magallanes, <span class="at">seed =</span> <span class="dv">201</span>)</span>
+<span id="cb2-12"><a href=""></a>fit_ays <span class="ot">&lt;-</span> <span class="fu">ajustar_lineal</span>(aysen, <span class="at">seed =</span> <span class="dv">202</span>)</span>
+<span id="cb2-13"><a href=""></a>names_beta <span class="ot">&lt;-</span> <span class="fu">colnames</span>(<span class="fu">construir_X</span>(<span class="fu">filter</span>(aysen, apto_modelo)))</span>
+<span id="cb2-14"><a href=""></a>region_draws <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) {</span>
+<span id="cb2-15"><a href=""></a>  beta <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fit, <span class="at">pars =</span> <span class="st">"beta"</span>)</span>
+<span id="cb2-16"><a href=""></a>  <span class="fu">names</span>(beta) <span class="ot">&lt;-</span> names_beta</span>
+<span id="cb2-17"><a href=""></a>  beta<span class="sc">$</span>sigma <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"sigma"</span>)[, <span class="dv">1</span>]</span>
+<span id="cb2-18"><a href=""></a>  beta<span class="sc">$</span>lp__ <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"lp__"</span>)[, <span class="dv">1</span>]</span>
+<span id="cb2-19"><a href=""></a>  beta</span>
+<span id="cb2-20"><a href=""></a>}</span>
+<span id="cb2-21"><a href=""></a>draws_mag <span class="ot">&lt;-</span> <span class="fu">region_draws</span>(fit_mag)</span>
+<span id="cb2-22"><a href=""></a>draws_ays <span class="ot">&lt;-</span> <span class="fu">region_draws</span>(fit_ays)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="solución-1-comparación-de-coeficientes" class="slide level2">
+<h2>Solución 1: comparación de coeficientes</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>efectos <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="at">Magallanes =</span> draws_mag, <span class="st">"Aysén"</span> <span class="ot">=</span> draws_ays, <span class="at">.id =</span> <span class="st">"region"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href=""></a>  <span class="fu">select</span>(<span class="sc">-</span>intercepto, <span class="sc">-</span>sigma, <span class="sc">-</span>lp__) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href=""></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>region, <span class="at">names_to =</span> <span class="st">"termino"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href=""></a>  <span class="fu">group_by</span>(region, termino) <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href=""></a>  <span class="fu">summarise</span>(<span class="at">media =</span> <span class="fu">mean</span>(value), <span class="at">li =</span> <span class="fu">quantile</span>(value, <span class="fl">0.025</span>), <span class="at">ls =</span> <span class="fu">quantile</span>(value, <span class="fl">0.975</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb3-6"><a href=""></a></span>
+<span id="cb3-7"><a href=""></a>grafico_ej1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(efectos, <span class="fu">aes</span>(media, <span class="fu">str_remove</span>(termino, <span class="st">"_std$"</span>), <span class="at">colour =</span> region)) <span class="sc">+</span></span>
+<span id="cb3-8"><a href=""></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb3-9"><a href=""></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> li, <span class="at">xmax =</span> ls), <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.6</span>)) <span class="sc">+</span></span>
+<span id="cb3-10"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Coeficiente"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">colour =</span> <span class="st">"Región"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="solución-1-gráfico" class="slide level2">
+<h2>Solución 1: gráfico</h2>
+
+<img data-src="resultados/grafico_ej1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:85.0%"></section>
+<section id="solución-1-discusión" class="slide level2">
+<h2>Solución 1: discusión</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="font-size: 19px; width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">termino</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Aysén</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Magallanes</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">mismo_signo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">building_fractional_count_sum</td>
+<td style="text-align: right;">0,002</td>
+<td style="text-align: right;">0,040</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dens_len_allroads</td>
+<td style="text-align: right;">0,070</td>
+<td style="text-align: right;">0,029</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">dist_closest_school_m</td>
+<td style="text-align: right;">-0,020</td>
+<td style="text-align: right;">-0,016</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dyn_world_urb_mean</td>
+<td style="text-align: right;">0,033</td>
+<td style="text-align: right;">-0,026</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ine_opb_area_ratio</td>
+<td style="text-align: right;">0,028</td>
+<td style="text-align: right;">0,008</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ine_opb_count</td>
+<td style="text-align: right;">0,027</td>
+<td style="text-align: right;">-0,043</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ine_opb_nnd_mean</td>
+<td style="text-align: right;">0,014</td>
+<td style="text-align: right;">-0,034</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lu_pct_artif_urban</td>
+<td style="text-align: right;">0,013</td>
+<td style="text-align: right;">0,035</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mean_slope</td>
+<td style="text-align: right;">0,006</td>
+<td style="text-align: right;">0,003</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nlav_mean</td>
+<td style="text-align: right;">-0,059</td>
+<td style="text-align: right;">-0,066</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">zona_aldea</td>
+<td style="text-align: right;">-0,071</td>
+<td style="text-align: right;">0,335</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">zona_urbana</td>
+<td style="text-align: right;">0,016</td>
+<td style="text-align: right;">0,192</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="caja">
+<p>Mantienen el signo: building_fractional_count_sum, dens_len_allroads, dist_closest_school_m, ine_opb_area_ratio, lu_pct_artif_urban, mean_slope, nlav_mean, zona_urbana. Cambian de signo: dyn_world_urb_mean, ine_opb_count, ine_opb_nnd_mean, zona_aldea. Estos signos corresponden a medias posteriores de dos regiones. No prueban una diferencia entre efectos ni justifican por sí solos una especificación para todo el país.</p>
+</div>
+</section>
+<section id="diferencias-posteriores-entre-regiones" class="slide level2">
+<h2>Diferencias posteriores entre regiones</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">term</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_difference</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q025</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q975</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">probability_positive</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">zona_urbana</td>
+<td style="text-align: right;">0,175</td>
+<td style="text-align: right;">0,040</td>
+<td style="text-align: right;">0,312</td>
+<td style="text-align: right;">0,995</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">zona_aldea</td>
+<td style="text-align: right;">0,406</td>
+<td style="text-align: right;">0,251</td>
+<td style="text-align: right;">0,561</td>
+<td style="text-align: right;">1,000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">nlav_mean_std</td>
+<td style="text-align: right;">-0,007</td>
+<td style="text-align: right;">-0,056</td>
+<td style="text-align: right;">0,042</td>
+<td style="text-align: right;">0,390</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dyn_world_urb_mean_std</td>
+<td style="text-align: right;">-0,059</td>
+<td style="text-align: right;">-0,110</td>
+<td style="text-align: right;">-0,009</td>
+<td style="text-align: right;">0,008</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lu_pct_artif_urban_std</td>
+<td style="text-align: right;">0,022</td>
+<td style="text-align: right;">-0,010</td>
+<td style="text-align: right;">0,056</td>
+<td style="text-align: right;">0,907</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">building_fractional_count_sum_std</td>
+<td style="text-align: right;">0,038</td>
+<td style="text-align: right;">0,024</td>
+<td style="text-align: right;">0,051</td>
+<td style="text-align: right;">1,000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ine_opb_count_std</td>
+<td style="text-align: right;">-0,070</td>
+<td style="text-align: right;">-0,097</td>
+<td style="text-align: right;">-0,042</td>
+<td style="text-align: right;">0,000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ine_opb_area_ratio_std</td>
+<td style="text-align: right;">-0,020</td>
+<td style="text-align: right;">-0,043</td>
+<td style="text-align: right;">0,002</td>
+<td style="text-align: right;">0,042</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ine_opb_nnd_mean_std</td>
+<td style="text-align: right;">-0,048</td>
+<td style="text-align: right;">-0,079</td>
+<td style="text-align: right;">-0,017</td>
+<td style="text-align: right;">0,001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dens_len_allroads_std</td>
+<td style="text-align: right;">-0,041</td>
+<td style="text-align: right;">-0,063</td>
+<td style="text-align: right;">-0,018</td>
+<td style="text-align: right;">0,000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">dist_closest_school_m_std</td>
+<td style="text-align: right;">0,004</td>
+<td style="text-align: right;">-0,009</td>
+<td style="text-align: right;">0,017</td>
+<td style="text-align: right;">0,728</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mean_slope_std</td>
+<td style="text-align: right;">-0,003</td>
+<td style="text-align: right;">-0,022</td>
+<td style="text-align: right;">0,017</td>
+<td style="text-align: right;">0,387</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Las diferencias se calculan como Magallanes menos Aysén, suponiendo previas y verosimilitudes independientes entre regiones. Revise intervalos y probabilidades, la colinealidad y la información disponible; el solapamiento de intervalos individuales tampoco es una prueba formal de igualdad.</p>
+</section></section>
+<section>
+<section id="ejercicio-2-comparación-de-modelos" class="title-slide slide level1 center">
+<h1>Ejercicio 2: comparación de modelos</h1>
+
+</section>
+<section id="ejercicio-2" class="slide level2">
+<h2>Ejercicio 2</h2>
+<div class="ejercicio">
+<p>En Aysén, compare dos modelos:</p>
+<ul>
+<li><strong>Modelo A</strong>: solo intercepto y zona.</li>
+<li><strong>Modelo B</strong>: intercepto, zona y las 10 covariables satelitales.</li>
+</ul>
+<ol type="1">
+<li>Ajuste ambos y compare su <span class="math inline">\(\sigma\)</span> posterior.</li>
+<li>Calcule en R la <strong>log-verosimilitud puntual</strong> <span class="math inline">\(\log p(y_i \mid \boldsymbol\beta^{(s)}, \sigma^{(s)})\)</span> y compare los modelos con <strong>LOO</strong> <span class="citation" data-cites="vehtari2017loo">(<a href="#/muchas-gracias" role="doc-biblioref" onclick="">Vehtari et&nbsp;al. 2017</a>)</span> usando <code>loo()</code> y <code>loo_compare()</code>.</li>
+<li>Revise Pareto-k antes de interpretar diferencias de elpd. Si hay casos señalados, indique cómo comprobaría la comparación mediante reajustes exactos o K-fold.</li>
+</ol>
+</div>
+</section>
+<section id="recordatorio-validación-cruzada-dejando-uno-fuera" class="slide level2">
+<h2>Recordatorio: validación cruzada dejando uno fuera</h2>
+<p>La capacidad predictiva fuera de muestra se mide con la <strong>densidad predictiva logarítmica esperada</strong>:</p>
+<p><span class="math display">\[
+\text{elpd}_{\text{loo}} = \sum_{i=1}^n \log p(y_i \mid \mathbf{y}_{-i}),
+\qquad
+p(y_i \mid \mathbf{y}_{-i}) = \int p(y_i \mid \boldsymbol\theta)\,p(\boldsymbol\theta \mid \mathbf{y}_{-i})\,d\boldsymbol\theta.
+\]</span></p>
+<p>Reajustar el modelo <span class="math inline">\(n\)</span> veces puede ser costoso; <strong>PSIS-LOO</strong> lo aproxima con los draws de un solo ajuste mediante muestreo por importancia:</p>
+<p><span class="math display">\[
+p(y_i \mid \mathbf{y}_{-i}) \approx \frac{\sum_s w_i^{(s)}\,p(y_i \mid \boldsymbol\theta^{(s)})}{\sum_s w_i^{(s)}}, \qquad
+w_i^{(s)} \propto \frac{1}{p(y_i \mid \boldsymbol\theta^{(s)})},
+\]</span></p>
+<p>con pesos suavizados por una distribución de Pareto. El umbral de Pareto-k depende del número de draws: <span class="math inline">\(\min(1-1/\log_{10}S,\ 0{,}7)\)</span>. Revise las observaciones señaladas y, si procede, use reajustes LOO exactos o validación cruzada K-fold antes de adoptar el ranking.</p>
+</section>
+<section id="solución-2-ajustes" class="slide level2">
+<h2>Solución 2: ajustes</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>aptos_ays <span class="ot">&lt;-</span> aysen <span class="sc">%&gt;%</span> <span class="fu">filter</span>(apto_modelo)</span>
+<span id="cb4-2"><a href=""></a>y <span class="ot">&lt;-</span> <span class="fu">log</span>(aptos_ays<span class="sc">$</span>delta)</span>
+<span id="cb4-3"><a href=""></a>X_B <span class="ot">&lt;-</span> <span class="fu">construir_X</span>(aptos_ays)</span>
+<span id="cb4-4"><a href=""></a>X_A <span class="ot">&lt;-</span> X_B[, <span class="fu">c</span>(<span class="st">"intercepto"</span>, <span class="st">"zona_urbana"</span>, <span class="st">"zona_aldea"</span>)]</span>
+<span id="cb4-5"><a href=""></a></span>
+<span id="cb4-6"><a href=""></a>ajustar_X <span class="ot">&lt;-</span> <span class="cf">function</span>(X, seed) {</span>
+<span id="cb4-7"><a href=""></a>  <span class="fu">sampling</span>(modelo_lineal, <span class="at">data =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">nrow</span>(X), <span class="at">p =</span> <span class="fu">ncol</span>(X), <span class="at">X =</span> X, <span class="at">y =</span> y, <span class="at">sd_beta =</span> <span class="dv">1</span>),</span>
+<span id="cb4-8"><a href=""></a>           <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">seed =</span> seed, <span class="at">refresh =</span> <span class="dv">0</span>, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"beta"</span>, <span class="st">"sigma"</span>))</span>
+<span id="cb4-9"><a href=""></a>}</span>
+<span id="cb4-10"><a href=""></a>fit_A <span class="ot">&lt;-</span> <span class="fu">ajustar_X</span>(X_A, <span class="at">seed =</span> <span class="dv">203</span>)</span>
+<span id="cb4-11"><a href=""></a>fit_B <span class="ot">&lt;-</span> fit_ays  <span class="co"># same data, design and prior: reuse the regional fit</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="solución-2-loo" class="slide level2">
+<h2>Solución 2: LOO</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>log_lik_lineal <span class="ot">&lt;-</span> <span class="cf">function</span>(fit, X) {</span>
+<span id="cb5-2"><a href=""></a>  beta <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"beta"</span>); sigma <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"sigma"</span>)[, <span class="dv">1</span>]</span>
+<span id="cb5-3"><a href=""></a>  mu <span class="ot">&lt;-</span> beta <span class="sc">%*%</span> <span class="fu">t</span>(X)                                       <span class="co"># draws x segmentos</span></span>
+<span id="cb5-4"><a href=""></a>  <span class="fu">dnorm</span>(<span class="fu">matrix</span>(y, <span class="fu">nrow</span>(mu), <span class="fu">ncol</span>(mu), <span class="at">byrow =</span> <span class="cn">TRUE</span>), mu, sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-5"><a href=""></a>}</span>
+<span id="cb5-6"><a href=""></a>compute_loo <span class="ot">&lt;-</span> <span class="cf">function</span>(log_lik, fit) {</span>
+<span id="cb5-7"><a href=""></a>  dims <span class="ot">&lt;-</span> <span class="fu">dim</span>(<span class="fu">as.array</span>(fit, <span class="at">pars =</span> <span class="st">"beta"</span>))</span>
+<span id="cb5-8"><a href=""></a>  chain_id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(dims[<span class="dv">2</span>]), <span class="at">each =</span> dims[<span class="dv">1</span>])</span>
+<span id="cb5-9"><a href=""></a>  scaled_likelihood <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">sweep</span>(log_lik, <span class="dv">2</span>, <span class="fu">apply</span>(log_lik, <span class="dv">2</span>, max), <span class="st">"-"</span>))</span>
+<span id="cb5-10"><a href=""></a>  r_eff <span class="ot">&lt;-</span> loo<span class="sc">::</span><span class="fu">relative_eff</span>(scaled_likelihood, <span class="at">chain_id =</span> chain_id, <span class="at">cores =</span> <span class="dv">2</span>)</span>
+<span id="cb5-11"><a href=""></a>  loo<span class="sc">::</span><span class="fu">loo</span>(log_lik, <span class="at">r_eff =</span> r_eff, <span class="at">cores =</span> <span class="dv">2</span>)</span>
+<span id="cb5-12"><a href=""></a>}</span>
+<span id="cb5-13"><a href=""></a>loo_A <span class="ot">&lt;-</span> <span class="fu">compute_loo</span>(<span class="fu">log_lik_lineal</span>(fit_A, X_A), fit_A)</span>
+<span id="cb5-14"><a href=""></a>loo_B <span class="ot">&lt;-</span> <span class="fu">compute_loo</span>(<span class="fu">log_lik_lineal</span>(fit_B, X_B), fit_B)</span>
+<span id="cb5-15"><a href=""></a>comparacion_loo <span class="ot">&lt;-</span> <span class="fu">loo_compare</span>(<span class="fu">list</span>(<span class="st">`</span><span class="at">A: zona</span><span class="st">`</span> <span class="ot">=</span> loo_A, <span class="st">`</span><span class="at">B: zona + satelitales</span><span class="st">`</span> <span class="ot">=</span> loo_B))</span>
+<span id="cb5-16"><a href=""></a>comparacion_loo</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>                      elpd_diff se_diff
+B: zona + satelitales   0.0       0.0  
+A: zona               -59.0      12.3  </code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">modelo</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sigma</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">elpd_loo</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">p_loo</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k_mayor_0.7</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">A: zona</td>
+<td style="text-align: right;">0,205</td>
+<td style="text-align: right;">242,325</td>
+<td style="text-align: right;">5,166</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B: zona + satelitales</td>
+<td style="text-align: right;">0,195</td>
+<td style="text-align: right;">301,344</td>
+<td style="text-align: right;">19,017</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="antes-de-interpretar-loo" class="slide level2">
+<h2>Antes de interpretar LOO</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">model</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k_threshold</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k_max</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n_flagged</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n_k_above_one</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">A</td>
+<td style="text-align: right;">0,7</td>
+<td style="text-align: right;">0,093</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B</td>
+<td style="text-align: right;">0,7</td>
+<td style="text-align: right;">1,061</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C</td>
+<td style="text-align: right;">0,7</td>
+<td style="text-align: right;">0,838</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>En esta ejecución, el modelo B tiene un Pareto-k superior a 1: la aproximación por importancia es problemática para ese segmento. Las diferencias de elpd mostradas son <strong>provisionales y no justifican adoptar el ranking</strong>. Primero hay que comprobar el caso con un reajuste LOO exacto o una estrategia alternativa de validación.</p>
+</section>
+<section id="solución-2-interpretación" class="slide level2">
+<h2>Solución 2: interpretación</h2>
+<div class="caja">
+<ul>
+<li><code>elpd_diff</code> es la diferencia en capacidad predictiva fuera de muestra; el mejor modelo aparece con 0.</li>
+<li>La diferencia <strong>B menos A</strong> es 59,0 unidades de elpd, con error estándar 12,3. El signo indica la dirección; interprete la magnitud respecto de su incertidumbre y los diagnósticos PSIS.</li>
+<li>Esta validación deja fuera un segmento del conjunto apto de Aysén. No evalúa directamente predicción en otra región, en no aptos o en bloques espaciales; esas tareas requieren una partición adecuada.</li>
+<li><code>p_loo</code> mide complejidad efectiva y puede diferir del número de coeficientes; valores inusuales motivan revisar el ajuste y las observaciones influyentes.</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="ejercicio-3-una-sigma-por-zona" class="title-slide slide level1 center">
+<h1>Ejercicio 3: una <span class="math inline">\(\sigma\)</span> por zona</h1>
+
+</section>
+<section id="ejercicio-3" class="slide level2">
+<h2>Ejercicio 3</h2>
+<div class="ejercicio">
+<p>El chequeo de D2S1 permite explorar discrepancias en la variabilidad por zona. Aquí se evalúa una especificación alternativa, sin dar por demostrado que resuelva todos los problemas.</p>
+<ol type="1">
+<li>Revise <code>stan/regresion_sigma_zona.stan</code>: ¿cómo se indexa <code>sigma[zona]</code>?</li>
+<li>Ajuste el modelo en Aysén con la zona codificada como 1 = rural, 2 = aldea, 3 = urbana.</li>
+<li>Compare las tres <span class="math inline">\(\sigma\)</span> posteriores.</li>
+<li>Repita <code>ppc_stat_grouped(..., stat = "sd")</code>. ¿Mejoró?</li>
+<li>Compare con el modelo B mediante LOO.</li>
+</ol>
+</div>
+</section>
+<section id="recordatorio-heterocedasticidad-por-grupo" class="slide level2">
+<h2>Recordatorio: heterocedasticidad por grupo</h2>
+<p><span class="math display">\[
+y_i \mid \boldsymbol\beta, \boldsymbol\sigma \sim N\big(\mathbf{x}_i^\top\boldsymbol\beta,\ \sigma^2_{z[i]}\big), \qquad z[i] \in \{1, 2, 3\}.
+\]</span></p>
+<p>En Stan, <code>sigma[zona]</code> construye un vector con la <span class="math inline">\(\sigma\)</span> de la zona de cada segmento (<strong>indexación múltiple</strong>):</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb7-1"><a href=""></a><span class="co">// Regresion lineal con una desviacion estandar distinta por zona</span></span>
+<span id="cb7-2"><a href=""></a><span class="kw">data</span> {</span>
+<span id="cb7-3"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; n;</span>
+<span id="cb7-4"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; p;</span>
+<span id="cb7-5"><a href=""></a>  <span class="dt">matrix</span>[n, p] X;</span>
+<span id="cb7-6"><a href=""></a>  <span class="dt">vector</span>[n] y;                               <span class="co">// log(delta_i)</span></span>
+<span id="cb7-7"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; J;                            <span class="co">// numero de zonas</span></span>
+<span id="cb7-8"><a href=""></a>  <span class="dt">array</span>[n] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>, <span class="kw">upper</span>=J&gt; zona;       <span class="co">// zona de cada segmento</span></span>
+<span id="cb7-9"><a href=""></a>}</span>
+<span id="cb7-10"><a href=""></a><span class="kw">parameters</span> {</span>
+<span id="cb7-11"><a href=""></a>  <span class="dt">vector</span>[p] beta;</span>
+<span id="cb7-12"><a href=""></a>  <span class="dt">vector</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt;[J] sigma;                  <span class="co">// una sigma por zona</span></span>
+<span id="cb7-13"><a href=""></a>}</span>
+<span id="cb7-14"><a href=""></a><span class="kw">model</span> {</span>
+<span id="cb7-15"><a href=""></a>  beta ~ normal(<span class="dv">0</span>, <span class="dv">1</span>);</span>
+<span id="cb7-16"><a href=""></a>  sigma ~ cauchy(<span class="dv">0</span>, <span class="fl">2.5</span>);</span>
+<span id="cb7-17"><a href=""></a>  y ~ normal(X * beta, sigma[zona]);         <span class="co">// indexacion: sigma de la zona de cada segmento</span></span>
+<span id="cb7-18"><a href=""></a>}</span>
+<span id="cb7-19"><a href=""></a><span class="kw">generated quantities</span> {</span>
+<span id="cb7-20"><a href=""></a>  <span class="dt">array</span>[n] <span class="dt">real</span> y_rep = normal_rng(X * beta, sigma[zona]);</span>
+<span id="cb7-21"><a href=""></a>  <span class="dt">vector</span>[n] log_lik;</span>
+<span id="cb7-22"><a href=""></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:n) log_lik[i] = normal_lpdf(y[i] | X[i] * beta, sigma[zona[i]]);</span>
+<span id="cb7-23"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</section>
+<section id="solución-3" class="slide level2">
+<h2>Solución 3</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>zonas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"rural"</span>, <span class="st">"aldea"</span>, <span class="st">"urbana"</span>)</span>
+<span id="cb8-2"><a href=""></a>modelo_sz <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/regresion_sigma_zona.stan"</span>)</span>
+<span id="cb8-3"><a href=""></a>fit_sz <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
+<span id="cb8-4"><a href=""></a>  modelo_sz,</span>
+<span id="cb8-5"><a href=""></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">nrow</span>(X_B), <span class="at">p =</span> <span class="fu">ncol</span>(X_B), <span class="at">X =</span> X_B, <span class="at">y =</span> y,</span>
+<span id="cb8-6"><a href=""></a>              <span class="at">J =</span> <span class="dv">3</span>, <span class="at">zona =</span> <span class="fu">match</span>(aptos_ays<span class="sc">$</span>zona, zonas)),</span>
+<span id="cb8-7"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">seed =</span> <span class="dv">204</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="cb8-8"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a>sigmas_zona <span class="ot">&lt;-</span> <span class="fu">summarise_draws</span>(<span class="fu">as_draws_df</span>(fit_sz), <span class="st">"mean"</span>, <span class="sc">~</span> <span class="fu">quantile</span>(.x, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href=""></a>  <span class="fu">filter</span>(<span class="fu">str_starts</span>(variable, <span class="st">"sigma"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">zona =</span> zonas, <span class="at">.after =</span> variable)</span>
+<span id="cb9-4"><a href=""></a>loo_sz <span class="ot">&lt;-</span> <span class="fu">compute_loo</span>(loo<span class="sc">::</span><span class="fu">extract_log_lik</span>(fit_sz), fit_sz)</span>
+<span id="cb9-5"><a href=""></a>comparacion_sz <span class="ot">&lt;-</span> <span class="fu">loo_compare</span>(<span class="fu">list</span>(<span class="st">`</span><span class="at">B: sigma común</span><span class="st">`</span> <span class="ot">=</span> loo_B, <span class="st">`</span><span class="at">C: sigma por zona</span><span class="st">`</span> <span class="ot">=</span> loo_sz))</span>
+<span id="cb9-6"><a href=""></a>sigmas_zona</span>
+<span id="cb9-7"><a href=""></a>comparacion_sz</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="solución-3-resultados" class="slide level2">
+<h2>Solución 3: resultados</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">zona</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">2.5%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">97.5%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">sigma[1]</td>
+<td style="text-align: left;">rural</td>
+<td style="text-align: right;">0,231</td>
+<td style="text-align: right;">0,211</td>
+<td style="text-align: right;">0,252</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sigma[2]</td>
+<td style="text-align: left;">aldea</td>
+<td style="text-align: right;">0,247</td>
+<td style="text-align: right;">0,216</td>
+<td style="text-align: right;">0,282</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sigma[3]</td>
+<td style="text-align: left;">urbana</td>
+<td style="text-align: right;">0,182</td>
+<td style="text-align: right;">0,175</td>
+<td style="text-align: right;">0,190</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>                  elpd_diff se_diff
+C: sigma por zona   0.0       0.0  
+B: sigma com&lt;U+00FA&gt;n    -16.8       6.8  </code></pre>
+</div>
+</div>
+</section>
+<section id="solución-3-chequeo-predictivo" class="slide level2">
+<h2>Solución 3: chequeo predictivo</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>y_rep_sz <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_sz, <span class="at">pars =</span> <span class="st">"y_rep"</span>)</span>
+<span id="cb11-2"><a href=""></a>grafico_ej3 <span class="ot">&lt;-</span> <span class="fu">ppc_stat_grouped</span>(y, y_rep_sz, <span class="at">group =</span> aptos_ays<span class="sc">$</span>zona, <span class="at">stat =</span> <span class="st">"sd"</span>) <span class="sc">+</span></span>
+<span id="cb11-3"><a href=""></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">"Modelo con una sigma por zona"</span>)</span>
+<span id="cb11-4"><a href=""></a><span class="fu">guardar_figura</span>(grafico_ej3, <span class="st">"grafico_ej3"</span>, <span class="at">alto =</span> <span class="fl">4.6</span>)</span>
+<span id="cb11-5"><a href=""></a></span>
+<span id="cb11-6"><a href=""></a><span class="co"># =============================================================================</span></span>
+<span id="cb11-7"><a href=""></a><span class="co"># Ejercicio 4: densidad y poblacion en segmentos de cobertura incompleta</span></span>
+<span id="cb11-8"><a href=""></a><span class="co"># =============================================================================</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+<img data-src="resultados/grafico_ej3.png" class="quarto-figure quarto-figure-center r-stretch" style="width:85.0%"><p>Compare la desviación observada con las réplicas por zona. Reproducir ese estadístico no garantiza adecuación en colas, medias, otros subgrupos o dependencia espacial.</p>
+</section></section>
+<section>
+<section id="ejercicio-4-extensión-población-implícita-con-viviendas-observadas" class="title-slide slide level1 center">
+<h1>Ejercicio 4 (extensión): población implícita con viviendas observadas</h1>
+
+</section>
+<section id="ejercicio-4" class="slide level2">
+<h2>Ejercicio 4</h2>
+<div class="ejercicio">
+<ol type="1">
+<li>Con el modelo B ajustado en Aysén, simule la predictiva posterior de <span class="math inline">\(\delta_i\)</span> para <strong>todos</strong> los segmentos, aptos y no aptos.</li>
+<li>Calcule en cada draw la población implícita <span class="math inline">\(\hat Y_i = \hat\delta_i \times V_i\)</span> con las viviendas ocupadas <strong>observadas</strong>, y súmela por clasificación de cobertura.</li>
+<li>Compare con las personas censadas. ¿Dónde aumenta o disminuye el total implícito? ¿Qué supuestos condicionan esa diferencia?</li>
+<li>¿Qué pasa con los segmentos con <span class="math inline">\(V_i = 0\)</span>? ¿Qué información faltaría para corregir la <strong>subcobertura de viviendas</strong>?</li>
+</ol>
+</div>
+</section>
+<section id="recordatorio-totales-por-draw" class="slide level2">
+<h2>Recordatorio: totales por draw</h2>
+<p>Para un conjunto de segmentos <span class="math inline">\(A\)</span>:</p>
+<p><span class="math display">\[
+T_A^{(s)} = \sum_{i \in A} \hat\delta_i^{(s)} V_i, \qquad
+\hat\delta_i^{(s)} = \exp\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)} + \sigma^{(s)}\varepsilon_i^{(s)}\big).
+\]</span></p>
+<ul>
+<li>Se suma <strong>dentro</strong> de cada draw y luego se resumen los <span class="math inline">\(T_A^{(s)}\)</span>.</li>
+<li>Estos son totales implícitos continuos bajo un modelo de densidad. No incluyen una nueva simulación Poisson de personas ni constituyen una estimación validada de omisión censal.</li>
+<li>Si <span class="math inline">\(V_i = 0\)</span>, <span class="math inline">\(\hat Y_i = 0\)</span> en todos los draws: la fórmula aporta una densidad modelada, pero no identifica las <strong>viviendas</strong> faltantes.</li>
+</ul>
+</section>
+<section id="solución-4" class="slide level2">
+<h2>Solución 4</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>beta_B <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_B, <span class="at">pars =</span> <span class="st">"beta"</span>); sigma_B <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_B, <span class="at">pars =</span> <span class="st">"sigma"</span>)[, <span class="dv">1</span>]</span>
+<span id="cb12-2"><a href=""></a>X_todos <span class="ot">&lt;-</span> <span class="fu">construir_X</span>(aysen)</span>
+<span id="cb12-3"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">identical</span>(<span class="fu">colnames</span>(X_todos), <span class="fu">colnames</span>(X_B)), <span class="fu">all</span>(<span class="fu">is.finite</span>(X_todos)),</span>
+<span id="cb12-4"><a href=""></a>          <span class="sc">!</span><span class="fu">anyNA</span>(aysen<span class="sc">$</span>n_vpo), <span class="fu">all</span>(aysen<span class="sc">$</span>n_vpo <span class="sc">&gt;=</span> <span class="dv">0</span>))</span>
+<span id="cb12-5"><a href=""></a></span>
+<span id="cb12-6"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">4</span>)</span>
+<span id="cb12-7"><a href=""></a>eta <span class="ot">&lt;-</span> beta_B <span class="sc">%*%</span> <span class="fu">t</span>(X_todos)</span>
+<span id="cb12-8"><a href=""></a>delta_pred <span class="ot">&lt;-</span> <span class="fu">exp</span>(eta <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fu">length</span>(eta)), <span class="fu">nrow</span>(eta)) <span class="sc">*</span> sigma_B)</span>
+<span id="cb12-9"><a href=""></a>y_pred <span class="ot">&lt;-</span> delta_pred <span class="sc">*</span> <span class="fu">matrix</span>(aysen<span class="sc">$</span>n_vpo, <span class="fu">nrow</span>(eta), <span class="fu">ncol</span>(eta), <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-10"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(y_pred)))</span>
+<span id="cb12-11"><a href=""></a></span>
+<span id="cb12-12"><a href=""></a>ej4 <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">levels</span>(aysen<span class="sc">$</span>clasificacion_cobertura), <span class="cf">function</span>(k) {</span>
+<span id="cb12-13"><a href=""></a>  cols <span class="ot">&lt;-</span> aysen<span class="sc">$</span>clasificacion_cobertura <span class="sc">==</span> k</span>
+<span id="cb12-14"><a href=""></a>  total <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(y_pred[, cols, <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb12-15"><a href=""></a>  <span class="fu">tibble</span>(<span class="at">cobertura =</span> k, <span class="at">censado =</span> <span class="fu">sum</span>(aysen<span class="sc">$</span>n_per[cols]),</span>
+<span id="cb12-16"><a href=""></a>         <span class="at">predicho =</span> <span class="fu">mean</span>(total), <span class="at">q025 =</span> <span class="fu">quantile</span>(total, <span class="fl">0.025</span>), <span class="at">q975 =</span> <span class="fu">quantile</span>(total, <span class="fl">0.975</span>),</span>
+<span id="cb12-17"><a href=""></a>         <span class="at">V_cero =</span> <span class="fu">sum</span>(aysen<span class="sc">$</span>n_vpo[cols] <span class="sc">==</span> <span class="dv">0</span>))</span>
+<span id="cb12-18"><a href=""></a>})</span>
+<span id="cb12-19"><a href=""></a>ej4</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">cobertura</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">censado</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">predicho</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q025</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">q975</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">V_cero</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Completa</td>
+<td style="text-align: right;">45.095</td>
+<td style="text-align: right;">44.260</td>
+<td style="text-align: right;">43.220</td>
+<td style="text-align: right;">45.419</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Parcial</td>
+<td style="text-align: right;">44.640</td>
+<td style="text-align: right;">45.752</td>
+<td style="text-align: right;">44.607</td>
+<td style="text-align: right;">46.987</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Incompleta</td>
+<td style="text-align: right;">8.616</td>
+<td style="text-align: right;">8.747</td>
+<td style="text-align: right;">8.476</td>
+<td style="text-align: right;">9.030</td>
+<td style="text-align: right;">129</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="solución-4-discusión" class="slide level2">
+<h2>Solución 4: discusión</h2>
+<div class="caja">
+<ul>
+<li>Con <span class="math inline">\(\hat Y_i = \hat\delta_i V_i\)</span> y las viviendas <strong>observadas</strong>, se obtiene un total condicionado a esas viviendas: la diferencia con el censo no demuestra una corrección válida de omisión.</li>
+<li>Los segmentos con <span class="math inline">\(V_i = 0\)</span> quedan con población predicha 0.</li>
+<li>Para corregir la subcobertura hace falta <strong>ajustar la exposición</strong>: <span class="math inline">\(V_i^{tot} = V_i / c_i\)</span>, con <span class="math inline">\(c_i\)</span> la cobertura de viviendas del segmento. La división requiere cobertura positiva y una definición operativa validada; con cobertura cero hace falta otra fuente de exposición. Su uso se revisará en el modelo de Chile (días 3 y 4).</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="ejercicio-5-chequeo-predictivo-previo" class="title-slide slide level1 center">
+<h1>Ejercicio 5: chequeo predictivo previo</h1>
+
+</section>
+<section id="ejercicio-5" class="slide level2">
+<h2>Ejercicio 5</h2>
+<div class="ejercicio">
+<p>Antes de ver los datos, ¿qué densidades considera plausibles el modelo?</p>
+<ol type="1">
+<li>Simule 200 valores de <span class="math inline">\(\boldsymbol\beta\)</span> desde la previa <span class="math inline">\(N(0, 1)\)</span> y de <span class="math inline">\(\sigma\)</span> desde una <span class="math inline">\(\text{Cauchy}^+(0; 2{,}5)\)</span>.</li>
+<li>Para cada simulación, calcule <span class="math inline">\(\delta_i = \exp(\mathbf{x}_i^\top\boldsymbol\beta + \sigma\varepsilon_i)\)</span> en los segmentos de Aysén.</li>
+<li>¿Qué proporción de los <span class="math inline">\(\delta_i\)</span> simulados es mayor que 20 o menor que 1 persona por vivienda?</li>
+<li>Repita con <span class="math inline">\(\beta_k \sim N(0; 0{,}2^2)\)</span>, <span class="math inline">\(\beta_0 \sim N(\log 2{,}5;\ 0{,}5^2)\)</span> y <span class="math inline">\(\sigma \sim N^+(0; 0{,}5^2)\)</span>.</li>
+</ol>
+</div>
+</section>
+<section id="recordatorio-la-predictiva-previa" class="slide level2">
+<h2>Recordatorio: la predictiva previa</h2>
+<p><span class="math display">\[
+p(\mathbf{y}) = \int p(\mathbf{y} \mid \boldsymbol\theta)\,p(\boldsymbol\theta)\,d\boldsymbol\theta.
+\]</span></p>
+<p>Simular de la <strong>predictiva previa</strong> (primero <span class="math inline">\(\boldsymbol\theta \sim p(\boldsymbol\theta)\)</span>, luego <span class="math inline">\(\mathbf{y} \sim p(\mathbf{y} \mid \boldsymbol\theta)\)</span>) muestra qué datos considera plausibles el modelo <strong>antes</strong> de observarlos <span class="citation" data-cites="gabry2019">(<a href="#/muchas-gracias" role="doc-biblioref" onclick="">Gabry et&nbsp;al. 2019</a>)</span>.</p>
+<ul>
+<li>Con 13 coeficientes <span class="math inline">\(N(0, 1)\)</span> y covariables estandarizadas, <span class="math inline">\(\text{Var}(\mathbf{x}_i^\top\boldsymbol\beta) = \sum_k x_{ik}^2\)</span>: el predictor lineal puede ser enorme en segmentos con covariables extremas.</li>
+<li>Una previa que implica densidades de miles de personas por vivienda es <strong>poco realista</strong>, y su influencia posterior debe comprobarse, sin descartarla solo por tener muchos segmentos.</li>
+</ul>
+</section>
+<section id="solución-5" class="slide level2">
+<h2>Solución 5</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>simular_previa <span class="ot">&lt;-</span> <span class="cf">function</span>(sd_beta, media_b0, sd_b0, sim_sigma, seed, <span class="at">n_sim =</span> <span class="dv">200</span>) {</span>
+<span id="cb13-2"><a href=""></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb13-3"><a href=""></a>  <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_sim, <span class="cf">function</span>(s) {</span>
+<span id="cb13-4"><a href=""></a>    beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">1</span>, media_b0, sd_b0), <span class="fu">rnorm</span>(<span class="fu">ncol</span>(X_todos) <span class="sc">-</span> <span class="dv">1</span>, <span class="dv">0</span>, sd_beta))</span>
+<span id="cb13-5"><a href=""></a>    sigma <span class="ot">&lt;-</span> <span class="fu">sim_sigma</span>()</span>
+<span id="cb13-6"><a href=""></a>    <span class="fu">tibble</span>(<span class="at">log_delta =</span> <span class="fu">drop</span>(X_todos <span class="sc">%*%</span> beta) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">nrow</span>(X_todos), <span class="dv">0</span>, sigma))</span>
+<span id="cb13-7"><a href=""></a>  })</span>
+<span id="cb13-8"><a href=""></a>}</span>
+<span id="cb13-9"><a href=""></a>previa_vaga <span class="ot">&lt;-</span> <span class="fu">simular_previa</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="cf">function</span>() <span class="fu">abs</span>(<span class="fu">rcauchy</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">2.5</span>)), <span class="at">seed =</span> <span class="dv">501</span>)</span>
+<span id="cb13-10"><a href=""></a>previa_info <span class="ot">&lt;-</span> <span class="fu">simular_previa</span>(<span class="fl">0.2</span>, <span class="fu">log</span>(<span class="fl">2.5</span>), <span class="fl">0.5</span>, <span class="cf">function</span>() <span class="fu">abs</span>(<span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)), <span class="at">seed =</span> <span class="dv">502</span>)</span>
+<span id="cb13-11"><a href=""></a></span>
+<span id="cb13-12"><a href=""></a>ej5 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="st">`</span><span class="at">β ~ N(0, 1), σ ~ Cauchy⁺</span><span class="st">`</span> <span class="ot">=</span> previa_vaga, <span class="st">`</span><span class="at">Previas informativas</span><span class="st">`</span> <span class="ot">=</span> previa_info, <span class="at">.id =</span> <span class="st">"previa"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-13"><a href=""></a>  <span class="fu">group_by</span>(previa) <span class="sc">%&gt;%</span></span>
+<span id="cb13-14"><a href=""></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">% δ &gt; 20</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&gt;</span> <span class="fu">log</span>(<span class="dv">20</span>)), <span class="st">`</span><span class="at">% δ &lt; 1</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&lt;</span> <span class="dv">0</span>),</span>
+<span id="cb13-15"><a href=""></a>            <span class="st">`</span><span class="at">mediana δ</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">exp</span>(<span class="fu">median</span>(log_delta)), <span class="st">`</span><span class="at">P90 δ</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">exp</span>(<span class="fu">quantile</span>(log_delta, <span class="fl">0.90</span>)),</span>
+<span id="cb13-16"><a href=""></a>            <span class="at">pct_overflow =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&gt;</span> <span class="fu">log</span>(.Machine<span class="sc">$</span>double.xmax)),</span>
+<span id="cb13-17"><a href=""></a>            <span class="at">pct_plot_omitted =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&lt;=</span> <span class="fu">log</span>(<span class="fl">0.01</span>) <span class="sc">|</span> log_delta <span class="sc">&gt;=</span> <span class="fu">log</span>(<span class="dv">100</span>)))</span>
+<span id="cb13-18"><a href=""></a>ej5</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="solución-5-resultados" class="slide level2">
+<h2>Solución 5: resultados</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">previa</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">% δ &gt; 20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">% δ &lt; 1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mediana δ</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">P90 δ</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pct_overflow</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pct_plot_omitted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Previas informativas</td>
+<td style="text-align: right;">3,7</td>
+<td style="text-align: right;">17,1</td>
+<td style="text-align: right;">2,4</td>
+<td style="text-align: right;">8,5</td>
+<td style="text-align: right;">0,0</td>
+<td style="text-align: right;">1,6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">&lt;U+03B2&gt; ~ N(0, 1), &lt;U+03C3&gt; ~ Cauchy&lt;U+207A&gt;</td>
+<td style="text-align: right;">26,6</td>
+<td style="text-align: right;">50,8</td>
+<td style="text-align: right;">0,9</td>
+<td style="text-align: right;">18.897,1</td>
+<td style="text-align: right;">0,2</td>
+<td style="text-align: right;">39,8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<img data-src="resultados/grafico_ej5.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"><p>Las probabilidades de superar umbrales se calculan en <strong>escala logarítmica</strong>, sin exponentiar valores extremos. <code>pct_overflow</code> indica qué porcentaje desbordaría al exponentiar y <code>pct_plot_omitted</code> qué porcentaje no se muestra en el gráfico. Los límites 1 y 6 son referencias ilustrativas, no límites universales de plausibilidad.</p>
+<p>El chequeo se realiza condicionado al diseño observado, antes de usar la respuesta. Las alternativas de previa son propuestas para evaluación; no se adoptan automáticamente por producir menos extremos.</p>
+</section></section>
+<section>
+<section id="cierre" class="title-slide slide level1 center">
+<h1>Cierre</h1>
+
+</section>
+<section id="diagnósticos-psis-loo" class="slide level2">
+<h2>Diagnósticos PSIS-LOO</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">model</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k_threshold</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k_max</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n_flagged</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n_k_above_one</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">A</td>
+<td style="text-align: right;">0,7</td>
+<td style="text-align: right;">0,093</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B</td>
+<td style="text-align: right;">0,7</td>
+<td style="text-align: right;">1,061</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C</td>
+<td style="text-align: right;">0,7</td>
+<td style="text-align: right;">0,838</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Si <code>n_flagged</code> es mayor que cero, la comparación es <strong>provisional</strong> hasta revisar los casos influyentes y comprobar la aproximación. Un Pareto-k favorable tampoco demuestra que el modelo sea adecuado para otra población o tarea predictiva.</p>
+</section>
+<section id="diagnósticos-de-muestreo" class="slide level2">
+<h2>Diagnósticos de muestreo</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="table table-striped table-condensed lightable-classic caption-top" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">fit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Rhat_max</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ESS_bulk_min</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ESS_tail_min</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">divergences</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">max_treedepth_hits</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">aysen_A</td>
+<td style="text-align: right;">1,002</td>
+<td style="text-align: right;">1.837,402</td>
+<td style="text-align: right;">1.867,157</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">aysen_B</td>
+<td style="text-align: right;">1,004</td>
+<td style="text-align: right;">1.579,566</td>
+<td style="text-align: right;">2.098,423</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">aysen_C</td>
+<td style="text-align: right;">1,002</td>
+<td style="text-align: right;">1.601,058</td>
+<td style="text-align: right;">1.840,557</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">magallanes</td>
+<td style="text-align: right;">1,006</td>
+<td style="text-align: right;">1.974,244</td>
+<td style="text-align: right;">1.981,804</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Use R-hat menor que 1,01 y ESS_bulk/ESS_tail de al menos 400 como guías para cuatro cadenas, junto con trazas, error Monte Carlo y diagnósticos NUTS. Estos controles son distintos de la evaluación predictiva.</p>
+</section>
+<section id="para-llevar" class="slide level2">
+<h2>Para llevar</h2>
+<ul>
+<li>Las diferencias entre regiones se evalúan mediante distribuciones de diferencias y comparación predictiva; un cambio de signo no impone un modelo por región.</li>
+<li><strong>LOO</strong> compara modelos por su capacidad de <strong>predecir segmentos nuevos</strong>; revise los <span class="math inline">\(\hat k\)</span> de Pareto.</li>
+<li>La variabilidad no explicada puede depender de la <strong>zona</strong>; la indexación <code>sigma[zona]</code> en Stan lo permite.</li>
+<li>Predecir <span class="math inline">\(\delta_i\)</span> no basta: con <span class="math inline">\(V_i\)</span> observado no se corrige la <strong>subcobertura de viviendas</strong>.</li>
+<li>Revise siempre qué implican las <strong>previas</strong> en la escala de los datos.</li>
+</ul>
+<div class="caja">
+<p><strong>Próxima sesión:</strong> un modelo de <strong>conteos</strong> para <span class="math inline">\(Y_i\)</span> con exposición <span class="math inline">\(V_i\)</span> (Poisson loglineal).</p>
+</div>
+</section>
+<section id="muchas-gracias" class="slide level2 smaller scrollable">
+<h2>Muchas gracias</h2>
+<p><strong>Andrés Gutiérrez · Stalyn Guerrero</strong></p>
+<p><strong>Contacto: Andrés Gutiérrez</strong><br>
+<a href="mailto:andres.gutierrez@cepal.org">andres.gutierrez@cepal.org</a></p>
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-gabry2019" class="csl-entry" role="listitem">
+Gabry, Jonah, Daniel Simpson, Aki Vehtari, Michael Betancourt, y Andrew Gelman. 2019. <span>«Visualization in Bayesian Workflow»</span>. <em>Journal of the Royal Statistical Society: Series A</em> 182 (2): 389-402.
+</div>
+<div id="ref-vehtari2017loo" class="csl-entry" role="listitem">
+Vehtari, Aki, Andrew Gelman, y Jonah Gabry. 2017. <span>«Practical <span>B</span>ayesian Model Evaluation Using Leave-One-Out Cross-Validation and <span>WAIC</span>»</span>. <em>Statistics and Computing</em> 27 (5): 1413-32.
+</div>
+</div>
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Practica_Dia2_lineal_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1600,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 8.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <div class="logos-institucionales" aria-label="CEPAL y UNFPA">
+      <img src="img/logoCepal.jpg" alt="CEPAL">
+      <img src="img/UNFPA_logo.svg" alt="UNFPA, Fondo de Población de las Naciones Unidas">
+    </div>
+
+    
+
+    <script>
+
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+
+      // slide changes (different for each slide format).
+
+      (function () {
+
+        // dispatch for htmlwidgets
+
+        function fireSlideEnter() {
+
+          const event = window.document.createEvent("Event");
+
+          event.initEvent("slideenter", true, true);
+
+          window.document.dispatchEvent(event);
+
+        }
+
+    
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+
+          fireSlideEnter();
+
+    
+
+          // dispatch for shiny
+
+          if (window.jQuery) {
+
+            if (previousSlide) {
+
+              window.jQuery(previousSlide).trigger("hidden");
+
+            }
+
+            if (currentSlide) {
+
+              window.jQuery(currentSlide).trigger("shown");
+
+            }
+
+          }
+
+        }
+
+    
+
+        // hookup for slidy
+
+        if (window.w3c_slidy) {
+
+          window.w3c_slidy.add_observer(function (slide_num) {
+
+            // slide_num starts at position 1
+
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+
+          });
+
+        }
+
+    
+
+      })();
+
+    </script>
+
+    
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copiado");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copiado");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

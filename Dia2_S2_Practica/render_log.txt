@@ -1,0 +1,115 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+
+
+processing file: Practica_Dia2_lineal.qmd
+1/53                   
+2/53 [setup]           
+3/53                   
+4/53 [datos]           
+5/53                   
+6/53 [ej1]             
+7/53                   
+8/53 [ej1-grafico]     
+9/53                   
+10/53 [unnamed-chunk-1] 
+11/53                   
+12/53 [unnamed-chunk-2] 
+13/53                   
+14/53 [unnamed-chunk-3] 
+15/53                   
+16/53 [ej2]             
+17/53                   
+18/53 [ej2-loo]         
+19/53                   
+20/53 [unnamed-chunk-4] 
+21/53                   
+22/53 [unnamed-chunk-5] 
+23/53                   
+24/53 [unnamed-chunk-6] 
+25/53                   
+26/53 [unnamed-chunk-7] 
+27/53                   
+28/53 [ej3]             
+29/53                   
+30/53 [ej3-resultado]   
+31/53                   
+32/53 [unnamed-chunk-8] 
+33/53                   
+34/53 [unnamed-chunk-9] 
+35/53                   
+36/53 [ej3-ppc]         
+37/53                   
+38/53 [unnamed-chunk-10]
+39/53                   
+40/53 [ej4]             
+41/53                   
+42/53 [unnamed-chunk-11]
+43/53                   
+44/53 [ej5]             
+45/53                   
+46/53 [unnamed-chunk-12]
+47/53                   
+48/53 [unnamed-chunk-13]
+49/53                   
+50/53 [unnamed-chunk-14]
+51/53                   
+52/53 [unnamed-chunk-15]
+53/53                   
+output file: Practica_Dia2_lineal.knit.md
+
+Warning messages:
+1: In eval(substitute(expr), data, enclos = parent.frame()) :
+  unable to translate 'Ays<U+00E9>n' to native encoding
+2: In eval(substitute(expr), data, enclos = parent.frame()) :
+  unable to translate 'Ays<U+00E9>n' to native encoding
+pandoc 
+  to: revealjs
+  output-file: Practica_Dia2_lineal.html
+  standalone: true
+  wrap: none
+  default-image-extension: png
+  html-math-method:
+    method: mathjax
+    url: >-
+      https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full
+  slide-level: 2
+  css:
+    - styles.css
+  variables: {}
+  
+metadata
+  link-citations: true
+  width: 1600
+  height: 900
+  margin: 0.08
+  center: false
+  navigationMode: linear
+  controlsLayout: edges
+  controlsTutorial: false
+  hash: true
+  history: true
+  hashOneBasedIndex: false
+  fragmentInURL: false
+  transition: fade
+  backgroundTransition: none
+  pdfSeparateFragments: false
+  lang: es
+  auto-stretch: true
+  engines:
+    - path: C:\Program Files\RStudio\resources\app\bin\quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  title: Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
+  subtitle: 'Práctica computacional en RStan: regresión bayesiana de la densidad'
+  author: Stalyn Guerrero
+  institute: CEPAL · UNFPA América Latina y el Caribe · INE Chile
+  date: 24 de noviembre de 2026 · Día 2, sesión 2 · 11:30–13:00
+  bibliography:
+    - references.bib
+  theme: simple
+  slideNumber: true
+  
+Output created: Practica_Dia2_lineal.html
+
