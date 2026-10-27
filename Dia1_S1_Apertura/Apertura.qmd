@@ -1,0 +1,197 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Apertura · Día 1, sesión 1 · Versión 02"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "23 de noviembre de 2026 · 09:30–11:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+---
+
+## Bienvenida institucional
+
+**CEPAL · UNFPA · Instituto Nacional de Estadísticas de Chile**
+
+Intervenciones previstas en la nota conceptual:
+
+- CEPAL: Rolando Ocampo.
+- UNFPA: Andrés Alban.
+- INE Chile: Denise López.
+
+**23 al 26 de noviembre de 2026**  
+Sala Carmen Miró · CEPAL · Santiago de Chile.
+
+::: {.notes}
+Los nombres corresponden al programa de la nota conceptual de referencia. Esta lámina presenta las intervenciones institucionales; no atribuye a sus participantes la autoría del contenido técnico. La nota no distribuye minutos entre las intervenciones.
+:::
+
+## Un trabajo conjunto para fortalecer capacidades
+
+- Durante 2026, CEPAL y UNFPA-LACRO han acompañado al INE de Chile en el desarrollo de un **modelo de población por segmento censal** orientado a la estimación de la omisión censal.
+- El modelo combina información censal, covariables satelitales e inferencia bayesiana.
+- El taller busca que el equipo del INE pueda **comprender, reproducir, evaluar y adaptar** la metodología de manera progresivamente autónoma.
+
+## ¿Qué problema abordamos?
+
+Los conteos censales y la información auxiliar permiten estudiar la población a escalas territoriales desagregadas.
+
+::: {.caja}
+**Pregunta del taller:** ¿cómo estimar la población por segmento censal, cuantificar su incertidumbre y evaluar la coherencia de los resultados con otras evidencias demográficas?
+:::
+
+El modelo aporta una **herramienta complementaria** para evaluar la omisión censal y reconciliar las estimaciones de población.
+
+## Del segmento a las estimaciones de población
+
+1. Preparar y revisar los datos censales y auxiliares.
+2. Aprender la relación entre población, viviendas ocupadas y características del territorio.
+3. Generar predicciones por segmento y agregarlas a las áreas de interés.
+4. Contrastar y validar los resultados con otras fuentes y métodos.
+
+Estas estimaciones contribuyen a la reconciliación de la población base para la actualización de las **proyecciones nacionales y subnacionales**.
+
+::: {.notes}
+Evitar presentar 2026 como horizonte de las proyecciones. La nota conceptual sitúa en 2026 la cooperación técnica y el taller, y vincula el modelo con la actualización de las proyecciones sin fijar un horizonte.
+:::
+
+## Objetivo general
+
+::: {.caja}
+Fortalecer las capacidades técnicas del INE de Chile para **especificar, implementar, diagnosticar y validar modelos bayesianos jerárquicos de estimación de población a nivel de segmento censal**, como herramienta complementaria para la evaluación de la omisión censal y la reconciliación de las estimaciones de población que sirven de base para la actualización de las proyecciones nacionales y subnacionales.
+:::
+
+## Objetivos específicos
+
+1. Comprender los fundamentos de la inferencia bayesiana en modelos uniparamétricos y multiparamétricos.
+2. Especificar un modelo Poisson con vínculo loglineal e incorporar un *offset* de viviendas particulares ocupadas.
+3. Incorporar covariables satelitales como predictores auxiliares de la densidad poblacional latente.
+4. Implementar y ejecutar el modelo en Stan: sintaxis, compilación y muestreo MCMC.
+5. Diagnosticar la convergencia y el ajuste, y generar predicciones de población.
+
+## Resultado esperado
+
+Al finalizar, el equipo técnico contará con códigos, bases de trabajo y documentación para reproducir el flujo completo:
+
+**Preparación → especificación → ajuste → diagnóstico → validación → predicción.**
+
+El propósito es continuar su aplicación y adaptación institucional, con acompañamiento técnico de CEPAL y UNFPA según sea requerido.
+
+## El modelo: una primera intuición
+
+$$
+\text{Población esperada del segmento}
+= \text{viviendas ocupadas} \times \text{personas por vivienda}.
+$$
+
+- Las viviendas ocupadas aportan la **exposición** del modelo.
+- Las covariables satelitales ayudan a explicar diferencias entre segmentos.
+- La estructura jerárquica representa variación adicional entre segmentos.
+- La inferencia bayesiana permite expresar la **incertidumbre** de los resultados.
+
+El taller desarrollará progresivamente esta idea hasta el modelo **Poisson–lognormal** del caso chileno.
+
+::: {.notes}
+La definición operativa de cobertura, la elegibilidad, las previas, las correcciones de exposición y los escenarios predictivos se revisarán con el código del modelo en las sesiones técnicas. No se presentan aquí como especificaciones ya validadas por la nota conceptual.
+:::
+
+## Aprender mediante el caso de Chile
+
+- Exposiciones teóricas y prácticas computacionales guiadas.
+- Datos censales y covariables del propio caso de Chile.
+- Material actual: Aysén para los ejemplos y Magallanes para ejercicios de réplica.
+- Revisión de supuestos, diagnóstico, validación e interpretación de predicciones.
+
+**Equipo docente:** especialistas de la Unidad de Estadísticas Sociales de la División de Estadísticas de CEPAL y del equipo regional en Datos y Dinámicas de Población de UNFPA.
+
+## Lunes 23 · Fundamentos
+
+| Horario | Sesión / responsable |
+|---|---|
+| 09:30–11:00 | Apertura · CEPAL, UNFPA e INE Chile |
+| 11:30–13:00 | Inferencia bayesiana I: uniparamétricos · Andrés Gutiérrez |
+| 14:30–16:00 | Inferencia bayesiana II: multiparamétricos · Andrés Gutiérrez |
+| 16:30–18:00 | Práctica computacional en RStan · Stalyn Guerrero |
+
+## Martes 24 · Regresión y conteos
+
+| Horario | Sesión / responsable |
+|---|---|
+| 09:30–11:00 | Introducción a modelos lineales con métodos bayesianos · Andrés Gutiérrez |
+| 11:30–13:00 | Práctica computacional en RStan · Stalyn Guerrero |
+| 14:30–16:00 | Modelo Poisson con vínculo loglineal · Andrés Gutiérrez |
+| 16:30–18:00 | Práctica computacional en RStan · Stalyn Guerrero |
+
+## Miércoles 25 · Covariables y modelo de Chile
+
+| Horario | Sesión / responsable |
+|---|---|
+| 09:30–11:00 | Variables satelitales para modelos de población I · Luís de la Rúa |
+| 11:30–13:00 | Variables satelitales para modelos de población II · Luís de la Rúa |
+| 14:30–16:00 | El modelo de población en Chile · Andrés Gutiérrez y Stalyn Guerrero |
+| 16:30–18:00 | Práctica computacional en RStan · Stalyn Guerrero |
+
+## Jueves 26 · Diagnóstico y predicción
+
+| Horario | Sesión / responsable |
+|---|---|
+| 09:30–11:00 | Diagnóstico del modelo · Andrés Gutiérrez y Stalyn Guerrero |
+| 11:30–13:00 | Predicción en los segmentos censales · Andrés Gutiérrez y Stalyn Guerrero |
+| 14:30–16:00 | Práctica computacional en RStan · Stalyn Guerrero |
+| 16:30–18:00 | Cierre del evento · CEPAL: Xavier Mancero; UNFPA: Sabrina Jurán |
+
+## Organización de las jornadas
+
+- **Modalidad:** presencial, del 23 al 26 de noviembre de 2026.
+- **Horario:** 09:30–18:00.
+- **Café:** 11:00–11:30 y 16:00–16:30.
+- **Almuerzo:** 13:00–14:30.
+- **Lugar:** sala Carmen Miró, CEPAL, Santiago de Chile.
+
+## Requisitos y materiales
+
+Se recomiendan conocimientos sólidos de estadística, manejo de bases de datos, inferencia y regresión, además de manejo de **R y RStudio**.
+
+**No se requiere experiencia previa en Stan ni en modelación bayesiana.**
+
+Traer computador con internet y R, RStudio y Stan previamente instalados.
+
+Se entregarán presentaciones, guías paso a paso, bases de trabajo, scripts de ajuste y ejercicios de implementación y diagnóstico.
+
+## Cómo seguir las prácticas
+
+1. Abrir la carpeta de la sesión y su script en `Rcode/`.
+2. Ejecutar el código por bloques y revisar los resultados con el equipo docente.
+3. Relacionar cada resultado con los supuestos del modelo.
+4. Registrar dudas, decisiones y aspectos que requieren validación.
+
+Los scripts conservan los análisis disponibles en el material anterior. El desarrollo técnico de la apertura original permanece en la carpeta inicial `Taller/Dia1_S1_Apertura/`.
+
+::: {.notes}
+La carpeta inicial conserva íntegramente la apertura original como fuente de consulta docente; no constituye una especificación actualizada ni validada del modelo. El control de cambios de esta sesión indica qué temas se revisarán después.
+:::
+
+## Para comenzar
+
+::: {.caja}
+**Meta compartida:** que el equipo del INE pueda reproducir el modelo, evaluar sus resultados y fundamentar sus decisiones de aplicación.
+:::
+
+La siguiente sesión introduce los fundamentos de la inferencia bayesiana con modelos uniparamétricos.
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)
