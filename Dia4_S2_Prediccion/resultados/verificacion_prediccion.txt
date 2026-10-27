@@ -1,0 +1,33 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+[1] "English_United States.utf8"
+This is posterior version 1.6.1
+
+Attaching package: 'posterior'
+
+The following objects are masked from 'package:stats':
+
+    mad, sd, var
+
+The following objects are masked from 'package:base':
+
+    %in%, match
+
+Destino: subconjunto sin colectivas y con VPO positiva. No es toda la region.
+                    escenario viviendas segmentos censado_mismo_destino  media
+base                     base     58116      2330                143875 144255
+uniforme_095     uniforme_095     61190      2330                143875 151893
+focalizada_090 focalizada_090     58526      2330                143875 145247
+               mediana inferior superior cambio_mediana_pct
+base            144256   142630   145809            0.00000
+uniforme_095    151896   150225   153508            5.29614
+focalizada_090  145248   143626   146815            0.68732
+   media  mediana inferior superior 
+118912.6 118931.0 117478.8 120313.1 
+  limite_inferior_suma_segmentos limite_inferior_total_correcto
+1                       103300.4                         142630
+  limite_superior_suma_segmentos limite_superior_total_correcto
+1                       190548.3                       145809.1

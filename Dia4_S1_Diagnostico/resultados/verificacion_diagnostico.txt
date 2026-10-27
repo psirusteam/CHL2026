@@ -1,0 +1,60 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+[1] "English_United States.utf8"
+This is posterior version 1.6.1
+
+Attaching package: 'posterior'
+
+The following objects are masked from 'package:stats':
+
+    mad, sd, var
+
+The following objects are masked from 'package:base':
+
+    %in%, match
+
+This is bayesplot version 1.12.0
+- Online documentation and vignettes at mc-stan.org/bayesplot
+- bayesplot theme set to bayesplot::theme_default()
+   * Does _not_ affect other ggplot2 plots
+   * See ?bayesplot_theme_set for details on theme setting
+
+Attaching package: 'bayesplot'
+
+The following object is masked from 'package:posterior':
+
+    rhat
+
+[1] 1500    4   17
+    variable      mean       sd  rhat ess_bulk ess_tail mcse_mean revisar
+1    beta[1]  0.577220 0.043984 1.003   1700.4     2414 0.0010730   FALSE
+2    beta[2]  0.499735 0.040418 1.001   2604.1     4118 0.0007925   FALSE
+3    beta[3]  0.371301 0.027781 1.002   2306.8     3496 0.0005806   FALSE
+4    beta[4] -0.062539 0.010480 1.001   2771.5     3502 0.0001999   FALSE
+5    beta[5] -0.016582 0.007368 1.002   2770.4     3937 0.0001399   FALSE
+6   gamma[1] -0.009239 0.038654 1.003   1750.8     1784 0.0009538   FALSE
+7   gamma[2] -0.016968 0.066924 1.005   3275.2     3050 0.0012052   FALSE
+8   gamma[3] -0.048504 0.082768 1.000   1995.9     1704 0.0019687   FALSE
+9   gamma[4] -0.061549 0.090846 1.001   3177.2     2871 0.0017257   FALSE
+10  gamma[5]  0.088499 0.048175 1.003   1750.9     1897 0.0011917   FALSE
+11  gamma[6] -0.064039 0.041024 1.002   1777.0     2035 0.0009908   FALSE
+12  gamma[7]  0.075681 0.076919 1.001   1924.9     2455 0.0018331   FALSE
+13  gamma[8]  0.060821 0.079156 1.001   2922.9     2484 0.0015646   FALSE
+14  gamma[9] -0.030734 0.039384 1.002   1755.8     1619 0.0009692   FALSE
+15 gamma[10] -0.001285 0.083425 1.001   3729.6     3280 0.0014024   FALSE
+16     sigma  0.095554 0.003832 1.008    746.8     1268 0.0001405   FALSE
+17    sigmaU  0.092693 0.046120 1.001   1480.4     2638 0.0011632   FALSE
+  cadena divergencias limite_profundidad  ebfmi revisar
+1      1            0                  0 0.3866   FALSE
+2      2            0                  0 0.3730   FALSE
+3      3            0                  0 0.3717   FALSE
+4      4            0                  0 0.3379   FALSE
+    zona observado mediana_replica inferior superior
+1  aldea  3.069042        3.102450 2.805067 3.383073
+2  rural  1.941025        1.956655 1.858830 2.065928
+3 urbana  2.507402        2.507889 2.479952 2.533545
+  observado  inferior mediana_replica  superior
+1 0.4616034 0.4636533       0.4819532 0.5007582

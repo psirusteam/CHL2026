@@ -1,0 +1,172 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+[1] "English_United States.utf8"
+Loading required package: StanHeaders
+
+rstan version 2.32.7 (Stan version 2.32.2)
+
+For execution on a local, multicore CPU with excess RAM we recommend calling
+options(mc.cores = parallel::detectCores()).
+To avoid recompilation of unchanged Stan programs, we recommend calling
+rstan_options(auto_write = TRUE)
+For within-chain threading using `reduce_sum()` or `map_rect()` Stan functions,
+change `threads_per_chain` option:
+rstan_options(threads_per_chain = 1)
+
+Do not specify '-march=native' in 'LOCAL_CPPFLAGS' or a Makevars file
+This is posterior version 1.6.1
+
+Attaching package: 'posterior'
+
+The following objects are masked from 'package:rstan':
+
+    ess_bulk, ess_tail
+
+The following objects are masked from 'package:stats':
+
+    mad, sd, var
+
+The following objects are masked from 'package:base':
+
+    %in%, match
+
+                    conjunto segmentos
+1            Base disponible      3044
+2         Aptos para ajustar      2288
+3 Destino de la demostracion      2330
+      comuna aptos
+12101  12101  1785
+12102  12102     6
+12103  12103     6
+12104  12104     3
+12201  12201    30
+12301  12301   129
+12302  12302     7
+12303  12303     4
+12401  12401   315
+12402  12402     3
+List of 5
+ $ D_obs    : int 2288
+ $ D_tot    : int 2330
+ $ P        : int 5
+ $ Q        : int 10
+ $ delta_max: num 4.35
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+starting worker pid=18416 on localhost:11272 at 14:01:55.875
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+starting worker pid=12820 on localhost:11272 at 14:01:56.148
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+starting worker pid=11144 on localhost:11272 at 14:01:56.402
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+starting worker pid=21416 on localhost:11272 at 14:01:56.630
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 0.000643 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 6.43 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 3000 [  0%]  (Warmup)
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 0.000701 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 7.01 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 3000 [  0%]  (Warmup)
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 3: 
+Chain 3: Gradient evaluation took 0.000811 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 8.11 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 3000 [  0%]  (Warmup)
+Chain 4: 
+Chain 4: Gradient evaluation took 0.00073 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 7.3 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 3000 [  0%]  (Warmup)
+Chain 4: Iteration:  500 / 3000 [ 16%]  (Warmup)
+Chain 2: Iteration:  500 / 3000 [ 16%]  (Warmup)
+Chain 3: Iteration:  500 / 3000 [ 16%]  (Warmup)
+Chain 1: Iteration:  500 / 3000 [ 16%]  (Warmup)
+Chain 4: Iteration: 1000 / 3000 [ 33%]  (Warmup)
+Chain 2: Iteration: 1000 / 3000 [ 33%]  (Warmup)
+Chain 3: Iteration: 1000 / 3000 [ 33%]  (Warmup)
+Chain 1: Iteration: 1000 / 3000 [ 33%]  (Warmup)
+Chain 4: Iteration: 1500 / 3000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1501 / 3000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1500 / 3000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1501 / 3000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1500 / 3000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1501 / 3000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1500 / 3000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1501 / 3000 [ 50%]  (Sampling)
+Chain 3: Iteration: 2000 / 3000 [ 66%]  (Sampling)
+Chain 4: Iteration: 2000 / 3000 [ 66%]  (Sampling)
+Chain 3: Iteration: 2500 / 3000 [ 83%]  (Sampling)
+Chain 2: Iteration: 2000 / 3000 [ 66%]  (Sampling)
+Chain 1: Iteration: 2000 / 3000 [ 66%]  (Sampling)
+Chain 3: Iteration: 3000 / 3000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 146.196 seconds (Warm-up)
+Chain 3:                119.821 seconds (Sampling)
+Chain 3:                266.017 seconds (Total)
+Chain 3: 
+Chain 4: Iteration: 2500 / 3000 [ 83%]  (Sampling)
+Chain 2: Iteration: 2500 / 3000 [ 83%]  (Sampling)
+Chain 1: Iteration: 2500 / 3000 [ 83%]  (Sampling)
+Chain 4: Iteration: 3000 / 3000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 143.062 seconds (Warm-up)
+Chain 4:                235.525 seconds (Sampling)
+Chain 4:                378.587 seconds (Total)
+Chain 4: 
+Chain 2: Iteration: 3000 / 3000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 149.794 seconds (Warm-up)
+Chain 2:                235.538 seconds (Sampling)
+Chain 2:                385.332 seconds (Total)
+Chain 2: 
+Chain 1: Iteration: 3000 / 3000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 166.956 seconds (Warm-up)
+Chain 1:                235.532 seconds (Sampling)
+Chain 1:                402.488 seconds (Total)
+Chain 1: 
+  rhat_max ess_bulk_min ess_tail_min divergencias limite_profundidad revisar
+1   1.0076       746.79       1267.7            0                  0   FALSE
+Cadenas y diagnosticos guardados sin modificar los resultados de D3S4.

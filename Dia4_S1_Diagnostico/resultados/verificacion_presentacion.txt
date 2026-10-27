@@ -1,0 +1,73 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+
+
+processing file: Diagnostico.qmd
+1/17                       
+2/17 [setup]               
+3/17                       
+4/17 [diagnostico-paquetes]
+5/17                       
+6/17 [diagnostico-cargar]  
+7/17                       
+8/17 [diagnostico-tabla]   
+9/17                       
+10/17 [unnamed-chunk-1]     
+11/17                       
+12/17 [unnamed-chunk-2]     
+13/17                       
+14/17 [unnamed-chunk-3]     
+15/17                       
+16/17 [unnamed-chunk-4]     
+17/17                       
+output file: Diagnostico.knit.md
+
+pandoc 
+  to: revealjs
+  output-file: Diagnostico.html
+  standalone: true
+  embed-resources: true
+  wrap: none
+  default-image-extension: png
+  html-math-method:
+    method: mathjax
+    url: >-
+      https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS_HTML-full
+  slide-level: 2
+  css:
+    - styles.css
+  variables: {}
+  
+metadata
+  link-citations: true
+  width: 1600
+  height: 900
+  margin: 0.08
+  center: false
+  navigationMode: linear
+  controlsLayout: edges
+  controlsTutorial: false
+  hash: true
+  history: true
+  hashOneBasedIndex: false
+  fragmentInURL: false
+  transition: fade
+  backgroundTransition: none
+  pdfSeparateFragments: false
+  lang: es
+  auto-stretch: true
+  engines:
+    - path: C:\Program Files\RStudio\resources\app\bin\quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  title: Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
+  subtitle: 'Diagnóstico del modelo: cálculo, especificación y datos censales'
+  author: Andrés Gutiérrez · Stalyn Guerrero
+  institute: CEPAL · UNFPA América Latina y el Caribe · INE Chile
+  date: 26 de noviembre de 2026 · Día 4, sesión 1 · 09:30–11:00
+  theme: simple
+  slideNumber: true
+  
+Output created: Diagnostico.html
+
