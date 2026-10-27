@@ -1,0 +1,246 @@
+---
+title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
+subtitle: "Práctica guiada en Stan: modelo Poisson para datos censales"
+author: "Andrés Gutiérrez · Stalyn Guerrero"
+institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+date: "24 de noviembre de 2026 · Día 2, sesión 4 · 16:30–18:00"
+lang: es
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    css: styles.css
+    width: 1600
+    height: 900
+    margin: 0.08
+    center: false
+    hash: true
+    include-after-body: logos_institucionales.html
+---
+
+```{r setup, include = FALSE}
+knitr::read_chunk("Rcode/Practica_Poisson_paso_a_paso.R")
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "", fig.align = "center", out.width = "92%")
+```
+
+# Del dato censal al modelo Poisson en Stan
+
+## Qué haremos hoy
+
+Ustedes conocen el censo. En esta práctica aprenderán a llevar esos datos a Stan y a interpretar un primer modelo bayesiano.
+
+1. Preparar personas, viviendas y zona para el ajuste.
+2. Leer el archivo Stan y **ajustar el modelo Poisson en su computador**.
+3. Revisar el cálculo e interpretar personas esperadas por vivienda.
+4. Predecir un nuevo conteo y comprobar qué reproduce el modelo.
+
+**Nivel intermedio, con guía:** ejecuten los bloques, cambien una entrada y expliquen qué cambia en el resultado.
+
+
+**Entregable:** ajuste ejecutado, tabla por zona, predicción con dos cantidades de viviendas y una conclusión sobre las limitaciones del Poisson.
+
+::: {.notes}
+El docente debe comprobar RStan y su compilador en los equipos antes de la sesión y ensayar los tiempos. Mientras compila, trabajar el significado de los bloques y parámetros. Si un equipo falla, completar el ajuste en pareja en otro equipo y resolver la instalación con apoyo; las salidas preparadas son apoyo, no sustituyen la experiencia de ajustar.
+:::
+
+## Abrir los materiales correctos
+
+En RStudio, sitúen el directorio de trabajo en la carpeta `Dia2_S4_Practica`.
+
+- Abran `Rcode/Practica_Poisson_paso_a_paso.R`: es la guía para participantes.
+- Abran `stan/poisson_offset.stan`: es el modelo que van a ajustar.
+- Ejecuten el script **bloque por bloque**, revisando lo que aparece.
+
+```{r taller-paquetes}
+```
+
+Si RStan no carga o informa que falta un compilador, soliciten apoyo al docente antes de continuar. La instalación debe prepararse antes del taller.
+
+## Tres ideas bayesianas para comenzar
+
+| Concepto | En esta práctica |
+|---|---|
+| Modelo de los datos | Poisson describe conteos de personas a partir de viviendas y zona. |
+| Distribución previa | Antes de usar estos datos, expresamos qué valores de los coeficientes consideramos plausibles. |
+| Distribución posterior | Los datos y la distribución previa se combinan para obtener valores plausibles actualizados. |
+
+Stan produce muchas simulaciones de los coeficientes a partir de esa distribución posterior. Las usaremos para resumir resultados y expresar incertidumbre.
+
+# Ejercicio 1: preparar datos y leer el modelo
+
+## Revisar las unidades y los filtros
+
+```{r taller-datos}
+```
+
+1. ¿Qué representa una fila? Identifiquen las variables de personas y viviendas ocupadas.
+2. ¿Cuántos segmentos entran y cuántos quedan fuera por zona?
+3. ¿Por qué no podemos aplicar el logaritmo a cero viviendas?
+
+La bandera `apto_modelo` ya viene preparada. Revisen con el docente sus criterios: el subconjunto de ajuste **no equivale automáticamente a todo el universo censal**. No eliminen registros adicionales sin justificación.
+
+## Lo que estamos suponiendo
+
+Para cada segmento:
+
+**Personas esperadas = viviendas ocupadas × personas esperadas por vivienda según zona.**
+
+El modelo permite que la relación personas/vivienda cambie entre **rural, aldea y urbana**. Dentro de cada zona utiliza la misma relación esperada.
+
+- La cantidad observada de personas puede variar alrededor de ese valor esperado.
+- Las viviendas se usan como una entrada conocida; su error de medición no se modela aquí.
+- Esta primera práctica no incluye las covariables satelitales ni efectos propios de cada segmento.
+
+**Pregunta:** ¿qué diferencias entre segmentos de una misma zona podrían quedar sin representar?
+
+## Preparar la lista que recibe Stan
+
+```{r taller-lista}
+```
+
+| Entrada | Significado |
+|---|---|
+| `n`, `p` | Número de segmentos y de coeficientes |
+| `X` | Intercepto e indicadores de aldea y urbana; rural es la referencia |
+| `y` | Conteos observados de personas |
+| `log_v` | Logaritmo de viviendas ocupadas: ajusta el tamaño de cada segmento |
+
+**Comprueben:** una fila de `X` y un elemento de `y` deben referirse al mismo segmento.
+
+## Identificar los bloques del archivo Stan
+
+Abran `stan/poisson_offset.stan` y localicen:
+
+| Bloque | Qué contiene |
+|---|---|
+| `data` | La estructura de los datos entregados desde R |
+| `parameters` | Los coeficientes `beta` que queremos aprender |
+| `model` | La distribución previa y la relación Poisson con los datos |
+| `generated quantities` | Conteos simulados `y_rep` para comprobar el modelo |
+
+**Tarea:** señalen qué parte corresponde al conocimiento inicial, cuál usa el censo y cuál simula nuevos conteos.
+
+## Entender las dos líneas centrales
+
+```stan
+beta ~ normal(0, 1);
+y ~ poisson_log(log_v + X * beta);
+```
+
+- La primera línea asigna una distribución previa a los coeficientes, en la escala del logaritmo.
+- La segunda relaciona personas con viviendas y zona. `poisson_log` recibe el logaritmo de la media del conteo.
+- `log_v` incorpora las viviendas con coeficiente fijo igual a uno: duplicar viviendas duplica el valor esperado, manteniendo la zona.
+
+**Pregunta:** ¿por qué `beta` no se interpreta directamente como personas por vivienda? Para volver a esa escala usaremos `exp()`.
+
+::: {.notes}
+Normal(0,1) no es ausencia de información: para un coeficiente, aproximadamente el 95 % previo está entre -1,96 y 1,96; al exponenciar representa un rango amplio de factores multiplicativos. El intercepto refiere a rural; los otros coeficientes son cambios logarítmicos respecto de rural. No exigir derivar esta relación ni ajustar manualmente el algoritmo.
+:::
+
+# Ejercicio 2: ajustar el Poisson en Stan
+
+## Compilar y ejecutar su propio ajuste
+
+```{r taller-ajuste}
+```
+
+1. Ejecuten `stan_model()`: compila el archivo Stan.
+2. Ejecuten `sampling()`: ajusta el modelo con sus datos.
+3. Identifiquen dónde se fija la semilla y dónde se indican las cuatro cadenas.
+
+El bloque proporciona valores iniciales y controles de cálculo. En este primer ajuste manténganlos como están.
+
+## Qué significan las iteraciones
+
+- Ejecutamos **cuatro cadenas**, recorridos que exploran posibles coeficientes.
+- Cada cadena realiza **2.000 iteraciones**; las primeras **1.000** se usan para adaptar el cálculo y se descartan del resumen posterior.
+- Quedan **4.000 simulaciones** en conjunto. Son dependientes; su información efectiva es menor que su número bruto.
+
+**Mientras esperan:** expliquen la diferencia entre compilar el archivo y ajustar el modelo. ¿Qué contiene el objeto `ajuste` que no estaba en `datos_stan`?
+
+## Comprobar antes de interpretar
+
+```{r taller-diagnostico}
+```
+
+Guía de lectura con apoyo del docente:
+
+- `rhat`: esperamos valores menores de **1,01** y cercanos a uno.
+- `ess_bulk` y `ess_tail`: buscamos al menos **400** en esta práctica.
+- Divergencias y llegadas al límite de profundidad: esperamos **cero**.
+- En las trazas, buscamos cadenas que se mezclen sin tendencias persistentes.
+
+Si falla un control, deténganse y consulten al docente. Que el cálculo sea estable **no demuestra que el modelo describa bien el censo**.
+
+# Ejercicio 3: interpretar y predecir
+
+## Volver a personas por vivienda
+
+```{r taller-interpretacion}
+```
+
+1. Lean la mediana y el intervalo del 95 % de personas **esperadas** por vivienda para cada zona.
+2. Compárenlos con el cociente observado de personas/viviendas por zona.
+3. ¿Qué zona presenta la relación más alta? ¿Hay diferencias claras o intervalos superpuestos?
+
+La comparación utiliza los mismos datos del ajuste: es descriptiva y no una validación con datos independientes. El docente ayuda a interpretar los intervalos sin convertir su superposición en una prueba formal.
+
+## Predecir para un segmento urbano
+
+```{r taller-prediccion}
+```
+
+1. Ejecuten con **100 viviendas** y registren ambos intervalos.
+2. Cambien a **150 viviendas** y repitan el bloque completo.
+3. ¿Cómo cambian el valor central y el ancho del intervalo predictivo?
+
+**Distingan:** `media_esperada` resume la incertidumbre sobre el promedio; `conteo_predictivo` añade la variación de un nuevo conteo. No tienen por qué mostrar el mismo ancho.
+
+## Explicar el alcance de la predicción
+
+Redacten dos frases para un equipo censal:
+
+- «Para un segmento urbano con ___ viviendas, el modelo entrega un conteo predictivo central de ___ personas y un intervalo de ___ a ___.»
+- «Este resultado supone que ___ y no considera ___.»
+
+Las viviendas del ejemplo son hipotéticas. El resultado depende de la relación aprendida en los segmentos aptos y de los supuestos del Poisson; no es una corrección automática de omisión censal.
+
+# Ejercicio 4: ¿el modelo reproduce los datos?
+
+## Comparar observaciones con réplicas del modelo
+
+```{r taller-chequeo}
+```
+
+El bloque calcula un indicador de variación entre segmentos. No necesitan memorizar su fórmula.
+
+1. Comparen el indicador observado con el rango 5 %–95 % de los simulados.
+2. Localicen la referencia roja en el gráfico. ¿El modelo reproduce la variación observada?
+3. Si las cadenas se comportan bien, pero este chequeo falla, ¿repetir más iteraciones resolvería por sí solo el problema?
+
+::: {.notes}
+No confundir problema del cálculo con falta de adecuación del modelo. La variación adicional puede requerir covariables, heterogeneidad u otro modelo de conteos. Estos modelos quedan en el apoyo docente, no como ajustes obligatorios en esta primera práctica de Stan. El indicador usa una media estimada común para el contraste descriptivo de observación y réplicas; no presentarlo como prueba formal concluyente.
+:::
+
+## Guardar y comunicar lo aprendido
+
+```{r taller-guardar}
+```
+
+Cada pareja entrega:
+
+1. Evidencia del ajuste y resumen de sus controles de cálculo.
+2. Tabla de personas esperadas por vivienda según zona.
+3. Predicciones para 100 y 150 viviendas y explicación de sus intervalos.
+4. Una conclusión de cinco líneas: qué aprendió el modelo, qué no reproduce y qué información censal revisaría antes de aplicarlo.
+
+**Pregunta final:** ¿qué diferencia hay entre lograr que Stan ejecute el modelo y justificar que ese modelo es útil para el objetivo censal?
+
+## Muchas gracias
+
+**Andrés Gutiérrez · Stalyn Guerrero**
+
+**Contacto: Andrés Gutiérrez**  
+[andres.gutierrez@cepal.org](mailto:andres.gutierrez@cepal.org)
