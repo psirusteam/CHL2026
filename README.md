@@ -1,6 +1,6 @@
 # Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
 
-**CEPAL · Fondo de Población de las Naciones Unidas (UNFPA) · Instituto Nacional de Estadísticas de Chile (INE)**
+**Comisión Económica para América Latina y el Caribe (CEPAL) · Fondo de Población de las Naciones Unidas (UNFPA) · Instituto Nacional de Estadísticas de Chile (INE)**
 
 **Fecha:** 23 al 26 de noviembre de 2026.  
 **Modalidad:** presencial.  
@@ -8,6 +8,8 @@
 **Horario:** 09:30 a 18:00.
 
 ## Introducción
+
+### Materiales y recursos del taller: https://psirusteam.github.io/CHL2026/
 
 Durante 2026, la CEPAL y UNFPA-LACRO han acompañado al INE de Chile en el desarrollo de un modelo de población por segmento censal orientado a la estimación de la omisión censal. La metodología combina información censal y covariables satelitales mediante un modelo jerárquico Poisson–lognormal ajustado con inferencia bayesiana.
 

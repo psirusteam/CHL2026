@@ -1,9 +1,10 @@
 ---
 title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
-subtitle: "Apertura · Día 1, sesión 1 · Versión 02"
+subtitle: "Apertura · Día 1, sesión 1"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
-institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "23 de noviembre de 2026 · 09:30–11:00"
+institute: "CEPAL  UNFPA  América Latina y el Caribe  INE Chile"
+date: 2026-11-23
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:

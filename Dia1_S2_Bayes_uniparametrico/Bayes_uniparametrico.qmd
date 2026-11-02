@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Fundamentos de la inferencia bayesiana I: modelos uniparamétricos"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "23 de noviembre de 2026 · Día 1, sesión 2 · 11:30–13:00"
+date: 2026-11-23
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -37,9 +38,6 @@ v <- leer_valores()
 
 **Recorrido:** proporciones → personas por vivienda → media de logaritmos.
 
-::: {.notes}
-Las derivaciones extensas y el código Stan sirven de apoyo; la ejecución guiada se retoma en la práctica de la tarde.
-:::
 
 # La regla de Bayes
 
