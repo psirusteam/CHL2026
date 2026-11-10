@@ -1,0 +1,121 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+This is posterior version 1.7.0
+
+Attaching package: 'posterior'
+
+The following objects are masked from 'package:stats':
+
+    mad, sd, var
+
+The following objects are masked from 'package:base':
+
+    %in%, match
+
+This is bayesplot version 1.16.0
+- Online documentation and vignettes at mc-stan.org/bayesplot
+- bayesplot theme set to bayesplot::theme_default()
+   * Does _not_ affect other ggplot2 plots
+   * See ?bayesplot_theme_set for details on theme setting
+
+Attaching package: 'bayesplot'
+
+The following object is masked from 'package:posterior':
+
+    rhat
+
+               conjunto segmentos
+1      Aptos del ajuste      2288
+2 Destino de prediccion      3044
+    variable       mean        sd  rhat ess_bulk ess_tail mcse_mean revisar
+1    beta[1]  0.7562160  0.057118 2.497    4.872    20.18 2.749e-02    TRUE
+2    beta[2]  0.1559239  0.017797 1.695    6.401    14.36 7.084e-03    TRUE
+3    beta[3]  0.3145649  0.042505 2.454    4.979    16.08 1.971e-02    TRUE
+4    beta[4] -0.0751306  0.008924 1.658    6.560    11.14 3.532e-03    TRUE
+5    beta[5]  0.5761644 21.146454 3.275    4.538    15.93 1.043e+01    TRUE
+6    beta[6]  0.5652075 20.798491 3.275    4.538    15.93 1.026e+01    TRUE
+7    beta[7]  0.0514848  2.998251 3.295    4.531    15.95 1.479e+00    TRUE
+8    beta[8]  0.2284918  8.205734 3.276    4.538    15.93 4.047e+00    TRUE
+9    beta[9] -0.7687308 28.554726 3.276    4.538    15.93 1.408e+01    TRUE
+10  beta[10]  0.0153047  0.002782 1.273   12.038    15.21 8.365e-04    TRUE
+11  beta[11] -0.0198176  0.008993 2.775    4.723    12.11 4.381e-03    TRUE
+12  beta[12] -0.0153673  0.005319 1.988    5.542    12.70 2.308e-03    TRUE
+13  beta[13] -0.0198345  0.008004 2.015    5.539    29.14 3.504e-03    TRUE
+14  beta[14]  0.0124096  0.005707 1.827    5.920    20.95 2.417e-03    TRUE
+15  beta[15]  0.0133900  0.005311 1.811    5.951    13.06 2.234e-03    TRUE
+16  beta[16] -0.0251865  0.011323 2.669    4.746    21.34 5.381e-03    TRUE
+17  beta[17] -0.0110748  0.013179 2.557    4.846    11.46 6.091e-03    TRUE
+18  beta[18]  0.0311778  0.008289 2.769    4.727    16.72 3.908e-03    TRUE
+19  beta[19]  0.0054763  0.010499 2.299    5.066    14.61 4.928e-03    TRUE
+20  beta[20] -0.0007316  0.013887 2.552    4.831    14.28 6.774e-03    TRUE
+21  beta[21]  0.2183380  0.320270 2.776    4.705    12.32 1.574e-01    TRUE
+22  beta[22] -0.1396955  0.166641 2.866    4.670    12.81 8.182e-02    TRUE
+23  beta[23] -0.3974411  0.134604 2.600    4.820    15.05 6.351e-02    TRUE
+24  beta[24]  0.0141906  0.007744 1.834    5.894    11.34 3.468e-03    TRUE
+25  beta[25] -0.0141969  0.005823 1.558    7.163    40.37 2.234e-03    TRUE
+26  beta[26]  0.0626636  0.049115 3.064    4.571    24.83 2.350e-02    TRUE
+27  beta[27]  0.0306289  0.014362 2.400    4.947    29.02 6.648e-03    TRUE
+28  beta[28]  0.2437073  0.094589 2.395    4.970    26.79 4.451e-02    TRUE
+29  beta[29]  0.6202113  0.232951 2.371    4.991    27.48 1.094e-01    TRUE
+30  beta[30]  0.3836320  0.140875 2.310    5.034    36.59 6.650e-02    TRUE
+31  beta[31]  0.0853063  0.028427 2.282    5.087    27.32 1.312e-02    TRUE
+32  beta[32]  0.3334868  0.136106 2.482    4.894    25.00 6.431e-02    TRUE
+33  beta[33]  0.0811127  0.078400 2.640    4.764    15.26 3.789e-02    TRUE
+34  beta[34] -0.0097156  0.011276 1.965    5.662    14.67 4.818e-03    TRUE
+35  beta[35]  0.0206543  0.011122 2.066    5.390    14.33 5.174e-03    TRUE
+36  beta[36] -0.0161797  0.011028 2.324    5.060    31.71 5.150e-03    TRUE
+37  beta[37]  0.0092484  0.003915 2.423    4.984    12.78 1.839e-03    TRUE
+38  beta[38]  0.0112584  0.002953 2.077    5.357    14.21 1.305e-03    TRUE
+39  beta[39]  0.0056927  0.014757 2.585    4.834    23.33 7.098e-03    TRUE
+40  beta[40]  0.0104980  0.008522 2.697    4.727    11.25 4.038e-03    TRUE
+41  beta[41] -0.0430955  0.010230 2.028    5.465    15.44 4.772e-03    TRUE
+42  beta[42] -0.0715185  0.019537 2.794    4.732    16.06 9.276e-03    TRUE
+43  beta[43]  0.0024756  0.009748 1.886    5.763    21.60 4.142e-03    TRUE
+44  gamma[1] -0.0187816  0.023683 1.940    5.607    19.19 1.085e-02    TRUE
+45  gamma[2] -0.0527087  0.035362 1.415    8.596    49.02 1.187e-02    TRUE
+46  gamma[3] -0.0277134  0.060527 1.668    6.583    12.87 2.408e-02    TRUE
+47  gamma[4] -0.0034771  0.067158 2.076    5.355    12.59 2.952e-02    TRUE
+48  gamma[5]  0.1169961  0.037748 2.551    4.857    12.85 1.766e-02    TRUE
+49  gamma[6] -0.0982241  0.022079 2.015    5.452    14.58 9.390e-03    TRUE
+50  gamma[7]  0.1088879  0.051526 1.686    6.446    22.31 2.083e-02    TRUE
+51  gamma[8] -0.0587462  0.067768 2.516    4.895    11.49 3.085e-02    TRUE
+52  gamma[9] -0.0191891  0.023075 2.147    5.238    21.79 1.055e-02    TRUE
+53 gamma[10]  0.0300034  0.069614 2.360    5.058    13.68 3.141e-02    TRUE
+54     sigma  0.0828693  0.001783 1.700    6.380    32.84 7.265e-04    TRUE
+55    sigmaU  0.1048987  0.026103 1.661    6.635    18.37 1.021e-02    TRUE
+  cadena divergencias limite_profundidad  ebfmi revisar
+1      1            0                500 1.6651    TRUE
+2      2            0                500 0.7903    TRUE
+3      3            0                500 1.4853    TRUE
+4      4            0                500 1.4620    TRUE
+Warning message:
+DEMOSTRACION DE CALCULO: ajuste final sin convergencia validada; no usar para inferencia. 
+   grupo segmentos observado mediana_replica inferior superior
+1  aldea        23  3.069042        3.057906 2.802617 3.334298
+2  rural       113  1.941025        1.948115 1.850387 2.036868
+3 urbana      2152  2.507402        2.498336 2.472260 2.522946
+  observado  inferior mediana_replica superior
+1 0.4616034 0.4784038       0.4941035 0.511895
+  comuna segmentos_del_grupo
+1  12101                 213
+                        estado escenario viviendas segmentos_modificados
+base   Pendiente de validacion      base     69473                     0
+c_0.9  Pendiente de validacion     c_0.9     69867                   213
+c_0.85 Pendiente de validacion    c_0.85     70098                   213
+       censado_mismo_destino    media  mediana inferior superior
+base                  163961 170364.5 170329.0 168602.0 172261.2
+c_0.9                 163961 171296.5 171253.5 169518.8 173190.1
+c_0.85                163961 171846.0 171807.0 170061.6 173738.2
+       escenario comuna segmentos censado_mismo_destino    media  mediana
+base        base  12101      2008                130524 135553.1 135558.5
+c_0.9      c_0.9  12101      2008                130524 136485.1 136501.0
+c_0.85    c_0.85  12101      2008                130524 137034.5 137049.5
+       inferior superior cambio_mediana_pct
+base   134049.0 136991.2          0.0000000
+c_0.9  134962.6 137928.8          0.6952718
+c_0.85 135503.5 138487.4          1.0998941
+   media  mediana inferior superior 
+24808.06 24779.00 24182.93 25598.15 

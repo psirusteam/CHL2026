@@ -1,0 +1,140 @@
+/* styles.css
+   Estilos comunes de las presentaciones del taller (Quarto -> revealjs).
+   Basado en el estilo de los talleres SAE de la CEPAL (2025CHL_MCMC_BENCH).
+*/
+
+/* --- Base y tamano global --- */
+.reveal { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; }
+.reveal .slides {
+  font-size: 0.9em;
+  line-height: 1.15;
+  text-align: left;
+}
+
+.justify {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* --- Encabezados --- */
+.reveal h1 { font-size: 2.0em; margin-bottom: 20pt; color: #1f4e79; }
+.reveal h2 { font-size: 1.45em; margin-bottom: 20pt; color: #1f4e79; }
+.reveal h3 { font-size: 1.15em; margin-bottom: 12pt; color: #2e75b6; }
+
+/* --- Bloques de codigo --- */
+.reveal pre {
+  max-width: 100%;
+  max-height: 70vh;
+  overflow-y: auto;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+}
+.reveal pre code {
+  font-size: 0.85em;
+  line-height: 1.25;
+  font-family: "Fira Code", "Consolas", "Courier New", monospace;
+}
+.reveal .cell-output pre code { font-size: 0.8em; }
+
+/* --- Figuras e imagenes centradas --- */
+.reveal figure,
+.reveal .figure,
+.reveal img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.reveal img {
+  max-width: 90%;
+  max-height: 72vh;
+  height: auto;
+  border-radius: 6px;
+}
+.reveal figcaption {
+  text-align: center;
+  font-size: 0.8em;
+  font-style: italic;
+  color: #444;
+}
+
+/* --- Tablas --- */
+.reveal table { font-size: 0.75em; }
+
+/* --- Contenedores con scroll --- */
+.reveal .scrollable {
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* --- Cajas de enfasis --- */
+.reveal .caja {
+  border-left: 6px solid #2e75b6;
+  background: #eef4fb;
+  padding: 0.5em 0.9em;
+  margin: 0.5em 0;
+  border-radius: 4px;
+}
+.reveal .ejercicio {
+  border-left: 6px solid #c55a11;
+  background: #fbf1ea;
+  padding: 0.5em 0.9em;
+  margin: 0.5em 0;
+  border-radius: 4px;
+}
+
+/* --- Logo --- */
+.reveal .slide-logo {
+  height: 70px !important;
+  width: auto !important;
+  max-height: none !important;
+}
+
+/* --- Diagrama de flujo en cajas --- */
+.reveal .flujo {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
+  margin: 1em 0;
+}
+.reveal .flujo .paso {
+  flex: 1;
+  color: #fff;
+  padding: 0.6em 0.7em;
+  border-radius: 8px;
+  font-size: 0.8em;
+  line-height: 1.25;
+}
+.reveal .flujo .paso strong { display: block; font-size: 1.15em; margin-bottom: 0.3em; }
+.reveal .flujo .d1 { background: #1f4e79; }
+.reveal .flujo .d2 { background: #2e75b6; }
+.reveal .flujo .d3 { background: #c55a11; }
+.reveal .flujo .d4 { background: #548235; }
+.reveal .flujo .gris { background: #7f7f7f; }
+
+/* Identidad institucional: visible en portada y diapositivas. */
+.logos-institucionales {
+  position: fixed;
+  bottom: 18px;
+  right: 70px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  z-index: 20;
+  background: white;
+  padding: 5px 12px;
+}
+.logos-institucionales img {
+  display: block;
+  height: 60px;
+  width: auto;
+  max-width: 190px;
+  object-fit: contain;
+  margin: 0;
+  border-radius: 0;
+}
+@media print {
+  .logos-institucionales { display: none; }
+}
+
