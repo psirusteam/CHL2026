@@ -15,18 +15,19 @@ destino <- target$destino
 X_tot <- target$X_tot
 Z_tot <- target$Z_tot
 config <- fit_data$configuration
-stopifnot(!diagnostics$sampler_review, identical(config, diagnostics$configuration),
+stopifnot(identical(config, diagnostics$configuration),
   identical(target$stan_hash, config$stan_hash),
+  identical(target$source_configuration, config),
   identical(colnames(X_tot), config$columns_X),
   identical(colnames(Z_tot), config$groups),
   !anyDuplicated(destino[c("edid", "fid")]),
   nrow(destino) == nrow(X_tot), nrow(destino) == nrow(Z_tot),
   all(is.finite(X_tot)), all(is.finite(Z_tot)),
   all(rowSums(Z_tot) == 1), all(Z_tot %in% c(0,1)),
-  all(as.character(destino$cut) %in% config$groups),
+  all(as.character(destino$cut) %in% config$group_labels),
   identical(as.integer(max.col(Z_tot, ties.method = "first")),
-    as.integer(match(as.character(destino$cut), config$groups))),
-  all(destino$n_vpo > 0))
+    as.integer(match(as.character(destino$cut), config$group_labels))),
+  all(destino$n_vpo >= 0), all(is.finite(destino$V_tot)), all(destino$V_tot >= 0))
 # Verificar que los aptos del ajuste esten representados sin cambiar sus datos.
 key <- function(d) paste(d$edid, d$fid, sep = "\r")
 idx <- match(key(fit_data$observed), key(destino))
@@ -35,7 +36,9 @@ stopifnot(!anyNA(idx),
   identical(as.numeric(destino$n_vpo[idx]), as.numeric(fit_data$observed$n_vpo)),
   isTRUE(all.equal(unname(X_tot[idx, ]), unname(fit_data$X_obs))),
   isTRUE(all.equal(unname(Z_tot[idx, ]), unname(fit_data$Z_obs))))
-cat("Destino: subconjunto sin colectivas y con VPO positiva. No es toda la region.\n")
+cat("Destino: mismo universo y V_tot del modelo final. Resultados pendientes de validacion.\n")
+
+if (diagnostics$sampler_review) warning("DEMOSTRACION DE CALCULO: ajuste final pendiente de validacion.")
 
 ## ---- prediccion-draws ----
 # Seleccion espaciada para limitar memoria, solo para prediccion.
@@ -60,7 +63,7 @@ uniforms <- matrix(runif(length(density)), nrow(density))
 predecir <- function(cobertura) {
   stopifnot(length(cobertura) == nrow(destino), all(is.finite(cobertura)),
             all(cobertura > 0 & cobertura <= 1))
-  viviendas <- round(destino$n_vpo / cobertura)
+  viviendas <- round(destino$V_tot / cobertura)
   lambda <- pmin(pmax(sweep(density, 2, viviendas, "*"), 1), 1e7)
   # qpois transforma los mismos uniformes en conteos Poisson por escenario.
   y <- matrix(qpois(as.vector(uniforms), as.vector(lambda)), nrow(lambda))
@@ -107,7 +110,7 @@ for (name in names(coverage_scenarios)) {
   pred <- predecir(coverage_scenarios[[name]])
   totals <- rowSums(pred$y)
   total_draws[[name]] <- totals
-  scenario_tables[[name]] <- data.frame(escenario = name,
+  scenario_tables[[name]] <- data.frame(estado = "Pendiente de validacion", escenario = name,
     viviendas = sum(pred$viviendas), segmentos = nrow(destino),
     censado_mismo_destino = sum(destino$n_per), t(summarize_total(totals)), check.names = FALSE)
   intervals <- t(apply(pred$y, 2, quantile, c(0.025, 0.5, 0.975)))
@@ -160,10 +163,10 @@ g_scenarios <- ggplot(scenario_summary, aes(x = mediana, y = escenario)) +
   geom_point(size = 3, colour = "#1f4e79") +
   geom_vline(xintercept = sum(destino$n_per), linetype = "dashed", colour = "#c55a11") +
   scale_x_continuous(labels = spanish_labels) +
-  scale_y_discrete(labels = c(base = "Base: c = 1", uniforme_095 = "Hipótesis: c = 0,95",
+  scale_y_discrete(labels = c(base = "Base: exposición final", uniforme_095 = "Hipótesis: c = 0,95",
     focalizada_090 = "Hipótesis focalizada: c = 0,90")) +
   labs(x = "Conteo predictivo del destino: mediana e intervalo del 95 %", y = NULL,
-    subtitle = "Mismo subconjunto de Magallanes; línea naranja: conteo censal comparable") +
+    subtitle = "Universo del modelo final de Magallanes; línea naranja: conteo censal comparable") +
   theme(plot.margin = margin(8, 35, 8, 8))
 ggsave("resultados/escenarios.png", g_scenarios, width = 12, height = 4.5, dpi = 120, bg = "white")
 base_communes <- commune_summary[commune_summary$escenario == "base", ]
@@ -172,13 +175,15 @@ g_communes <- ggplot(base_communes, aes(y = reorder(comuna, mediana))) +
   geom_point(aes(x = mediana), colour = "#1f4e79", size = 2.4) +
   geom_point(aes(x = censado_mismo_destino), colour = "#c55a11", shape = 4, size = 3) +
   scale_x_log10(labels = spanish_labels) + labs(x = "Personas en el destino de cada comuna (escala logarítmica)",
-    y = "Comuna", subtitle = "Azul: predicción base; cruz naranja: censado en el mismo subconjunto")
+    y = "Comuna", subtitle = "Azul: predicción base; cruz naranja: censado en el mismo universo")
 ggsave("resultados/comunas.png", g_communes, width = 11, height = 5.5, dpi = 120, bg = "white")
 
 ## ---- prediccion-guardar ----
 example_ids <- unique(c(which.min(destino$n_vpo), order(destino$n_vpo)[ceiling(nrow(destino)/2)],
   which.max(destino$n_vpo)))
 examples <- segment_tables$base[example_ids, ]
+segment_summary$estado <- "Pendiente de validacion del muestreo"
+commune_summary$estado <- "Pendiente de validacion del muestreo"
 write.csv(segment_summary, "resultados/prediccion_segmentos.csv", row.names = FALSE)
 write.csv(commune_summary, "resultados/totales_comuna.csv", row.names = FALSE)
 write.csv(scenario_summary, "resultados/escenarios.csv", row.names = FALSE)
@@ -188,7 +193,7 @@ saveRDS(list(escenarios = scenario_summary, comunas = commune_summary,
   ejemplos_segmentos = examples, agregacion = aggregation_check,
   destino_segmentos = nrow(destino), ajuste_segmentos = nrow(fit_data$observed),
   censado_destino = sum(destino$n_per), cap_pct = 100 * mean(density_raw > delta_max),
-  configuracion = list(n_draws = length(ids), ids = ids, delta_max = delta_max,
+  estado = "Pendiente de validacion", configuracion = list(n_draws = length(ids), ids = ids, delta_max = delta_max,
     seed_density = 2621, seed_uniforms = 2622, stan_hash = config$stan_hash,
     columns_X = config$columns_X, groups = config$groups,
     source_chains = "../Dia4_S1_Diagnostico/data/ajuste_magallanes.rds",

@@ -1,0 +1,4 @@
+"estado","escenario","viviendas","segmentos_modificados","censado_mismo_destino","media","mediana","inferior","superior"
+"Pendiente de validacion","base",69473,0,163961,170364.522,170329,168601.95,172261.225
+"Pendiente de validacion","c_0.9",69867,213,163961,171296.518,171253.5,169518.775,173190.125
+"Pendiente de validacion","c_0.85",70098,213,163961,171845.967,171807,170061.625,173738.175

@@ -1,127 +1,102 @@
-# D3S4: practica del modelo de poblacion en Magallanes.
-# Ejecutar por bloques desde la carpeta de esta sesion.
-# Copia exacta del Stan del proyecto a la fecha de revision; no modificar
-# el archivo nacional desde la carpeta del taller.
+# Modelo final implementado en Chile: Magallanes, 40 covariables.
+# Ejecutar por bloques desde esta sesion. No modifica los ajustes fuente.
 
 ## ---- practica-paquetes ----
-library(rstan)
 library(posterior)
 library(ggplot2)
-rstan_options(auto_write = TRUE)
-options(mc.cores = min(4L, parallel::detectCores()))
+source("../Modelo_final/utilidades_modelo_final.R")
 dir.create("resultados", showWarnings = FALSE)
 theme_set(theme_minimal(base_size = 15))
 
 ## ---- practica-datos ----
-segmentos <- readRDS("data/segmentos_magallanes.rds")
-stopifnot(!anyDuplicated(segmentos[c("edid", "fid")]),
-          !anyNA(segmentos[c("zona", "cut", "n_vpo", "n_per", "apto_modelo", "excluido_colectivo")]),
-          all(is.finite(segmentos$n_vpo)), all(segmentos$n_vpo >= 0),
-          all(segmentos$n_vpo == floor(segmentos$n_vpo)),
-          all(is.finite(segmentos$n_per)), all(segmentos$n_per >= 0),
-          all(segmentos$n_per == floor(segmentos$n_per)))
-# Respetar la elegibilidad preparada y verificar exposicion utilizable.
-aptos <- segmentos[segmentos$apto_modelo, ]
-stopifnot(all(aptos$n_vpo > 0), all(!aptos$excluido_colectivo))
-# Prediccion didactica: viviendas particulares con VPO positiva.
-# No es el universo completo regional ni un total poblacional validado.
-destino <- segmentos[!segmentos$excluido_colectivo & segmentos$n_vpo > 0, ]
-resumen_datos <- data.frame(
-  conjunto = c("Base disponible", "Aptos para ajustar", "Destino de la demostracion"),
-  segmentos = c(nrow(segmentos), nrow(aptos), nrow(destino)))
+final <- load_final_model("12")
+segmentos <- final$segments
+aptos <- final$observed
+destino <- segmentos # Mismas llaves y universo del ajuste final.
+resumen_datos <- data.frame(conjunto = c("Base disponible", "Aptos para ajustar", "Destino del modelo final"),
+ segmentos = c(nrow(segmentos), nrow(aptos), nrow(destino)))
 print(resumen_datos)
 
 ## ---- practica-matrices ----
-# Seleccion pequena para aprender el flujo: no reproduce el ajuste nacional.
-# Los _std ya usan los parametros nacionales; no reestandarizar por region.
-covariables <- c("nlav_mean_std", "dyn_world_urb_mean_std")
-construir_X <- function(d) {
-  cbind(intercepto = 1, zona_aldea = as.numeric(d$zona == "aldea"),
-        zona_urbana = as.numeric(d$zona == "urbana"),
-        as.matrix(d[, covariables, drop = FALSE]))
-}
-# El diccionario se define UNA vez para conservar columnas y orden.
-niveles_comuna <- sort(unique(as.character(segmentos$cut)))
+covariables <- final$covariates
+# Construir el mismo diseno final y cotejarlo con los insumos guardados.
+datos_stan <- final$data_stan
+niveles_comuna <- final$configuration$group_labels
+construir_X <- function(d) cbind(intercepto = 1,
+ zona_urbana = as.numeric(d$zona == "urbana"),
+ zona_aldea = as.numeric(d$zona == "aldea"),
+ as.matrix(d[, covariables, drop = FALSE]))
 construir_Z <- function(d) {
-  z <- outer(as.character(d$cut), niveles_comuna, "==") * 1
-  colnames(z) <- niveles_comuna
-  z
+ z <- outer(as.character(d$cut), niveles_comuna, "==") * 1
+ colnames(z) <- paste0("cut_", niveles_comuna)
+ z
 }
-X_obs <- construir_X(aptos)
-X_tot <- construir_X(destino)
-Z_obs <- construir_Z(aptos)
-Z_tot <- construir_Z(destino)
-stopifnot(all(is.finite(X_obs)), all(is.finite(X_tot)),
-          qr(X_obs)$rank == ncol(X_obs),
-          identical(colnames(X_obs), colnames(X_tot)),
-          identical(colnames(Z_obs), colnames(Z_tot)),
-          all(rowSums(Z_obs) == 1), all(rowSums(Z_tot) == 1))
+X_obs <- construir_X(aptos); X_tot <- construir_X(destino)
+Z_obs <- construir_Z(aptos); Z_tot <- construir_Z(destino)
+stopifnot(isTRUE(all.equal(X_obs, datos_stan$X_obs)),
+ isTRUE(all.equal(X_tot, datos_stan$X_tot)),
+ isTRUE(all.equal(Z_obs, datos_stan$Z_obs)),
+ isTRUE(all.equal(Z_tot, datos_stan$Z_tot)))
+stopifnot(ncol(X_obs) == 43L, length(covariables) == 40L,
+ identical(colnames(X_obs), colnames(X_tot)),
+ identical(colnames(Z_obs), colnames(Z_tot)), all(rowSums(Z_obs) == 1),
+ all(rowSums(Z_tot) == 1), all(is.finite(X_tot)))
 print(data.frame(comuna = niveles_comuna, aptos = colSums(Z_obs)))
+# El rango y la colinealidad se inspeccionan, sin retirar covariables.
+print(c(columnas_X = ncol(X_obs), rango_X = qr(X_obs)$rank))
 
 ## ---- practica-lista ----
-# Escenario base: usar VPO observada en prediccion, sin ampliacion de cobertura.
-cobertura_destino <- rep(1, nrow(destino))
-# Valor de referencia historico del taller (p99 nacional de los aptos).
-# No se estima en Magallanes ni representa un limite universal biologico.
-delta_max <- 4.35
-datos_stan <- list(D_obs = nrow(aptos), D_tot = nrow(destino),
-  P = ncol(X_obs), Q = ncol(Z_obs),
-  Y_obs = as.integer(aptos$n_per), V_obs = as.integer(aptos$n_vpo),
-  V_tot = as.integer(round(destino$n_vpo / cobertura_destino)),
-  X_obs = X_obs, X_tot = X_tot, Z_obs = Z_obs, Z_tot = Z_tot,
-  delta_max = delta_max)
+delta_max <- datos_stan$delta_max
+# V_tot ya contiene la regla de exposicion implementada en el proyecto.
+# No reemplazar por n_vpo ni asumir cobertura uno como escenario final.
+stopifnot(identical(as.numeric(destino$V_tot), as.numeric(datos_stan$V_tot)))
 str(datos_stan[c("D_obs", "D_tot", "P", "Q", "delta_max")])
+print(final$original_configuration)
 
 ## ---- practica-ajuste ----
-modelo <- stan_model("stan/modelo_poblacion_v02.stan")
-# Valores iniciales razonables: no son distribuciones previas.
-inicio <- lm(log(n_per / n_vpo) ~ X_obs - 1, data = aptos)
-inicializar <- function() list(
-  beta = unname(coef(inicio)) + rnorm(ncol(X_obs), 0, 0.01),
-  gamma = rep(0, ncol(Z_obs)), sigmaU = 0.1,
-  sigma = max(sd(residuals(inicio)), 0.1),
-  densidad = aptos$n_per / aptos$n_vpo * exp(rnorm(nrow(aptos), 0, 0.01)))
-ajuste <- sampling(modelo, data = datos_stan, init = inicializar,
-  chains = 4, iter = 3000, warmup = 1500, seed = 2543, refresh = 500,
-  control = list(adapt_delta = 0.99, max_treedepth = 12),
-  pars = c("beta", "gamma", "sigma", "sigmaU", "Y_tot"))
+# La clase usa las cadenas originales del ajuste implementado.
+# Para repetir el muestreo, ejecutar este bloque con reestimar = TRUE.
+reestimar <- FALSE
+if (reestimar) {
+ library(rstan)
+ ajuste <- rstan::stan(file = "stan/modelo_poblacion_v02.stan", data = datos_stan,
+  chains = final$configuration$chains, iter = final$configuration$iter,
+  warmup = final$configuration$warmup, seed = final$configuration$seed_Stan,
+  control = list(max_treedepth = final$configuration$max_treedepth))
+ # Una repeticion es una corrida nueva: conservarla separada de la referencia.
+ saveRDS(ajuste, "resultados/ajuste_repetido.rds")
+}
+# El resto del material analiza la referencia final, no la repeticion opcional.
+chain_matrix <- posterior::as_draws_matrix(posterior::as_draws_array(final$draws))
 
 ## ---- practica-diagnostico ----
-# Revisar TODOS los coeficientes y escalas: no excluir el intercepto/gamma.
-diagnostico <- posterior::summarise_draws(
-  posterior::as_draws_array(as.array(ajuste, pars = c("beta", "gamma", "sigma", "sigmaU"))),
-  "mean", "sd", "rhat", "ess_bulk", "ess_tail")
-sampler <- get_sampler_params(ajuste, inc_warmup = FALSE)
-controles <- data.frame(
-  rhat_max = max(diagnostico$rhat),
-  ess_bulk_min = min(diagnostico$ess_bulk), ess_tail_min = min(diagnostico$ess_tail),
-  divergencias = sum(vapply(sampler, function(x) sum(x[, "divergent__"]), numeric(1))),
-  limite_profundidad = sum(vapply(sampler, function(x) sum(x[, "treedepth__"] >= 12), numeric(1))))
-controles$revisar <- with(controles, !is.finite(rhat_max) | rhat_max >= 1.01 |
-  ess_bulk_min < 400 | ess_tail_min < 400 | divergencias > 0 | limite_profundidad > 0)
+checks <- check_final_model(final)
+diagnostico <- checks$diagnostics
+controles <- checks$controls
 print(controles, digits = 5)
-if (controles$revisar) warning("El ajuste requiere revision: no utilizar sus predicciones para decisiones.")
+if (controles$revisar) warning("AJUSTE FINAL PENDIENTE DE VALIDACION: resultados solo para ejercicio de calculo.")
 
 ## ---- practica-resultados ----
-beta <- as.matrix(ajuste, pars = "beta")
+beta <- chain_matrix[, paste0("beta[", seq_len(ncol(X_obs)), "]"), drop = FALSE]
 factores <- data.frame(termino = colnames(X_obs)[-1],
   t(apply(exp(beta[, -1, drop = FALSE]), 2, quantile, c(0.025, 0.5, 0.975))),
   check.names = FALSE)
 print(factores)
 # Un coeficiente de covariable: factor multiplicativo por una DE nacional,
 # manteniendo zona, comuna y restantes covariables. No implica causalidad.
-y_tot <- as.matrix(ajuste, pars = "Y_tot")
+y_tot <- final$Y_tot # Cantidades generadas originales, mismo orden de draws.
 stopifnot(all(is.finite(y_tot)), all(y_tot >= 0))
-prediccion <- data.frame(destino[c("edid", "fid", "cut", "zona", "apto_modelo", "n_per", "n_vpo")],
+prediccion <- data.frame(estado = "Pendiente de validacion", destino[c("edid", "fid", "cut", "zona", "apto_modelo", "n_per", "n_vpo")],
   media = colMeans(y_tot),
   t(apply(y_tot, 2, quantile, c(0.025, 0.5, 0.975))), check.names = FALSE)
 # Guardar por draw para sumar antes de resumir: uso en sesiones posteriores.
 total_draw <- rowSums(y_tot)
-resumen_total <- data.frame(universo = "Destino didactico: no es toda la region",
+resumen_total <- data.frame(universo = "Universo regional del modelo final; pendiente de validacion",
   censado_mismo_subconjunto = sum(destino$n_per),
   media_predictiva = mean(total_draw),
   inferior = unname(quantile(total_draw, 0.025)),
   superior = unname(quantile(total_draw, 0.975)), revisar_ajuste = controles$revisar)
+resumen_total$estado <- "Pendiente de validacion del muestreo"
 print(resumen_total)
 
 ## ---- practica-agregados ----
@@ -145,8 +120,8 @@ print(por_cobertura)
 # Se usan 1000 simulaciones repartidas por todo el ajuste para limitar memoria.
 ids <- unique(round(seq(1, nrow(beta), length.out = min(1000, nrow(beta)))))
 beta_pred <- beta[ids, , drop = FALSE]
-gamma_pred <- as.matrix(ajuste, pars = "gamma")[ids, , drop = FALSE]
-sigma_pred <- as.matrix(ajuste, pars = "sigma")[ids, 1]
+gamma_pred <- chain_matrix[ids, paste0("gamma[", seq_len(ncol(Z_obs)), "]"), drop = FALSE]
+sigma_pred <- as.numeric(chain_matrix[ids, "sigma"])
 predecir_escenario <- function(cobertura, semilla = 2544) {
   stopifnot(length(cobertura) == nrow(destino),
             all(is.finite(cobertura)), all(cobertura > 0 & cobertura <= 1))
@@ -154,7 +129,7 @@ predecir_escenario <- function(cobertura, semilla = 2544) {
   eta <- beta_pred %*% t(X_tot) + gamma_pred %*% t(Z_tot)
   ruido <- matrix(rnorm(length(eta)), nrow(eta)) * sigma_pred
   densidad <- pmin(exp(eta + ruido), delta_max)
-  viviendas <- round(destino$n_vpo / cobertura)
+  viviendas <- round(destino$V_tot / cobertura)
   lambda <- pmin(pmax(sweep(densidad, 2, viviendas, "*"), 1), 1e7)
   total <- rowSums(matrix(rpois(length(lambda), lambda), nrow(lambda)))
   c(viviendas = sum(viviendas), mediana = median(total),
@@ -175,7 +150,10 @@ print(escenarios)
 # X_obs, Z_obs, Y_obs, V_obs o las previas exige volver a ajustar.
 
 ## ---- practica-figuras ----
-g_coef <- ggplot(factores, aes(x = `50%`, y = termino)) +
+write.csv(factores, "resultados/factores_completos.csv", row.names = FALSE)
+# Mostrar algunos terminos; el ajuste conserva los 43 coeficientes.
+plot_factors <- factores[factores$termino %in% c("zona_urbana", "zona_aldea", "nlav_mean_std", "dyn_world_urb_mean_std"), ]
+g_coef <- ggplot(plot_factors, aes(x = `50%`, y = termino)) +
   geom_vline(xintercept = 1, linetype = "dashed") +
   geom_segment(aes(x = `2.5%`, xend = `97.5%`, yend = termino)) +
   geom_point(size = 2.8, colour = "#1f4e79") +
@@ -193,12 +171,16 @@ saveRDS(list(resumen_datos = resumen_datos, controles = controles,
   factores = factores, resumen_total = resumen_total,
   por_comuna = por_comuna, por_cobertura = por_cobertura, escenarios = escenarios,
   configuracion = list(covariables = covariables, columnas_X = colnames(X_obs),
-    niveles_comuna = niveles_comuna, cobertura = 1, delta_max = delta_max,
-    semilla = 2543, cadenas = 4, iter = 3000, warmup = 1500,
+    niveles_comuna = niveles_comuna, exposicion = "V_tot del modelo final", delta_max = delta_max,
+    semilla = final$configuration$seed_Stan, cadenas = final$configuration$chains,
+    iter = final$configuration$iter, warmup = final$configuration$warmup,
     firma_stan = unname(tools::md5sum("stan/modelo_poblacion_v02.stan")))),
   "resultados/resumen.rds")
 saveRDS(total_draw, "resultados/total_draw_destino.rds")
 capture.output(sessionInfo(), file = "resultados/sessionInfo.txt")
+por_comuna$estado <- "Pendiente de validacion del muestreo"
+por_cobertura$estado <- "Pendiente de validacion del muestreo"
+escenarios$estado <- "Pendiente de validacion del muestreo"
 write.csv(por_comuna, "resultados/totales_comuna.csv", row.names = FALSE)
 write.csv(por_cobertura, "resultados/totales_cobertura.csv", row.names = FALSE)
 write.csv(escenarios, "resultados/escenarios.csv", row.names = FALSE)

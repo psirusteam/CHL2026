@@ -30,8 +30,8 @@ stopifnot(is.finite(var(y)), var(y) > 0)
 # =============================================================================
 
 ## ---- distribucion-delta ----
-grafico_log <- bind_rows(tibble(escala = "δ: personas por vivienda", valor = aptos$delta),
-                         tibble(escala = "log δ", valor = log(aptos$delta))) %>%
+grafico_log <- bind_rows(tibble(escala = "delta: personas por vivienda", valor = aptos$delta),
+                         tibble(escala = "log delta", valor = log(aptos$delta))) %>%
   ggplot(aes(valor)) +
   geom_histogram(bins = 40, fill = "#2e75b6", colour = "white") +
   facet_wrap(~ escala, scales = "free") +
@@ -104,6 +104,8 @@ y_rep <- t(sapply(idx, function(s)
 grafico_ppc <- ppc_dens_overlay(log(aptos$delta), y_rep) +
   labs(x = "log(personas por vivienda)")
 guardar_figura(grafico_ppc, "grafico_ppc", alto = 4.6)
+
+## --------
 
 # =============================================================================
 # Multinomial-Dirichlet

@@ -100,7 +100,7 @@ guardar(ej2, "ej2")
 grafico_ej2 <- ggplot(tibble(diferencia), aes(diferencia)) +
   geom_histogram(bins = 50, fill = "#2e75b6", colour = "white") +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  labs(x = "δ Magallanes − δ Aysén (personas por vivienda)", y = "Draws")
+  labs(x = "delta Magallanes − delta Aysén (personas por vivienda)", y = "Draws")
 guardar_figura(grafico_ej2, "grafico_ej2", alto = 4.2)
 
 ## ---- ej2-dispersion ----

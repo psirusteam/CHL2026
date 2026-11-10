@@ -1,0 +1,4 @@
+"escenario","comuna","segmentos","censado_mismo_destino","media","mediana","inferior","superior","cambio_mediana_pct","estado"
+"base","12101",2008,130524,135553.1,135558.5,134049,136991.2,0,"Pendiente de validacion del muestreo"
+"c_0.9","12101",2008,130524,136485.096,136501,134962.65,137928.75,0.695271783030948,"Pendiente de validacion del muestreo"
+"c_0.85","12101",2008,130524,137034.545,137049.5,135503.5,138487.425,1.09989414164364,"Pendiente de validacion del muestreo"

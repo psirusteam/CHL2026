@@ -1,31 +1,31 @@
-"escenario","comuna","segmentos","censado_mismo_destino","media","mediana","inferior","superior"
-"base","12101",1803,118521,118912.648,118931,117478.775,120313.075
-"base","12102",7,163,163.119,163,124.975,204
-"base","12103",6,63,69.016,68,50,93
-"base","12104",6,42,58.899,59,39,78.025
-"base","12201",31,1198,1188.754,1188,1062.95,1307
-"base","12301",134,5521,5555.046,5554,5287.95,5820.025
-"base","12302",7,120,108.654,108,83,138
-"base","12303",6,100,93.897,93,68,121
-"base","12401",327,18104,18062.105,18072,17570.925,18550.05
-"base","12402",3,43,42.453,42,27.975,59
-"uniforme_095","12101",1803,118521,125236.674,125268.5,123723.85,126697.15
-"uniforme_095","12102",7,163,169.03,169,129.95,211
-"uniforme_095","12103",6,63,70.94,70,51,95
-"uniforme_095","12104",6,42,60.803,61,41,81
-"uniforme_095","12201",31,1198,1247.897,1247,1117.95,1370
-"uniforme_095","12301",134,5521,5849.625,5848,5572,6127.1
-"uniforme_095","12302",7,120,110.792,110.5,84.975,140.025
-"uniforme_095","12303",6,100,96.038,95,69.975,124
-"uniforme_095","12401",327,18104,19007.119,19016,18495.975,19524.025
-"uniforme_095","12402",3,43,44.482,44,29,62
-"focalizada_090","12101",1803,118521,119726.537,119748,118276.55,121127.675
-"focalizada_090","12102",7,163,163.119,163,124.975,204
-"focalizada_090","12103",6,63,70.937,70,51,95
-"focalizada_090","12104",6,42,58.899,59,39,78.025
-"focalizada_090","12201",31,1198,1196.133,1195,1069.95,1315.025
-"focalizada_090","12301",134,5521,5638.338,5638,5371,5908
-"focalizada_090","12302",7,120,117.394,117,89.975,148.025
-"focalizada_090","12303",6,100,96.014,95,70,124
-"focalizada_090","12401",327,18104,18134.727,18146,17641.975,18624.025
-"focalizada_090","12402",3,43,44.482,44,29,62
+"escenario","comuna","segmentos","censado_mismo_destino","media","mediana","inferior","superior","estado"
+"base","12101",2008,130524,135553.1,135558.5,134049,136991.2,"Pendiente de validacion del muestreo"
+"base","12102",56,269,250.765,251,209,294.025,"Pendiente de validacion del muestreo"
+"base","12103",25,93,132.824,133,103,163.025,"Pendiente de validacion del muestreo"
+"base","12104",81,237,290.553,289,238.975,343,"Pendiente de validacion del muestreo"
+"base","12201",47,1742,1773.011,1773,1651.95,1902,"Pendiente de validacion del muestreo"
+"base","12301",253,6511,6703.37,6701,6481.975,6953.1,"Pendiente de validacion del muestreo"
+"base","12302",42,398,431.345,430,364,504.025,"Pendiente de validacion del muestreo"
+"base","12303",38,155,184.714,184,153.975,218,"Pendiente de validacion del muestreo"
+"base","12401",439,23835,24808.06,24779,24182.925,25598.15,"Pendiente de validacion del muestreo"
+"base","12402",55,197,236.78,236,195,280.025,"Pendiente de validacion del muestreo"
+"uniforme_095","12101",2008,130524,142694.898,142703,141141.6,144208.65,"Pendiente de validacion del muestreo"
+"uniforme_095","12102",56,269,258.815,259,214.975,304,"Pendiente de validacion del muestreo"
+"uniforme_095","12103",25,93,136.294,137,106,168,"Pendiente de validacion del muestreo"
+"uniforme_095","12104",81,237,302.15,301,248,357.025,"Pendiente de validacion del muestreo"
+"uniforme_095","12201",47,1742,1863.556,1863,1737.95,1997.05,"Pendiente de validacion del muestreo"
+"uniforme_095","12301",253,6511,7049.171,7047,6822.8,7311.1,"Pendiente de validacion del muestreo"
+"uniforme_095","12302",42,398,448.813,448,379.95,525,"Pendiente de validacion del muestreo"
+"uniforme_095","12303",38,155,186.875,187,155,220,"Pendiente de validacion del muestreo"
+"uniforme_095","12401",439,23835,26096.185,26068.5,25435.95,26923.325,"Pendiente de validacion del muestreo"
+"uniforme_095","12402",55,197,248.784,248,205,293.05,"Pendiente de validacion del muestreo"
+"focalizada_090","12101",2008,130524,136485.096,136501,134962.65,137928.75,"Pendiente de validacion del muestreo"
+"focalizada_090","12102",56,269,250.765,251,209,294.025,"Pendiente de validacion del muestreo"
+"focalizada_090","12103",25,93,137.524,138,107.975,168,"Pendiente de validacion del muestreo"
+"focalizada_090","12104",81,237,290.553,289,238.975,343,"Pendiente de validacion del muestreo"
+"focalizada_090","12201",47,1742,1786.334,1786,1664.975,1916.025,"Pendiente de validacion del muestreo"
+"focalizada_090","12301",253,6511,6786.656,6783,6563.975,7039,"Pendiente de validacion del muestreo"
+"focalizada_090","12302",42,398,445.035,444,376,520,"Pendiente de validacion del muestreo"
+"focalizada_090","12303",38,155,192.815,193,160.975,227.025,"Pendiente de validacion del muestreo"
+"focalizada_090","12401",439,23835,24903.381,24872,24278.975,25697.1,"Pendiente de validacion del muestreo"
+"focalizada_090","12402",55,197,253.983,253,209,301,"Pendiente de validacion del muestreo"

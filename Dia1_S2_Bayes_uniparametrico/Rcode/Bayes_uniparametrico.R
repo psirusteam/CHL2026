@@ -128,6 +128,8 @@ grafico_predictiva <- predictiva %>%
        subtitle = "Barras: simulación con los draws · Puntos: Beta-Binomial exacta")
 guardar_figura(grafico_predictiva, "grafico_predictiva_bern", alto = 4.5)
 
+## --------
+
 # =============================================================================
 # Modelo Poisson-Gamma con exposicion
 # =============================================================================

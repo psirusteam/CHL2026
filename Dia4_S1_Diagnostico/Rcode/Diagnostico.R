@@ -64,7 +64,7 @@ ggsave("resultados/autocorrelacion.png", g_acf, width = 12, height = 5.5, dpi = 
 
 ## ---- diagnostico-pares ----
 g_pair <- mcmc_scatter(draws, pars = c("beta[1]", "gamma[1]"), alpha = 0.12) +
-  labs(x = "Intercepto", y = paste("Efecto de comuna", config$groups[1]),
+  labs(x = "Intercepto", y = paste("Efecto de comuna", config$group_labels[1]),
        subtitle = "Asociacion posterior: revisar junto con R-hat, ESS y trazas")
 ggsave("resultados/pares.png", g_pair, width = 8, height = 5, dpi = 120, bg = "white")
 
