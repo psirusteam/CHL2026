@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Práctica computacional en RStan: regresión bayesiana de la densidad"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "24 de noviembre de 2026 · Día 2, sesión 2 · 11:30–13:00"
+date: 2026-11-24
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -365,6 +366,11 @@ Use R-hat menor que 1,01 y ESS_bulk/ESS_tail de al menos 400 como guías para cu
 
 ::: {.caja}
 **Próxima sesión:** un modelo de **conteos** para $Y_i$ con exposición $V_i$ (Poisson loglineal).
+:::
+
+## Referencias
+
+::: {#refs}
 :::
 
 ## Muchas gracias

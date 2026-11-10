@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Modelo Poisson con vínculo loglineal"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "24 de noviembre de 2026 · Día 2, sesión 3 · 14:30–16:00"
+date: 2026-11-24
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -37,9 +38,6 @@ D2S1 y D2S2 modelaron log(personas por vivienda). Ahora modelamos el conteo de p
 3. Introducir heterogeneidad entre segmentos mediante Poisson–lognormal.
 4. Distinguir réplicas con densidades nuevas, inferencia de densidades existentes y encogimiento.
 
-::: {.notes}
-Derivaciones IRLS y de mezclas como apoyo docente. D2S4 retoma la práctica de modelos de conteos.
-:::
 
 # Modelos lineales generalizados
 
@@ -437,9 +435,7 @@ Se revisan coeficientes y parámetros latentes. R-hat menor que 1,01 y ESS_bulk/
 - El **Poisson–lognormal** tiene $\text{Var}(Y) = E(Y) + E(Y)^2(e^{\sigma^2} - 1)$; representa variación Poisson y heterogeneidad latente, y permite **encogimiento** de las densidades.
 - En Stan se evalúan parametrización, diagnósticos y validez de las réplicas; un límite numérico del generador no debe introducir un recorte silencioso de la distribución.
 
-::: {.caja}
-**Próxima práctica:** comparación con binomial negativa y parametrizaciones. El día 3 comienza con dos sesiones de variables satelitales y continúa con el modelo de Chile. Este modelo, $Y_i \sim \text{Poisson}(V_i\delta_i)$ con $\log\delta_i \sim N(\mathbf{x}_i^\top\boldsymbol\beta, \sigma^2)$, es una **base didáctica para el modelo de población**. Falta predecir en los segmentos no aptos y corregir la exposición por cobertura.
-:::
+
 
 ## Referencias
 

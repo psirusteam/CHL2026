@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Práctica guiada en Stan: modelo Poisson para datos censales"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "24 de noviembre de 2026 · Día 2, sesión 4 · 16:30–18:00"
+date: 2026-11-24
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -36,14 +37,6 @@ Ustedes conocen el censo. En esta práctica aprenderán a llevar esos datos a St
 3. Revisar el cálculo e interpretar personas esperadas por vivienda.
 4. Predecir un nuevo conteo y comprobar qué reproduce el modelo.
 
-**Nivel intermedio, con guía:** ejecuten los bloques, cambien una entrada y expliquen qué cambia en el resultado.
-
-
-**Entregable:** ajuste ejecutado, tabla por zona, predicción con dos cantidades de viviendas y una conclusión sobre las limitaciones del Poisson.
-
-::: {.notes}
-El docente debe comprobar RStan y su compilador en los equipos antes de la sesión y ensayar los tiempos. Mientras compila, trabajar el significado de los bloques y parámetros. Si un equipo falla, completar el ajuste en pareja en otro equipo y resolver la instalación con apoyo; las salidas preparadas son apoyo, no sustituyen la experiencia de ajustar.
-:::
 
 ## Abrir los materiales correctos
 
@@ -135,10 +128,6 @@ y ~ poisson_log(log_v + X * beta);
 
 **Pregunta:** ¿por qué `beta` no se interpreta directamente como personas por vivienda? Para volver a esa escala usaremos `exp()`.
 
-::: {.notes}
-Normal(0,1) no es ausencia de información: para un coeficiente, aproximadamente el 95 % previo está entre -1,96 y 1,96; al exponenciar representa un rango amplio de factores multiplicativos. El intercepto refiere a rural; los otros coeficientes son cambios logarítmicos respecto de rural. No exigir derivar esta relación ni ajustar manualmente el algoritmo.
-:::
-
 # Ejercicio 2: ajustar el Poisson en Stan
 
 ## Compilar y ejecutar su propio ajuste
@@ -164,15 +153,6 @@ El bloque proporciona valores iniciales y controles de cálculo. En este primer 
 
 ```{r taller-diagnostico}
 ```
-
-Guía de lectura con apoyo del docente:
-
-- `rhat`: esperamos valores menores de **1,01** y cercanos a uno.
-- `ess_bulk` y `ess_tail`: buscamos al menos **400** en esta práctica.
-- Divergencias y llegadas al límite de profundidad: esperamos **cero**.
-- En las trazas, buscamos cadenas que se mezclen sin tendencias persistentes.
-
-Si falla un control, deténganse y consulten al docente. Que el cálculo sea estable **no demuestra que el modelo describa bien el censo**.
 
 # Ejercicio 3: interpretar y predecir
 
@@ -220,21 +200,11 @@ El bloque calcula un indicador de variación entre segmentos. No necesitan memor
 2. Localicen la referencia roja en el gráfico. ¿El modelo reproduce la variación observada?
 3. Si las cadenas se comportan bien, pero este chequeo falla, ¿repetir más iteraciones resolvería por sí solo el problema?
 
-::: {.notes}
-No confundir problema del cálculo con falta de adecuación del modelo. La variación adicional puede requerir covariables, heterogeneidad u otro modelo de conteos. Estos modelos quedan en el apoyo docente, no como ajustes obligatorios en esta primera práctica de Stan. El indicador usa una media estimada común para el contraste descriptivo de observación y réplicas; no presentarlo como prueba formal concluyente.
-:::
 
 ## Guardar y comunicar lo aprendido
 
 ```{r taller-guardar}
 ```
-
-Cada pareja entrega:
-
-1. Evidencia del ajuste y resumen de sus controles de cálculo.
-2. Tabla de personas esperadas por vivienda según zona.
-3. Predicciones para 100 y 150 viviendas y explicación de sus intervalos.
-4. Una conclusión de cinco líneas: qué aprendió el modelo, qué no reproduce y qué información censal revisaría antes de aplicarlo.
 
 **Pregunta final:** ¿qué diferencia hay entre lograr que Stan ejecute el modelo y justificar que ese modelo es útil para el objetivo censal?
 

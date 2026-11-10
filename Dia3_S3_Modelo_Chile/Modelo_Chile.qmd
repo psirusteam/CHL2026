@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "El modelo de población en Chile: de los datos censales a Stan"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "25 de noviembre de 2026 · Día 3, sesión 3 · 14:30–16:00"
+date: 2026-11-25
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -28,6 +29,14 @@ res <- readRDS("resultados/resumen.rds")
 ```
 
 # Del Poisson al modelo de Chile
+
+## Referencia del modelo final de Chile
+
+Se conserva la especificación implementada: **40 covariables, zona fija y efectos de comuna**, con matrices y exposición originales.
+
+**Estado del ajuste guardado:** presenta problemas fuertes de convergencia. Las cifras permiten reproducir y revisar el procedimiento. Su uso para inferir población queda pendiente de validación.
+
+La sesión de diagnóstico conserva todas las alertas. Los escenarios posteriores son ejercicios de cálculo sobre esa misma referencia.
 
 ## Lo que aprenderemos en esta sesión
 
@@ -78,9 +87,7 @@ $$
 
 La fórmula expresa la estructura conceptual. El archivo operativo añade límites a la intensidad; los revisaremos más adelante.
 
-::: {.notes}
-Distinguir delta descriptiva (cociente observado o completado en preparación) de delta latente. El predictor en escala log es la mediana condicional de la densidad: exp(eta) no es su media marginal, que sin topes es exp(eta+sigma^2/2). No exigir derivaciones a participantes.
-:::
+
 
 ## Qué significa «jerárquico» aquí
 
@@ -132,9 +139,6 @@ La preparación del proyecto marca aptos a los segmentos sin colectivas, con den
 
 No se modifican los filtros solo para mejorar el resultado. Cualquier cambio exige documentar la decisión y revisar su efecto.
 
-::: {.notes}
-Fuente: funciones/fun_preparacion_segmentos.R, calcular_elegibilidad_modelo(). Completar delta con edificios no significa que ese conteo ya haya sustituido V_obs en Stan. Verificar la exposición efectiva y su coherencia con la fuente antes de ajustar. No afirmar que todos los aptos son segmentos de cobertura completa.
-:::
 
 ## Exposición: ajuste y predicción
 
@@ -149,7 +153,7 @@ El valor de $c$ necesita respaldo. Una banda de cobertura no es automáticamente
 
 ## Qué aporta la información satelital
 
-En la demostración utilizaremos dos covariables ya estandarizadas:
+Se utilizan las **40 covariables estandarizadas del ajuste final**, además de zona y comuna. Dos ejemplos son:
 
 | Variable | Información que resume |
 |---|---|
@@ -176,13 +180,10 @@ Las columnas `_std` del taller ya emplean la referencia nacional.
 
 Abran `Rcode/Modelo_Chile.R` y `stan/modelo_poblacion_v02.stan` en la carpeta de D3S3.
 
-La demostración usa **Aysén**, comuna como agrupamiento, zona como efecto fijo y dos covariables. Conserva el programa Stan actual del proyecto, copiado sin modificar sus distribuciones previas ni sus topes.
+La demostración usa **Aysén**, comuna como agrupamiento, zona como efecto fijo y las 40 covariables finales. Conserva el programa Stan actual del proyecto, copiado sin modificar sus distribuciones previas ni sus topes.
 
-**Para predecir:** se restringe el destino a segmentos sin colectivas y con viviendas ocupadas positivas; se usa la exposición observada ($c=1$). No representa toda la región ni una corrección de cobertura.
+**Para predecir:** se conservan las mismas llaves, matrices y exposición `V_tot` del ajuste final. La base regional contiene 2.085 segmentos y 1.455 aptos. Los resultados del muestreo original requieren revisión antes de inferir población.
 
-::: {.notes}
-La base procede de Taller/Dia3_S3_Implementacion/data/segmentos_aysen.rds. Programa Stan procedente de la raíz del proyecto, no de la copia histórica del taller: las previas difieren entre ambas. Los originales se conservan. Sesión anterior de referencia: Taller/Dia4_S1_Modelo_Chile/Modelo_Chile.qmd.
-:::
 
 ## Revisar cuántos segmentos utilizamos
 
@@ -196,18 +197,23 @@ En `chile-datos`, revisen las llaves `edid`–`fid`, los conteos y los filtros.
 
 ## Construir X y Z sin perder correspondencias
 
-- `X`: intercepto, indicadores de aldea y urbana, y dos covariables. Rural es la referencia.
+- `X`: intercepto, indicadores de urbana y aldea, y 40 covariables (43 columnas). Rural es la referencia.
 - `Z`: una columna por comuna; cada fila señala a qué comuna pertenece el segmento.
 - El diccionario de comunas se define una vez; se utiliza en aptos y destino.
 - Las filas conservan el orden de los conteos y de las llaves censales.
 
 **En R:** ejecuten `chile-matrices`, lean la tabla de aptos por comuna y verifiquen que cada fila de `Z` suma uno.
 
-::: {.notes}
-No interpretar rango(X) completo como garantía de identificabilidad conjunta de X y Z: con indicadores completos de comuna e intercepto existe una dependencia que la distribución jerárquica regulariza. No repetir zona como efecto fijo si se escoge zona como agrupamiento. Grupos sin aptos obtendrían efectos desde la estructura previa jerárquica y requieren identificación explícita.
-:::
+## Revisar la colinealidad del diseño final
 
-## Entregar las entradas a Stan {.smaller}
+La matriz original tiene **43 columnas y rango 42** en Aysén y Magallanes. Se conserva sin eliminar variables para reproducir lo implementado.
+
+Comparen columnas de vialidad y revisen dependencias lineales. Relacionen esta evidencia con los coeficientes extremos, las trazas y los diagnósticos.
+
+**Tarea:** propongan qué revisarían en una nueva especificación. Esa revisión produciría otro ajuste y debe documentarse por separado.
+
+
+## Entregar las entradas a Stan
 
 ```{r chile-lista}
 ```
@@ -224,7 +230,7 @@ No interpretar rango(X) completo como garantía de identificabilidad conjunta de
 | `model` | Distribuciones previas y relación con el censo |
 | `generated quantities` | Conteos predictivos para el destino |
 
-**Actividad:** localicen una entrada conocida del censo y un parámetro que Stan debe aprender. ¿Cuál es la diferencia?
+**Actividad:** localicen una entrada conocida del censo y un parámetro que Stan. ¿Cuál es la diferencia?
 
 ## Las líneas que conectan el modelo con el censo
 
@@ -238,7 +244,6 @@ densidad ~ lognormal(lp, sigma);
 - `densidad` permite que cada segmento se aparte de ese predictor.
 - `lambda` combina densidad y viviendas para formar el conteo esperado.
 
-**Comparen con D2S4:** ¿qué nuevo componente permite representar diferencias entre segmentos de una misma zona?
 
 ## Distribuciones previas del archivo actual
 
@@ -253,9 +258,7 @@ Las restricciones positivas de `sigma` y `sigmaU` dejan solo la parte positiva d
 
 Estas previas son amplias. Se conservan para leer el programa actual; **no se presentan como una elección ya validada**. Su sensibilidad y el comportamiento predictivo previo deben revisarse antes de una aplicación institucional.
 
-::: {.notes}
-La copia histórica del taller usa beta ~ normal(0,1) y sigmaU ~ normal(0,1), mientras el Stan de la raíz usa escalas 100 y 10. No mezclar cifras históricas con esta nueva demostración ni afirmar equivalencia numérica. La distribución previa regulariza la separación entre intercepto y efectos, pero no aporta identificabilidad a la verosimilitud por sí sola.
-:::
+
 
 ## Límites del programa: decisiones que afectan resultados
 
@@ -265,13 +268,10 @@ La copia histórica del taller usa beta ~ normal(0,1) y sigmaU ~ normal(0,1), mi
 | Densidad predictiva limitada a `delta_max = 4.35` | Reduce valores altos; requiere justificar el umbral y estudiar sensibilidad |
 | Piso de intensidad igual a 1 | Con cero viviendas, el programa generaría en promedio una persona |
 
-En esta demostración se excluyen del destino los segmentos con cero viviendas y los que tienen colectivas. Su tratamiento sigue siendo una tarea necesaria para definir el universo completo.
+Se conserva el universo del proyecto, incluidos los casos con exposición cero. El piso de intensidad también se conserva: identifiquen cuántos casos afecta y evalúen su consecuencia. Reproducir esta regla no valida su adecuación ni resuelve la población colectiva.
 
-::: {.notes}
-El techo es una operación min(lognormal_rng(...), delta_max): acumula masa en el umbral, no es una lognormal truncada y renormalizada. El umbral 4,35 es el p99 nacional histórico utilizado en los materiales, no un límite universal de densidad. No calificar como imposible una densidad superior sin evidencia. Los segmentos excluidos deben recibir tratamiento específico y conciliación de universos; no deben desaparecer del total institucional.
-:::
 
-## Compilar y ajustar: dos acciones distintas {.smaller}
+## Compilar y ajustar: dos acciones distintas
 
 ```{r chile-ajuste}
 ```
@@ -281,9 +281,7 @@ El techo es una operación min(lognormal_rng(...), delta_max): acumula masa en e
 - `sampling()` aprende los parámetros con los datos de esta demostración.
 - Los valores iniciales ayudan a empezar el cálculo: no sustituyen las distribuciones previas.
 
-::: {.notes}
-Realizar la demostración con el entorno verificado antes de la sesión. Cada cadena guarda 1500 simulaciones posteriores: 6000 en total, dependientes entre sí. Tiempo de compilación y muestreo varía por computador. No lanzar el flujo nacional desde la clase ni instalar paquetes automáticamente. La práctica autónoma se desarrolla en D3S4.
-:::
+
 
 ## Primera lectura de los controles
 
@@ -303,23 +301,10 @@ Si `Revisar` es verdadero, las predicciones quedan pendientes de revisión. Un b
 
 ![](resultados/factores.png){width=88%}
 
-Cada punto es la mediana de `exp(beta)` y cada línea su intervalo del 95 %. Un factor superior a uno aumenta la mediana condicional de personas/vivienda; uno inferior a uno la reduce.
+La figura muestra cuatro términos para facilitar su lectura. Los 42 términos sin intercepto están en resultados/factores_completos.csv. Cada punto es la mediana de `exp(beta)` y cada línea su intervalo del 95 %. Un factor superior a uno aumenta la mediana condicional de personas/vivienda; uno inferior a uno la reduce.
 
 Para zona se compara con rural; para covariables, el cambio es por una desviación estándar nacional, manteniendo comuna y demás entradas.
 
-::: {.notes}
-La figura no muestra el intercepto ni los gamma. Los factores también multiplican la media no acotada si sigma se mantiene, pero las predicciones con pisos/topes ya no siguen necesariamente ese cambio proporcional. Evitar interpretar como efecto causal o como aporte de población que pueda sumarse directamente.
-:::
-
-## Una interpretación para practicar
-
-Elijan una covariable y completen:
-
-«Manteniendo zona, comuna y las demás entradas, aumentar una desviación estándar nacional en ___ se asocia a multiplicar la mediana de personas por vivienda por ___. El intervalo del factor va de ___ a ___.»
-
-Después respondan: ¿por qué ese resultado no demuestra que la covariable cause un cambio en la población?
-
-**Producto breve:** una interpretación con números tomados del ajuste y una limitación.
 
 ## Qué predice `generated quantities`
 
@@ -339,14 +324,14 @@ Es una **predicción con nueva variación de segmento**, incluso si ese segmento
 Para obtener un total, primero sumamos segmentos **dentro de cada simulación** y luego resumimos esa colección de totales.
 
 ```r
-y_tot <- as.matrix(ajuste, pars = "Y_tot")
+y_tot <- final$Y_tot # Cantidades generadas originales
 total_draw <- rowSums(y_tot)
 quantile(total_draw, c(0.025, 0.5, 0.975))
 ```
 
 No se suman los límites inferiores y superiores de los intervalos por segmento. Estos conteos comparten parámetros y no son independientes sin condicionar en ellos.
 
-El total de esta demostración corresponde solo al destino definido, no a toda la población de Aysén.
+El total utiliza el universo regional del ajuste final. Su interpretación poblacional requiere validar el muestreo, las reglas de exposición y la conciliación con población colectiva.
 
 ## Una comparación que exige verificar el universo
 
@@ -374,21 +359,6 @@ Los escenarios de cobertura y su incertidumbre se trabajarán con más detalle e
 
 # Del ejemplo al trabajo institucional
 
-## Ajuste regional y agrupamiento: código actual
-
-El proyecto distingue dos recorridos:
-
-| Recorrido | Agrupamiento dentro de cada ajuste regional |
-|---|---|
-| Regional histórico | Una sola etiqueta regional: separación entre efecto e intercepto muy dependiente de las previas |
-| Generalizado | Comuna (`cut`), zona u otra variable categórica definida explícitamente |
-
-El script generalizado usa `cut` como agrupamiento predeterminado. Si se elige zona como agrupamiento, desactiva sus indicadores fijos para evitar repetirlos.
-
-No se mezclan cadenas de recorridos, agrupamientos o selecciones de covariables diferentes.
-
-
-
 ## Qué registrar con cada ajuste
 
 - Versión del archivo Stan y de la base de entrada.
@@ -399,15 +369,6 @@ No se mezclan cadenas de recorridos, agrupamientos o selecciones de covariables 
 - Diagnósticos completos y resultados de validación.
 
 El script de la sesión guarda esa configuración junto con resultados y entorno. Las reglas deben poder explicarse a un equipo que no participó en el ajuste.
-
-## Preparación para D3S4
-
-En parejas, antes de iniciar la práctica siguiente:
-
-1. Señalen dónde se entregan las personas y viviendas a Stan.
-2. Expliquen qué representan `X`, `Z`, `densidad` y `sigma`.
-3. Identifiquen qué universo cubren las predicciones.
-4. Propongan una verificación censal y un chequeo del modelo.
 
 ## Muchas gracias
 

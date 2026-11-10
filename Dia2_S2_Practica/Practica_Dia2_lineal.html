@@ -234,7 +234,7 @@ Andrés Gutiérrez · Stalyn Guerrero
     </div>
 </div>
 
-  <p class="date">Invalid Date</p>
+  <p class="date">24 de noviembre de 2026</p>
 </section>
 <section>
 <section id="instrucciones" class="title-slide slide level1 center">
@@ -600,7 +600,7 @@ Andrés Gutiérrez · Stalyn Guerrero
 </ul>
 <ol type="1">
 <li>Ajuste ambos y compare su <span class="math inline">\(\sigma\)</span> posterior.</li>
-<li>Calcule en R la <strong>log-verosimilitud puntual</strong> <span class="math inline">\(\log p(y_i \mid \boldsymbol\beta^{(s)}, \sigma^{(s)})\)</span> y compare los modelos con <strong>LOO</strong> <span class="citation" data-cites="vehtari2017loo">(<a href="#/muchas-gracias" role="doc-biblioref" onclick="">Vehtari et&nbsp;al. 2017</a>)</span> usando <code>loo()</code> y <code>loo_compare()</code>.</li>
+<li>Calcule en R la <strong>log-verosimilitud puntual</strong> <span class="math inline">\(\log p(y_i \mid \boldsymbol\beta^{(s)}, \sigma^{(s)})\)</span> y compare los modelos con <strong>LOO</strong> <span class="citation" data-cites="vehtari2017loo">(<a href="#/referencias" role="doc-biblioref" onclick="">Vehtari et&nbsp;al. 2017</a>)</span> usando <code>loo()</code> y <code>loo_compare()</code>.</li>
 <li>Revise Pareto-k antes de interpretar diferencias de elpd. Si hay casos señalados, indique cómo comprobaría la comparación mediante reajustes exactos o K-fold.</li>
 </ol>
 </div>
@@ -866,7 +866,7 @@ y_i \mid \boldsymbol\beta, \boldsymbol\sigma \sim N\big(\mathbf{x}_i^\top\boldsy
 <div class="cell-output cell-output-stdout">
 <pre><code>                  elpd_diff se_diff
 C: sigma por zona   0.0       0.0  
-B: sigma com&lt;U+00FA&gt;n    -16.8       6.8  </code></pre>
+B: sigma común    -16.8       6.8  </code></pre>
 </div>
 </div>
 </section>
@@ -1012,7 +1012,7 @@ T_A^{(s)} = \sum_{i \in A} \hat\delta_i^{(s)} V_i, \qquad
 <p><span class="math display">\[
 p(\mathbf{y}) = \int p(\mathbf{y} \mid \boldsymbol\theta)\,p(\boldsymbol\theta)\,d\boldsymbol\theta.
 \]</span></p>
-<p>Simular de la <strong>predictiva previa</strong> (primero <span class="math inline">\(\boldsymbol\theta \sim p(\boldsymbol\theta)\)</span>, luego <span class="math inline">\(\mathbf{y} \sim p(\mathbf{y} \mid \boldsymbol\theta)\)</span>) muestra qué datos considera plausibles el modelo <strong>antes</strong> de observarlos <span class="citation" data-cites="gabry2019">(<a href="#/muchas-gracias" role="doc-biblioref" onclick="">Gabry et&nbsp;al. 2019</a>)</span>.</p>
+<p>Simular de la <strong>predictiva previa</strong> (primero <span class="math inline">\(\boldsymbol\theta \sim p(\boldsymbol\theta)\)</span>, luego <span class="math inline">\(\mathbf{y} \sim p(\mathbf{y} \mid \boldsymbol\theta)\)</span>) muestra qué datos considera plausibles el modelo <strong>antes</strong> de observarlos <span class="citation" data-cites="gabry2019">(<a href="#/referencias" role="doc-biblioref" onclick="">Gabry et&nbsp;al. 2019</a>)</span>.</p>
 <ul>
 <li>Con 13 coeficientes <span class="math inline">\(N(0, 1)\)</span> y covariables estandarizadas, <span class="math inline">\(\text{Var}(\mathbf{x}_i^\top\boldsymbol\beta) = \sum_k x_{ik}^2\)</span>: el predictor lineal puede ser enorme en segmentos con covariables extremas.</li>
 <li>Una previa que implica densidades de miles de personas por vivienda es <strong>poco realista</strong>, y su influencia posterior debe comprobarse, sin descartarla solo por tener muchos segmentos.</li>
@@ -1068,7 +1068,7 @@ p(\mathbf{y}) = \int p(\mathbf{y} \mid \boldsymbol\theta)\,p(\boldsymbol\theta)\
 <td style="text-align: right;">1,6</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">&lt;U+03B2&gt; ~ N(0, 1), &lt;U+03C3&gt; ~ Cauchy&lt;U+207A&gt;</td>
+<td style="text-align: left;">β ~ N(0, 1), σ ~ Cauchy⁺</td>
 <td style="text-align: right;">26,6</td>
 <td style="text-align: right;">50,8</td>
 <td style="text-align: right;">0,9</td>
@@ -1198,12 +1198,8 @@ p(\mathbf{y}) = \int p(\mathbf{y} \mid \boldsymbol\theta)\,p(\boldsymbol\theta)\
 <p><strong>Próxima sesión:</strong> un modelo de <strong>conteos</strong> para <span class="math inline">\(Y_i\)</span> con exposición <span class="math inline">\(V_i\)</span> (Poisson loglineal).</p>
 </div>
 </section>
-<section id="muchas-gracias" class="slide level2 smaller scrollable">
-<h2>Muchas gracias</h2>
-<p><strong>Andrés Gutiérrez · Stalyn Guerrero</strong></p>
-<p><strong>Contacto: Andrés Gutiérrez</strong><br>
-<a href="mailto:andres.gutierrez@cepal.org">andres.gutierrez@cepal.org</a></p>
-
+<section id="referencias" class="slide level2 smaller scrollable">
+<h2>Referencias</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-gabry2019" class="csl-entry" role="listitem">
 Gabry, Jonah, Daniel Simpson, Aki Vehtari, Michael Betancourt, y Andrew Gelman. 2019. <span>«Visualization in Bayesian Workflow»</span>. <em>Journal of the Royal Statistical Society: Series A</em> 182 (2): 389-402.
@@ -1212,6 +1208,13 @@ Gabry, Jonah, Daniel Simpson, Aki Vehtari, Michael Betancourt, y Andrew Gelman. 
 Vehtari, Aki, Andrew Gelman, y Jonah Gabry. 2017. <span>«Practical <span>B</span>ayesian Model Evaluation Using Leave-One-Out Cross-Validation and <span>WAIC</span>»</span>. <em>Statistics and Computing</em> 27 (5): 1413-32.
 </div>
 </div>
+</section>
+<section id="muchas-gracias" class="slide level2">
+<h2>Muchas gracias</h2>
+<p><strong>Andrés Gutiérrez · Stalyn Guerrero</strong></p>
+<p><strong>Contacto: Andrés Gutiérrez</strong><br>
+<a href="mailto:andres.gutierrez@cepal.org">andres.gutierrez@cepal.org</a></p>
+
 </section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">

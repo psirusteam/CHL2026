@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Predicción en segmentos censales: escenarios y agregación de incertidumbre"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "26 de noviembre de 2026 · Día 4, sesión 2 · 11:30–13:00"
+date: 2026-11-26
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -70,7 +71,7 @@ Abran `Rcode/Prediccion.R` desde la carpeta `Dia4_S2_Prediccion`.
 
 Las cadenas y sus controles se leen de la sesión **D4S1**. El destino local conserva las llaves, matrices y datos definidos en D3S4, sin reutilizar sus simulaciones de parámetros.
 
-Para ejecutar R, mantengan las carpetas de la revisión en su estructura original. La presentación HTML puede abrirse por separado.
+Para ejecutar R, mantengan las carpetas de la revisión en su estructura original. 
 
 ## Verificar antes de predecir
 
@@ -147,9 +148,6 @@ El techo de densidad es una referencia histórica del taller, no un límite univ
 
 En esta ejecución, **`r format(round(res$cap_pct, 3), nsmall=3)` %** de las densidades generadas supera el techo antes de aplicarlo.
 
-::: {.notes}
-La operación min(densidad,delta_max) acumula masa en el límite; no es una lognormal truncada renormalizada. El piso de intensidad produciría, en promedio, una persona aun con cero viviendas: por eso el destino didáctico excluye esos casos, sin afirmar que su tratamiento institucional esté resuelto. En el ajuste, la densidad no tenía este techo predictivo, como se explicó en D4S1.
-:::
 
 ## Intensidad simulada y conteo predictivo
 
@@ -167,13 +165,10 @@ La intensidad ya varía por los parámetros posteriores y la nueva densidad de s
 ```{r prediccion-funcion}
 ```
 
-La función recibe una cobertura por segmento. El docente acompaña la lectura; no necesitan reescribir el algoritmo.
+La función recibe una cobertura por segmento. 
 
-`qpois()` transforma números aleatorios uniformes en conteos Poisson. Se reutilizan los mismos números entre escenarios para facilitar la comparación sin añadir diferencias por simulación ajenas a la exposición.
+`qpois()` transforma números aleatorios uniformes en conteos Poisson. 
 
-::: {.notes}
-Los escenarios tienen distribuciones marginales Poisson correctas y se acoplan mediante uniformes comunes y la misma densidad. El acoplamiento reduce ruido de comparación y preserva la igualdad de los segmentos cuya exposición no cambia; no identifica efectos causales ni una posterior de personas omitidas. No interpretar el intervalo de una diferencia pareada de escenarios como intervalo de omisión real.
-:::
 
 ## Un ejemplo por segmento
 
@@ -193,9 +188,9 @@ Son tres segmentos del escenario base con diferentes cantidades de viviendas.
 
 Para un supuesto de cobertura de viviendas $c_i$:
 
-\[
+$$
 V_i^{tot}=\operatorname{round}(VPO_i/c_i).
-\]
+$$
 
 - $c_i$ se refiere a viviendas ocupadas, no a cobertura de personas.
 - Si $c_i=1$, se mantiene la exposición observada.
@@ -324,11 +319,12 @@ Un intervalo estrecho puede coexistir con decisiones metodológicas débiles. Su
 
 ## Una lectura para un equipo censal
 
-Completen en pareja:
+Respondan en pareja:
 
-«Para el destino definido, el escenario ___ produce una mediana de ___ personas y un intervalo predictivo de ___ a ___. Supone una cobertura de viviendas ___ y mantiene ___. No incorpora ___, por lo que antes de una aplicación institucional debemos ___.»
-
-No etiqueten el contraste entre predicción y censo como omisión estimada sin una justificación adicional del objetivo y de los supuestos.
+1. ¿Qué escenario eligieron y cómo modifica las viviendas utilizadas para predecir?
+2. ¿Cuál es la mediana del total de personas y cuál es su intervalo predictivo?
+3. ¿Qué evidencia necesitarían para justificar esa modificación de las viviendas?
+4. ¿Qué problemas del ajuste deben resolverse antes de utilizar los resultados?
 
 ## Guardar resultados que se puedan revisar
 
@@ -343,20 +339,6 @@ El script conserva:
 
 No se mezclan parámetros de un ajuste con resultados de otro porque compartan el nombre de la región.
 
-## Preparación para D4S3
-
-En la práctica siguiente, cada pareja deberá:
-
-1. Revisar el destino y la correspondencia de entradas.
-2. Modificar un escenario de exposición y justificarlo.
-3. Calcular resultados de una comuna sumando por simulación.
-4. Comunicar incertidumbre y límites del resultado.
-
-**Producto de cierre:** una ficha de predicción que otro equipo pueda reproducir y evaluar.
-
-::: {.notes}
-Esta sesión separa y actualiza el bloque predictivo del original Taller/Dia4_S2_Diagnostico_prediccion. Se conserva el original íntegro. Se usa el nuevo ajuste documentado en D4S1, no las cadenas históricas de Aysén ni los parámetros antiguos de D3S4. El destino de D3S4 aporta solo llaves, covariables, grupos y exposición; sus valores de los aptos se cotejan con los del ajuste. La selección de 1000 simulaciones es de uso predictivo, no para recalcular R-hat y ESS. No se modifica el archivo Stan ni se presenta el escenario como una estimación oficial de cobertura.
-:::
 
 ## Muchas gracias
 

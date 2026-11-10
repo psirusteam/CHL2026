@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Práctica en Stan: modelo de población en Magallanes"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "25 de noviembre de 2026 · Día 3, sesión 4 · 16:30–18:00"
+date: 2026-11-25
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -31,17 +32,14 @@ res <- readRDS("resultados/resumen.rds")
 
 ## Lo que deben lograr en esta práctica
 
-Cada pareja debe **compilar y ajustar en Stan** el modelo presentado en D3S3, ahora con datos de Magallanes.
+Cada pareja debe **reproducir la estructura final de Chile** con los insumos y cadenas originales de Magallanes. Repetir el muestreo queda disponible en el bloque opcional.
 
 1. Preparar los datos y comprobar las matrices de zona, covariables y comuna.
-2. Ejecutar el ajuste y revisar todos sus coeficientes y escalas.
+2. Cargar el ajuste implementado y revisar los 43 coeficientes, efectos de comuna y escalas.
 3. Interpretar una asociación y calcular totales por comuna.
 4. Cambiar un supuesto de exposición sin volver a ajustar el modelo.
 
 Los bloques están preparados. Ustedes deben ejecutarlos, revisar las salidas y justificar las decisiones con su conocimiento del censo.
-
-
-Mientras compila y ajusta Stan, avancen con las preguntas sobre unidades, matrices y alcance.
 
 ## Abrir solo los archivos de esta sesión
 
@@ -53,7 +51,8 @@ Sitúen el directorio de trabajo de RStudio en `Dia3_S4_Practica` y abran:
 ```{r practica-paquetes}
 ```
 
-RStan y su compilador deben estar verificados antes de la sesión. Si un equipo falla, trabajen en pareja en un equipo operativo con apoyo del docente. **Las tablas preparadas sirven de referencia; no sustituyen ejecutar el ajuste.**
+Para la repetición opcional, RStan y su compilador deben estar verificados previamente. Para analizar la referencia bastan los paquetes declarados en el script. **El recorrido usa las cadenas originales completas.** No es necesario repetir horas de muestreo para revisar el modelo implementado.
+
 
 # Ejercicio 1: preparar y ajustar
 
@@ -68,9 +67,8 @@ Ejecuten el bloque `practica-datos` y respondan:
 
 **Completen una ficha:** región, unidad, personas observadas, exposición, criterios de ajuste y universo de predicción.
 
-::: {.notes}
-Se respeta apto_modelo tal como viene preparado; no se redefine como cobertura completa. El destino es un subconjunto de Magallanes: sin colectivas y con VPO positiva. Deben explicitar qué población queda fuera y qué tratamiento requeriría. No usar sus totales como toda la región ni como población nacional. La base original queda conservada.
-:::
+
+
 
 ## Comprobar las matrices X y Z
 
@@ -78,7 +76,7 @@ Ejecuten `practica-matrices`.
 
 | Matriz | Qué representa |
 |---|---|
-| `X_obs`, `X_tot` | Intercepto, zona y dos covariables satelitales estandarizadas |
+| `X_obs`, `X_tot` | Intercepto, zona y 40 covariables estandarizadas: 43 columnas |
 | `Z_obs`, `Z_tot` | Indicadores de comuna con un único diccionario de columnas |
 
 1. Identifiquen las columnas de zona y su categoría de referencia.
@@ -87,12 +85,13 @@ Ejecuten `practica-matrices`.
 
 **Pregunta:** ¿qué error produciría intercambiar dos columnas de comuna al predecir?
 
-## Entregar los datos a Stan {.smaller}
+
+## Entregar los datos a Stan
 
 ```{r practica-lista}
 ```
 
-Expliquen con sus palabras la diferencia entre `Y_obs`, `V_obs` y `V_tot`. En este ajuste base la exposición predictiva no se amplía por cobertura.
+Expliquen con sus palabras la diferencia entre `Y_obs`, `V_obs` y `V_tot`. La exposición base es el `V_tot` implementado en el proyecto, sin reemplazarlo por VPO observada.
 
 ## Localizar el modelo que van a ejecutar
 
@@ -115,11 +114,8 @@ No cambien esas líneas durante el ajuste inicial. El archivo es una copia del p
 ```{r practica-ajuste}
 ```
 
-**Tarea obligatoria:** ejecutar `stan_model()` y `sampling()`. Anoten semilla, cadenas, iteraciones y calentamiento. Identifiquen qué objeto contiene el ajuste.
+**Actividad** Identificar la procedencia del ajuste, semilla, cadenas, iteraciones y calentamiento. `reestimar = TRUE` repite el muestreo en una salida separada. El resto del script analiza la referencia final.
 
-::: {.notes}
-Los valores iniciales se obtienen de una regresión auxiliar y de las densidades observadas; no sustituyen las previas. No interpretar la regresión auxiliar como el resultado bayesiano. No lanzar el proyecto nacional ni instalar dependencias automáticamente. El docente acompaña el código y adapta el tiempo de espera a cada equipo.
-:::
 
 # Ejercicio 2: revisar e interpretar
 
@@ -150,9 +146,6 @@ Completen:
 2. ¿Por qué no se interpreta directamente como personas adicionales?
 3. ¿Por qué esta asociación no demuestra causalidad?
 
-::: {.notes}
-Leer factores antes de aplicar pisos y topes predictivos. La mediana condicional de densidad es exp(eta), no su media marginal. La unidad de covariable es una DE nacional; no reestandarizar en Magallanes. Los intervalos no deben usarse mecánicamente como una prueba formal de selección de covariables.
-:::
 
 # Ejercicio 3: del segmento a la comuna
 
@@ -181,11 +174,7 @@ Lean `por_comuna` y `por_cobertura`.
 2. Describan la diferencia entre predicción y conteo censal, indicando su universo.
 3. Mencionen dos explicaciones posibles además de omisión censal.
 
-La clasificación de cobertura se utiliza aquí para **describir** resultados. No transforma automáticamente una banda en una tasa exacta ni modifica la exposición del ajuste base.
-
-::: {.notes}
-Posibles explicaciones: selección de aptos, covariables insuficientes, transferencia a no aptos, generación de nueva densidad de segmento, pisos y techo, errores de exposición, universo incompleto. La predicción del programa genera nueva densidad incluso para segmentos aptos; no es reconstrucción condicionada en su densidad latente particular. Las simulaciones comparten beta, gamma y escalas: preservar esa dependencia sumando por draw.
-:::
+La clasificación permite describir resultados. La exposición base conserva la regla implementada en el proyecto; verifiquen `V_tot` frente a `n_vpo` antes de modificarla.
 
 # Ejercicio 4: cambiar la exposición
 
@@ -211,10 +200,6 @@ La transformación es $V^{tot}=\operatorname{round}(VPO/c)$; el resto de la espe
 - Las cifras de cobertura se tratan como fijas: el intervalo no incorpora incertidumbre sobre ellas.
 
 **Justifiquen:** ¿qué evidencia censal o de terreno necesitarían para defender ese escenario en una aplicación real?
-
-::: {.notes}
-La función usa 1000 simulaciones posteriores repartidas por el ajuste para limitar memoria, genera nueva densidad, aplica techo y pisos y usa Z_tot %*% gamma. La referencia base regenerada puede diferir del resultado de Stan por variación Monte Carlo y por emplear un subconjunto de draws; no exigir igualdad exacta. Se fija la misma semilla por escenario como ayuda a la comparación; el aumento del conteo simulado no tiene que ser proporcional exacto por redondeo y variación predictiva. Cambios de muestra o entradas del ajuste, covariables, agrupamiento o previas requieren volver a ajustar.
-:::
 
 ## Muchas gracias
 

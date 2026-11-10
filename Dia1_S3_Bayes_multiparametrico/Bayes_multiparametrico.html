@@ -234,7 +234,7 @@ Andrés Gutiérrez · Stalyn Guerrero
     </div>
 </div>
 
-  <p class="date">Invalid Date</p>
+  <p class="date">23 de noviembre de 2026</p>
 </section>
 <section id="de-un-parámetro-a-una-distribución-conjunta" class="slide level2">
 <h2>De un parámetro a una distribución conjunta</h2>
@@ -246,19 +246,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li>Construir un Metropolis sencillo y reconocer problemas de exploración.</li>
 <li>Interpretar los diagnósticos y la estructura de un programa Stan.</li>
 </ol>
-<aside class="notes">
-<p>Las derivaciones y la integración leapfrog son apoyo docente. La programación guiada se retoma en D1S4.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section>
 <section>
 <section id="modelos-multiparamétricos" class="title-slide slide level1 center">
@@ -315,8 +302,8 @@ p(\mathbf{y} \mid \mu, \sigma^2) = (2\pi\sigma^2)^{-n/2}\exp\!\Big(-\frac{1}{2\s
 <section id="por-qué-el-logaritmo" class="slide level2">
 <h2>¿Por qué el logaritmo?</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>grafico_log <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">tibble</span>(<span class="at">escala =</span> <span class="st">"δ: personas por vivienda"</span>, <span class="at">valor =</span> aptos<span class="sc">$</span>delta),</span>
-<span id="cb1-2"><a href=""></a>                         <span class="fu">tibble</span>(<span class="at">escala =</span> <span class="st">"log δ"</span>, <span class="at">valor =</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta))) <span class="sc">%&gt;%</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>grafico_log <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">tibble</span>(<span class="at">escala =</span> <span class="st">"delta: personas por vivienda"</span>, <span class="at">valor =</span> aptos<span class="sc">$</span>delta),</span>
+<span id="cb1-2"><a href=""></a>                         <span class="fu">tibble</span>(<span class="at">escala =</span> <span class="st">"log delta"</span>, <span class="at">valor =</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta))) <span class="sc">%&gt;%</span></span>
 <span id="cb1-3"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(valor)) <span class="sc">+</span></span>
 <span id="cb1-4"><a href=""></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">40</span>, <span class="at">fill =</span> <span class="st">"#2e75b6"</span>, <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
 <span id="cb1-5"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> escala, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
@@ -639,11 +626,7 @@ p(\tilde\delta \mid \mathbf{y}) = \iint p(\tilde\delta \mid \mu, \sigma)\,p(\mu,
 <span id="cb8-5"><a href=""></a></span>
 <span id="cb8-6"><a href=""></a>grafico_ppc <span class="ot">&lt;-</span> <span class="fu">ppc_dens_overlay</span>(<span class="fu">log</span>(aptos<span class="sc">$</span>delta), y_rep) <span class="sc">+</span></span>
 <span id="cb8-7"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"log(personas por vivienda)"</span>)</span>
-<span id="cb8-8"><a href=""></a><span class="fu">guardar_figura</span>(grafico_ppc, <span class="st">"grafico_ppc"</span>, <span class="at">alto =</span> <span class="fl">4.6</span>)</span>
-<span id="cb8-9"><a href=""></a></span>
-<span id="cb8-10"><a href=""></a><span class="co"># =============================================================================</span></span>
-<span id="cb8-11"><a href=""></a><span class="co"># Multinomial-Dirichlet</span></span>
-<span id="cb8-12"><a href=""></a><span class="co"># =============================================================================</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-8"><a href=""></a><span class="fu">guardar_figura</span>(grafico_ppc, <span class="st">"grafico_ppc"</span>, <span class="at">alto =</span> <span class="fl">4.6</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 <img data-src="resultados/grafico_ppc.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"><p>La superposición de densidades permite revisar el ajuste global; no basta para validar colas, subgrupos o patrones territoriales. La media y la varianza del modelo son <strong>las mismas para todos los segmentos</strong>. El día 2 se agregan covariables: <span class="math inline">\(\mu_i = \mathbf{x}_i^\top\boldsymbol\beta\)</span>.</p>

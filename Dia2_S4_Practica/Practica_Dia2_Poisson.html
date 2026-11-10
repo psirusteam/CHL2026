@@ -211,7 +211,7 @@ Andrés Gutiérrez · Stalyn Guerrero
     </div>
 </div>
 
-  <p class="date">Invalid Date</p>
+  <p class="date">24 de noviembre de 2026</p>
 </section>
 <section>
 <section id="del-dato-censal-al-modelo-poisson-en-stan" class="title-slide slide level1 center">
@@ -227,21 +227,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li>Revisar el cálculo e interpretar personas esperadas por vivienda.</li>
 <li>Predecir un nuevo conteo y comprobar qué reproduce el modelo.</li>
 </ol>
-<p><strong>Nivel intermedio, con guía:</strong> ejecuten los bloques, cambien una entrada y expliquen qué cambia en el resultado.</p>
-<p><strong>Entregable:</strong> ajuste ejecutado, tabla por zona, predicción con dos cantidades de viviendas y una conclusión sobre las limitaciones del Poisson.</p>
-<aside class="notes">
-<p>El docente debe comprobar RStan y su compilador en los equipos antes de la sesión y ensayar los tiempos. Mientras compila, trabajar el significado de los bloques y parámetros. Si un equipo falla, completar el ajuste en pareja en otro equipo y resolver la instalación con apoyo; las salidas preparadas son apoyo, no sustituyen la experiencia de ajustar.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section>
 <section id="abrir-los-materiales-correctos" class="slide level2">
 <h2>Abrir los materiales correctos</h2>
@@ -416,19 +401,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li><code>log_v</code> incorpora las viviendas con coeficiente fijo igual a uno: duplicar viviendas duplica el valor esperado, manteniendo la zona.</li>
 </ul>
 <p><strong>Pregunta:</strong> ¿por qué <code>beta</code> no se interpreta directamente como personas por vivienda? Para volver a esa escala usaremos <code>exp()</code>.</p>
-<aside class="notes">
-<p>Normal(0,1) no es ausencia de información: para un coeficiente, aproximadamente el 95 % previo está entre -1,96 y 1,96; al exponenciar representa un rango amplio de factores multiplicativos. El intercepto refiere a rural; los otros coeficientes son cambios logarítmicos respecto de rural. No exigir derivar esta relación ni ajustar manualmente el algoritmo.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section></section>
 <section>
 <section id="ejercicio-2-ajustar-el-poisson-en-stan" class="title-slide slide level1 center">
@@ -485,14 +457,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <span id="cb6-15"><a href=""></a>          divergencias <span class="sc">==</span> <span class="dv">0</span>, limite_profundidad <span class="sc">==</span> <span class="dv">0</span>,</span>
 <span id="cb6-16"><a href=""></a>          <span class="fu">all</span>(<span class="fu">as.matrix</span>(ajuste, <span class="at">pars =</span> <span class="st">"rng_out_of_range"</span>) <span class="sc">==</span> <span class="dv">0</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Guía de lectura con apoyo del docente:</p>
-<ul>
-<li><code>rhat</code>: esperamos valores menores de <strong>1,01</strong> y cercanos a uno.</li>
-<li><code>ess_bulk</code> y <code>ess_tail</code>: buscamos al menos <strong>400</strong> en esta práctica.</li>
-<li>Divergencias y llegadas al límite de profundidad: esperamos <strong>cero</strong>.</li>
-<li>En las trazas, buscamos cadenas que se mezclen sin tendencias persistentes.</li>
-</ul>
-<p>Si falla un control, deténganse y consulten al docente. Que el cálculo sea estable <strong>no demuestra que el modelo describa bien el censo</strong>.</p>
 </section></section>
 <section>
 <section id="ejercicio-3-interpretar-y-predecir" class="title-slide slide level1 center">
@@ -581,19 +545,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li>Localicen la referencia roja en el gráfico. ¿El modelo reproduce la variación observada?</li>
 <li>Si las cadenas se comportan bien, pero este chequeo falla, ¿repetir más iteraciones resolvería por sí solo el problema?</li>
 </ol>
-<aside class="notes">
-<p>No confundir problema del cálculo con falta de adecuación del modelo. La variación adicional puede requerir covariables, heterogeneidad u otro modelo de conteos. Estos modelos quedan en el apoyo docente, no como ajustes obligatorios en esta primera práctica de Stan. El indicador usa una media estimada común para el contraste descriptivo de observación y réplicas; no presentarlo como prueba formal concluyente.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section>
 <section id="guardar-y-comunicar-lo-aprendido" class="slide level2">
 <h2>Guardar y comunicar lo aprendido</h2>
@@ -609,13 +560,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <span id="cb10-9"><a href=""></a><span class="fu">capture.output</span>(<span class="fu">sessionInfo</span>(), <span class="at">file =</span> <span class="st">"resultados/practica_poisson/sessionInfo.txt"</span>)</span>
 <span id="cb10-10"><a href=""></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">interactive</span>()) <span class="fu">dev.off</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Cada pareja entrega:</p>
-<ol type="1">
-<li>Evidencia del ajuste y resumen de sus controles de cálculo.</li>
-<li>Tabla de personas esperadas por vivienda según zona.</li>
-<li>Predicciones para 100 y 150 viviendas y explicación de sus intervalos.</li>
-<li>Una conclusión de cinco líneas: qué aprendió el modelo, qué no reproduce y qué información censal revisaría antes de aplicarlo.</li>
-</ol>
 <p><strong>Pregunta final:</strong> ¿qué diferencia hay entre lograr que Stan ejecute el modelo y justificar que ese modelo es útil para el objetivo censal?</p>
 </section>
 <section id="muchas-gracias" class="slide level2">

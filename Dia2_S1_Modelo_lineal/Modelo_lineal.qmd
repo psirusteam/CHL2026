@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Introducción a modelos lineales con métodos bayesianos"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "24 de noviembre de 2026 · Día 2, sesión 1 · 09:30–11:00"
+date: 2026-11-24
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -38,10 +39,7 @@ En D1S3 se estimaron una media y una dispersión comunes; en D1S4 se compararon 
 4. Distinguir media, mediana y predicción en la escala original.
 5. Reconocer las limitaciones de modelar log(personas por vivienda).
 
-::: {.notes}
-Las derivaciones matriciales son apoyo docente. La práctica de D2S2 retoma la ejecución y la comparación de modelos.
-:::
-
+  
 # El modelo de regresión
 
 ## De una densidad común a una densidad por segmento

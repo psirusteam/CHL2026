@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Diagnóstico del modelo: cálculo, especificación y datos censales"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "26 de noviembre de 2026 · Día 4, sesión 1 · 09:30–11:00"
+date: 2026-11-26
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -39,21 +40,18 @@ Hoy distinguiremos:
 2. **Modelo:** ¿reproduce aspectos relevantes de los datos?
 3. **Información censal:** ¿variables, exposición y universo son adecuados para el uso propuesto?
 
-El trabajo es guiado y de nivel intermedio. No requiere derivar los diagnósticos ni modificar el algoritmo de Stan.
 
 ## Qué material vamos a revisar
 
-Usaremos una **nueva ejecución controlada de la especificación de D3S4**: Magallanes, dos covariables, zona fija y efectos de comuna.
+Usaremos las **cadenas originales del ajuste final de Magallanes**: 40 covariables, zona fija y efectos de comuna.
 
-- Mismo archivo Stan y configuración de muestreo; no son resultados nacionales.
-- Se conservan todas las iteraciones posteriores de los coeficientes y escalas, separadas por cadena, y los diagnósticos del muestreador.
-- El diagnóstico y los chequeos no vuelven a ajustar Stan en clase.
+- Mismas matrices y archivo Stan del proyecto.
+- Cuatro cadenas, 5000 iteraciones y 4500 de calentamiento: 500 draws posteriores por cadena.
+- Se conservan orden, parámetros y controles NUTS originales.
+- Los diagnósticos muestran problemas de convergencia. La tarea es detectarlos, describirlos y proponer una revisión.
 
-Las diferencias pequeñas con las tablas anteriores pueden deberse a la nueva ejecución y sus valores iniciales. Se diagnostica este ajuste, sin trasladar automáticamente la aprobación de otro.
+El taller ya incluye las cadenas y los datos en `data/ajuste_magallanes.rds`. Abran `Rcode/Diagnostico.R` y ejecútenlo desde la carpeta de esta sesión.
 
-::: {.notes}
-D3S4 guardaba resúmenes y 1000 simulaciones seleccionadas para predicción, no las cadenas completas ni energy__. Esta revisión las regenera con la misma especificación; no reconstruye ni inventa las cadenas originales. No se modifican los resultados publicados de D3S4. El archivo nuevo registra semilla R y Stan, hash del modelo, configuración y orden de columnas/grupos.
-:::
 
 ## Archivos y preparación
 
@@ -62,9 +60,8 @@ Abran `Rcode/Diagnostico.R` desde la carpeta `Dia4_S1_Diagnostico`.
 ```{r diagnostico-paquetes}
 ```
 
-Ejecuten por bloques con apoyo del docente. `data/ajuste_magallanes.rds` contiene las cadenas y los datos necesarios.
+Ejecuten por bloques `data/ajuste_magallanes.rds` contiene las cadenas y los datos necesarios.
 
-`Rcode/Preparar_cadenas_docente.R` sirve para regenerar ese insumo antes de la sesión; no es un ejercicio obligatorio ni debe lanzarse durante la exposición.
 
 # Controles del cálculo
 
@@ -101,9 +98,6 @@ Las cadenas exploran la distribución posterior desde recorridos distintos.
 
 Son criterios de revisión, no un certificado de que la estimación censal sea correcta. Véase la [guía de diagnósticos de Stan](https://mc-stan.org/learn-stan/diagnostics-warnings.html).
 
-::: {.notes}
-La profundidad máxima afecta especialmente a eficiencia; no equivale por sí sola a sesgo por divergencias. La guía de esta capacitación marca para revisión cualquier llegada al límite como política conservadora, pero el tratamiento depende de su frecuencia y de otros diagnósticos. Los umbrales son orientación; la precisión requerida depende de las cantidades y decisiones concretas.
-:::
 
 ## R-hat: comparar recorridos
 
@@ -193,9 +187,7 @@ Cada color es una cadena; el eje horizontal conserva el orden posterior.
 
 **En pareja:** identifiquen el panel problemático. ¿Sería correcto borrar esa cadena y presentar las otras tres?
 
-::: {.notes}
-No quitar una cadena por incomodidad. Investigar causas, verificar ejecución/datos y decidir si corresponde repetir un ajuste corregido. El ejemplo desplaza artificialmente la cuarta cadena; no pretende reproducir un problema específico del modelo de población ni representar un ajuste Bayesiano válido.
-:::
+
 
 ## Qué dicen los números del ejemplo
 
@@ -230,9 +222,6 @@ El intercepto y un efecto de comuna pueden compensarse parcialmente. Una nube al
 
 En el ajuste histórico con una única etiqueta regional, separar ese efecto del intercepto dependía especialmente de las previas. Aquí el agrupamiento es comuna.
 
-::: {.notes}
-No extrapolar el problema Q=1 del flujo histórico a una prueba de fallo automático en el modelo generalizado. El intercepto y el conjunto completo de indicadores de comuna tienen una dependencia en la verosimilitud; las previas jerárquicas regularizan la separación. Las correlaciones se evalúan junto a mezcla, precisión y cantidades de interés. No se presenta SVD ni derivaciones de rango como requisito del público.
-:::
 
 # Del cálculo a los datos censales
 
@@ -257,9 +246,6 @@ Esto permite preguntar si la estructura del modelo reproduce tasas y variación 
 - Usa datos del ajuste: **no es validación fuera de muestra**.
 - No pretende representar colectivas, segmentos excluidos ni toda la región.
 
-::: {.notes}
-Los parámetros globales se toman de la posterior; se generan efectos nuevos de segmento mediante una densidad lognormal. Esta elección del nivel de réplica define la pregunta de comprobación. Un chequeo condicionado en densidades latentes aprendidas respondería otra pregunta y requiere guardarlas; no inventar esos valores a partir de medianas. La selección de aptos depende de una densidad descriptiva superior a uno; las réplicas no vuelven a imponer ese filtro. Una discrepancia puede reflejar selección y estructura del modelo: investigar ambas, sin presentar el chequeo como una prueba formal concluyente.
-:::
 
 ## No confundir la regla de ajuste con el techo de predicción
 

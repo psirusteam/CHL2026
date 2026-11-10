@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Práctica computacional en RStan: fundamentos de la inferencia bayesiana"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "23 de noviembre de 2026 · Día 1, sesión 4 · 16:30–18:00"
+date: 2026-11-23
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -37,8 +38,6 @@ v <- leer_valores()
 3. Obtener diferencias, razones e intervalos a partir de draws conjuntos.
 4. Revisar el muestreo y el ajuste antes de interpretar las estimaciones.
 
-
-Los ejercicios 4 y 5 se conservan como **extensiones** para grupos que avancen más rápido o trabajo posterior. La primera compilación de los modelos puede requerir tiempo adicional.
 
 ## Producto de la práctica
 

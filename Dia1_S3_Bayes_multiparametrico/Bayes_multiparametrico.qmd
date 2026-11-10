@@ -3,7 +3,8 @@ title: "Taller de fortalecimiento de capacidades en modelación estadística de 
 subtitle: "Fundamentos de la inferencia bayesiana II: modelos multiparamétricos y MCMC"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
 institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
-date: "23 de noviembre de 2026 · Día 1, sesión 3 · 14:30–16:00"
+date: 2026-11-23
+date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
@@ -38,9 +39,6 @@ En D1S2 se fijó la desviación estándar para estudiar una sola media. Ahora ap
 4. Construir un Metropolis sencillo y reconocer problemas de exploración.
 5. Interpretar los diagnósticos y la estructura de un programa Stan.
 
-::: {.notes}
-Las derivaciones y la integración leapfrog son apoyo docente. La programación guiada se retoma en D1S4.
-:::
 
 # Modelos multiparamétricos
 

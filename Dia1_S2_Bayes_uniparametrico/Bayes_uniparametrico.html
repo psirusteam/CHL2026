@@ -245,19 +245,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li>Relacionar la solución analítica con una primera implementación en Stan.</li>
 </ol>
 <p><strong>Recorrido:</strong> proporciones → personas por vivienda → media de logaritmos.</p>
-<aside class="notes">
-<p>Las derivaciones extensas y el código Stan sirven de apoyo; la ejecución guiada se retoma en la práctica de la tarde.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section>
 <section>
 <section id="la-regla-de-bayes" class="title-slide slide level1 center">
@@ -700,11 +687,7 @@ p(\tilde k \mid \mathbf{Y}) &amp;= \int_0^1 \binom{m}{\tilde k}\theta^{\tilde k}
 <span id="cb6-12"><a href=""></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> exacta), <span class="at">colour =</span> <span class="st">"#c00000"</span>, <span class="at">size =</span> <span class="fl">2.5</span>) <span class="sc">+</span></span>
 <span id="cb6-13"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Segmentos completos entre 20 nuevos"</span>, <span class="at">y =</span> <span class="st">"Probabilidad"</span>,</span>
 <span id="cb6-14"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"Barras: simulación con los draws · Puntos: Beta-Binomial exacta"</span>)</span>
-<span id="cb6-15"><a href=""></a><span class="fu">guardar_figura</span>(grafico_predictiva, <span class="st">"grafico_predictiva_bern"</span>, <span class="at">alto =</span> <span class="fl">4.5</span>)</span>
-<span id="cb6-16"><a href=""></a></span>
-<span id="cb6-17"><a href=""></a><span class="co"># =============================================================================</span></span>
-<span id="cb6-18"><a href=""></a><span class="co"># Modelo Poisson-Gamma con exposicion</span></span>
-<span id="cb6-19"><a href=""></a><span class="co"># =============================================================================</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-15"><a href=""></a><span class="fu">guardar_figura</span>(grafico_predictiva, <span class="st">"grafico_predictiva_bern"</span>, <span class="at">alto =</span> <span class="fl">4.5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 <img data-src="resultados/grafico_predictiva_bern.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"></section></section>
