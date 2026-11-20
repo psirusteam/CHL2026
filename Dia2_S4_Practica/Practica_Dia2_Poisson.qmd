@@ -2,7 +2,7 @@
 title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
 subtitle: "Práctica guiada en Stan: modelo Poisson para datos censales"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
-institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+institute: "CEPAL · UNFPA · INE Chile"
 date: 2026-11-24
 date-format: "D [de] MMMM [de] YYYY"
 lang: es
@@ -30,7 +30,7 @@ knitr::opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALS
 
 ## Qué haremos hoy
 
-Ustedes conocen el censo. En esta práctica aprenderán a llevar esos datos a Stan y a interpretar un primer modelo bayesiano.
+En esta práctica aprenderán a llevar esos datos a Stan y a interpretar un primer modelo bayesiano.
 
 1. Preparar personas, viviendas y zona para el ajuste.
 2. Leer el archivo Stan y **ajustar el modelo Poisson en su computador**.
@@ -132,9 +132,6 @@ y ~ poisson_log(log_v + X * beta);
 
 ## Compilar y ejecutar su propio ajuste
 
-```{r taller-ajuste}
-```
-
 1. Ejecuten `stan_model()`: compila el archivo Stan.
 2. Ejecuten `sampling()`: ajusta el modelo con sus datos.
 3. Identifiquen dónde se fija la semilla y dónde se indican las cuatro cadenas.
@@ -144,22 +141,15 @@ El bloque proporciona valores iniciales y controles de cálculo. En este primer 
 ## Qué significan las iteraciones
 
 - Ejecutamos **cuatro cadenas**, recorridos que exploran posibles coeficientes.
-- Cada cadena realiza **2.000 iteraciones**; las primeras **1.000** se usan para adaptar el cálculo y se descartan del resumen posterior.
+- Cada cadena realiza **2.000 iteraciones**; las primeras **1.000** se usan para adaptar el cálculo y se descartan del resumen de la distribución posterior.
 - Quedan **4.000 simulaciones** en conjunto. Son dependientes; su información efectiva es menor que su número bruto.
 
 **Mientras esperan:** expliquen la diferencia entre compilar el archivo y ajustar el modelo. ¿Qué contiene el objeto `ajuste` que no estaba en `datos_stan`?
 
-## Comprobar antes de interpretar
-
-```{r taller-diagnostico}
-```
 
 # Ejercicio 3: interpretar y predecir
 
 ## Volver a personas por vivienda
-
-```{r taller-interpretacion}
-```
 
 1. Lean la mediana y el intervalo del 95 % de personas **esperadas** por vivienda para cada zona.
 2. Compárenlos con el cociente observado de personas/viviendas por zona.
@@ -207,6 +197,47 @@ El bloque calcula un indicador de variación entre segmentos. No necesitan memor
 ```
 
 **Pregunta final:** ¿qué diferencia hay entre lograr que Stan ejecute el modelo y justificar que ese modelo es útil para el objetivo censal?
+
+# Ejercicio 5: extensión Poisson–lognormal
+
+## ¿Y si los segmentos de una zona son distintos?
+
+En el Poisson, dos segmentos de la misma zona y con igual número de viviendas tienen el mismo conteo esperado. El **Poisson–lognormal** permite que tengan tasas distintas de personas por vivienda, incluso dentro de la misma zona.
+
+$$
+Y_i \sim \operatorname{Poisson}(\lambda_i), \qquad
+\log\lambda_i=\log V_i + \mathbf{x}_i^\top\boldsymbol\beta+\sigma z_i,
+\quad z_i\sim N(0,1).
+$$
+
+- $\sigma$ mide cuánto varían esas tasas entre segmentos en la escala logarítmica. Su distribución previa es normal positiva, con escala 0,5.
+- Ambos ajustes usan los mismos datos, covariables y viviendas. Se mantiene el supuesto de que, a igual tasa, duplicar las viviendas duplica el conteo esperado.
+
+## Ajustar el Poisson–lognormal en Stan
+
+```{r taller-pln-ajuste}
+```
+
+Ejecuten después el bloque `taller-pln-diagnostico` del script. Revisen R-hat, ESS, divergencias y profundidad del árbol. La estimación de $\sigma$ se interpreta después de revisar el muestreo.
+
+## Comparar con el mismo indicador
+
+```{r taller-pln-chequeo}
+```
+
+Stan genera un efecto nuevo para cada segmento simulado, conservando sus viviendas y su zona. R calcula el mismo indicador de variación para las réplicas de ambos modelos, usando como referencia el conteo esperado del Poisson original.
+
+Ejecuten `taller-pln-guardar` para generar el gráfico y guardar el resumen.
+
+## Resultados en Magallanes
+
+```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
+ruta <- "resultados/practica_poisson"
+comparacion_pln <- readRDS(file.path(ruta, "comparacion_pln.rds"))
+knitr::include_graphics(file.path(ruta, "comparacion_pln.png"))
+```
+
+La línea roja marca el valor observado (**`r formatC(comparacion_pln$observado, digits = 2, format = "f", decimal.mark = ",")`**). Comparen dónde cae respecto de las réplicas de cada modelo. **¿Cuál reproduce mejor este aspecto de la variación entre segmentos?**
 
 ## Muchas gracias
 

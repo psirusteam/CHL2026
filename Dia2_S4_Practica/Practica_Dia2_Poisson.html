@@ -206,7 +206,7 @@
 Andrés Gutiérrez · Stalyn Guerrero 
 </div>
         <p class="quarto-title-affiliation">
-            CEPAL · UNFPA América Latina y el Caribe · INE Chile
+            CEPAL · UNFPA · INE Chile
           </p>
     </div>
 </div>
@@ -220,7 +220,7 @@ Andrés Gutiérrez · Stalyn Guerrero
 </section>
 <section id="qué-haremos-hoy" class="slide level2">
 <h2>Qué haremos hoy</h2>
-<p>Ustedes conocen el censo. En esta práctica aprenderán a llevar esos datos a Stan y a interpretar un primer modelo bayesiano.</p>
+<p>En esta práctica aprenderán a llevar esos datos a Stan y a interpretar un primer modelo bayesiano.</p>
 <ol type="1">
 <li>Preparar personas, viviendas y zona para el ajuste.</li>
 <li>Leer el archivo Stan y <strong>ajustar el modelo Poisson en su computador</strong>.</li>
@@ -409,18 +409,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 </section>
 <section id="compilar-y-ejecutar-su-propio-ajuste" class="slide level2">
 <h2>Compilar y ejecutar su propio ajuste</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a><span class="co"># Compilar transforma el archivo Stan en un programa ejecutable.</span></span>
-<span id="cb5-2"><a href=""></a>modelo <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/poisson_offset.stan"</span>)</span>
-<span id="cb5-3"><a href=""></a><span class="co"># Cuatro cadenas: cuatro recorridos para explorar los parametros posibles.</span></span>
-<span id="cb5-4"><a href=""></a><span class="co"># Las primeras 1000 iteraciones de cada cadena son de adaptacion.</span></span>
-<span id="cb5-5"><a href=""></a>beta_inicial <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">log</span>(<span class="fu">sum</span>(datos<span class="sc">$</span>n_per) <span class="sc">/</span> <span class="fu">sum</span>(datos<span class="sc">$</span>n_vpo)), <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">ncol</span>(X) <span class="sc">-</span> <span class="dv">1</span>))</span>
-<span id="cb5-6"><a href=""></a>ajuste <span class="ot">&lt;-</span> <span class="fu">sampling</span>(modelo, <span class="at">data =</span> datos_stan,</span>
-<span id="cb5-7"><a href=""></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">beta =</span> beta_inicial <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">ncol</span>(X), <span class="dv">0</span>, <span class="fl">0.05</span>)),</span>
-<span id="cb5-8"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">seed =</span> <span class="dv">2411</span>, <span class="at">refresh =</span> <span class="dv">500</span>,</span>
-<span id="cb5-9"><a href=""></a>  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.95</span>, <span class="at">max_treedepth =</span> <span class="dv">12</span>),</span>
-<span id="cb5-10"><a href=""></a>  <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"beta"</span>, <span class="st">"y_rep"</span>, <span class="st">"rng_out_of_range"</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <ol type="1">
 <li>Ejecuten <code>stan_model()</code>: compila el archivo Stan.</li>
 <li>Ejecuten <code>sampling()</code>: ajusta el modelo con sus datos.</li>
@@ -432,31 +420,10 @@ Andrés Gutiérrez · Stalyn Guerrero
 <h2>Qué significan las iteraciones</h2>
 <ul>
 <li>Ejecutamos <strong>cuatro cadenas</strong>, recorridos que exploran posibles coeficientes.</li>
-<li>Cada cadena realiza <strong>2.000 iteraciones</strong>; las primeras <strong>1.000</strong> se usan para adaptar el cálculo y se descartan del resumen posterior.</li>
+<li>Cada cadena realiza <strong>2.000 iteraciones</strong>; las primeras <strong>1.000</strong> se usan para adaptar el cálculo y se descartan del resumen de la distribución posterior.</li>
 <li>Quedan <strong>4.000 simulaciones</strong> en conjunto. Son dependientes; su información efectiva es menor que su número bruto.</li>
 </ul>
 <p><strong>Mientras esperan:</strong> expliquen la diferencia entre compilar el archivo y ajustar el modelo. ¿Qué contiene el objeto <code>ajuste</code> que no estaba en <code>datos_stan</code>?</p>
-</section>
-<section id="comprobar-antes-de-interpretar" class="slide level2">
-<h2>Comprobar antes de interpretar</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">interactive</span>()) <span class="fu">pdf</span>(<span class="st">"resultados/practica_poisson/diagnosticos.pdf"</span>, <span class="at">width =</span> <span class="dv">12</span>, <span class="at">height =</span> <span class="dv">7</span>)</span>
-<span id="cb6-2"><a href=""></a>diagnostico <span class="ot">&lt;-</span> posterior<span class="sc">::</span><span class="fu">summarise_draws</span>(</span>
-<span id="cb6-3"><a href=""></a>  posterior<span class="sc">::</span><span class="fu">as_draws_array</span>(<span class="fu">as.array</span>(ajuste, <span class="at">pars =</span> <span class="st">"beta"</span>)),</span>
-<span id="cb6-4"><a href=""></a>  <span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"rhat"</span>, <span class="st">"ess_bulk"</span>, <span class="st">"ess_tail"</span>)</span>
-<span id="cb6-5"><a href=""></a><span class="fu">print</span>(<span class="fu">as.data.frame</span>(diagnostico), <span class="at">digits =</span> <span class="dv">4</span>)</span>
-<span id="cb6-6"><a href=""></a>sampler <span class="ot">&lt;-</span> <span class="fu">get_sampler_params</span>(ajuste, <span class="at">inc_warmup =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb6-7"><a href=""></a>divergencias <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">vapply</span>(sampler, <span class="cf">function</span>(x) <span class="fu">sum</span>(x[, <span class="st">"divergent__"</span>]), <span class="fu">numeric</span>(<span class="dv">1</span>)))</span>
-<span id="cb6-8"><a href=""></a>limite_profundidad <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">vapply</span>(sampler,</span>
-<span id="cb6-9"><a href=""></a>  <span class="cf">function</span>(x) <span class="fu">sum</span>(x[, <span class="st">"treedepth__"</span>] <span class="sc">&gt;=</span> <span class="dv">12</span>), <span class="fu">numeric</span>(<span class="dv">1</span>)))</span>
-<span id="cb6-10"><a href=""></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">divergencias =</span> divergencias, <span class="at">limite_profundidad =</span> limite_profundidad))</span>
-<span id="cb6-11"><a href=""></a><span class="fu">traceplot</span>(ajuste, <span class="at">pars =</span> <span class="st">"beta"</span>)</span>
-<span id="cb6-12"><a href=""></a><span class="co"># No interpretar si fallan estos controles: pedir ayuda al docente.</span></span>
-<span id="cb6-13"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(diagnostico<span class="sc">$</span>rhat)), <span class="fu">all</span>(diagnostico<span class="sc">$</span>rhat <span class="sc">&lt;</span> <span class="fl">1.01</span>),</span>
-<span id="cb6-14"><a href=""></a>          <span class="fu">all</span>(diagnostico<span class="sc">$</span>ess_bulk <span class="sc">&gt;=</span> <span class="dv">400</span>), <span class="fu">all</span>(diagnostico<span class="sc">$</span>ess_tail <span class="sc">&gt;=</span> <span class="dv">400</span>),</span>
-<span id="cb6-15"><a href=""></a>          divergencias <span class="sc">==</span> <span class="dv">0</span>, limite_profundidad <span class="sc">==</span> <span class="dv">0</span>,</span>
-<span id="cb6-16"><a href=""></a>          <span class="fu">all</span>(<span class="fu">as.matrix</span>(ajuste, <span class="at">pars =</span> <span class="st">"rng_out_of_range"</span>) <span class="sc">==</span> <span class="dv">0</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 </section></section>
 <section>
 <section id="ejercicio-3-interpretar-y-predecir" class="title-slide slide level1 center">
@@ -465,21 +432,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 </section>
 <section id="volver-a-personas-por-vivienda" class="slide level2">
 <h2>Volver a personas por vivienda</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>beta <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(ajuste, <span class="at">pars =</span> <span class="st">"beta"</span>)</span>
-<span id="cb7-2"><a href=""></a><span class="co"># Transformar coeficientes a personas esperadas por vivienda, por zona.</span></span>
-<span id="cb7-3"><a href=""></a>X_zona <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> zona, <span class="at">data =</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-4"><a href=""></a>  <span class="at">zona =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"rural"</span>, <span class="st">"aldea"</span>, <span class="st">"urbana"</span>), <span class="at">levels =</span> <span class="fu">levels</span>(datos<span class="sc">$</span>zona))))</span>
-<span id="cb7-5"><a href=""></a>densidad <span class="ot">&lt;-</span> <span class="fu">exp</span>(beta <span class="sc">%*%</span> <span class="fu">t</span>(X_zona))</span>
-<span id="cb7-6"><a href=""></a>resumen_zona <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">zona =</span> <span class="fu">c</span>(<span class="st">"rural"</span>, <span class="st">"aldea"</span>, <span class="st">"urbana"</span>),</span>
-<span id="cb7-7"><a href=""></a>  <span class="fu">t</span>(<span class="fu">apply</span>(densidad, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>))),</span>
-<span id="cb7-8"><a href=""></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb7-9"><a href=""></a><span class="fu">print</span>(resumen_zona)</span>
-<span id="cb7-10"><a href=""></a><span class="co"># Comparacion descriptiva con los datos usados para ajustar, no validacion externa.</span></span>
-<span id="cb7-11"><a href=""></a>observado_zona <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(<span class="fu">cbind</span>(n_per, n_vpo) <span class="sc">~</span> zona, datos, sum)</span>
-<span id="cb7-12"><a href=""></a>observado_zona<span class="sc">$</span>personas_por_vivienda <span class="ot">&lt;-</span> observado_zona<span class="sc">$</span>n_per <span class="sc">/</span> observado_zona<span class="sc">$</span>n_vpo</span>
-<span id="cb7-13"><a href=""></a><span class="fu">print</span>(observado_zona)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <ol type="1">
 <li>Lean la mediana y el intervalo del 95 % de personas <strong>esperadas</strong> por vivienda para cada zona.</li>
 <li>Compárenlos con el cociente observado de personas/viviendas por zona.</li>
@@ -490,14 +442,14 @@ Andrés Gutiérrez · Stalyn Guerrero
 <section id="predecir-para-un-segmento-urbano" class="slide level2">
 <h2>Predecir para un segmento urbano</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="co"># Viviendas hipoteticas de zona urbana: cambiar 100 por 150.</span></span>
-<span id="cb8-2"><a href=""></a>viviendas_nuevas <span class="ot">&lt;-</span> <span class="dv">100</span></span>
-<span id="cb8-3"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">2412</span>)</span>
-<span id="cb8-4"><a href=""></a>media_esperada <span class="ot">&lt;-</span> viviendas_nuevas <span class="sc">*</span> densidad[, <span class="dv">3</span>]</span>
-<span id="cb8-5"><a href=""></a>poblacion_simulada <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="fu">length</span>(media_esperada), media_esperada)</span>
-<span id="cb8-6"><a href=""></a><span class="fu">print</span>(<span class="fu">rbind</span>(</span>
-<span id="cb8-7"><a href=""></a>  <span class="at">media_esperada =</span> <span class="fu">quantile</span>(media_esperada, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>)),</span>
-<span id="cb8-8"><a href=""></a>  <span class="at">conteo_predictivo =</span> <span class="fu">quantile</span>(poblacion_simulada, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>))))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a><span class="co"># Viviendas hipoteticas de zona urbana: cambiar 100 por 150.</span></span>
+<span id="cb5-2"><a href=""></a>viviendas_nuevas <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb5-3"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">2412</span>)</span>
+<span id="cb5-4"><a href=""></a>media_esperada <span class="ot">&lt;-</span> viviendas_nuevas <span class="sc">*</span> densidad[, <span class="dv">3</span>]</span>
+<span id="cb5-5"><a href=""></a>poblacion_simulada <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="fu">length</span>(media_esperada), media_esperada)</span>
+<span id="cb5-6"><a href=""></a><span class="fu">print</span>(<span class="fu">rbind</span>(</span>
+<span id="cb5-7"><a href=""></a>  <span class="at">media_esperada =</span> <span class="fu">quantile</span>(media_esperada, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>)),</span>
+<span id="cb5-8"><a href=""></a>  <span class="at">conteo_predictivo =</span> <span class="fu">quantile</span>(poblacion_simulada, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>))))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ol type="1">
 <li>Ejecuten con <strong>100 viviendas</strong> y registren ambos intervalos.</li>
@@ -523,21 +475,21 @@ Andrés Gutiérrez · Stalyn Guerrero
 <section id="comparar-observaciones-con-réplicas-del-modelo" class="slide level2">
 <h2>Comparar observaciones con réplicas del modelo</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># Un conteo replicado por segmento y simulacion bajo el modelo ajustado.</span></span>
-<span id="cb9-2"><a href=""></a>y_rep <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(ajuste, <span class="at">pars =</span> <span class="st">"y_rep"</span>)</span>
-<span id="cb9-3"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(y_rep <span class="sc">&gt;=</span> <span class="dv">0</span>))</span>
-<span id="cb9-4"><a href=""></a>mu <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">exp</span>(beta <span class="sc">%*%</span> <span class="fu">t</span>(X))) <span class="sc">*</span> datos<span class="sc">$</span>n_vpo</span>
-<span id="cb9-5"><a href=""></a><span class="co"># Indicador preparado: comparar variacion observada con variacion simulada.</span></span>
-<span id="cb9-6"><a href=""></a>indicador <span class="ot">&lt;-</span> <span class="cf">function</span>(y) <span class="fu">sum</span>((y <span class="sc">-</span> mu)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> mu) <span class="sc">/</span> (<span class="fu">length</span>(y) <span class="sc">-</span> <span class="fu">ncol</span>(X))</span>
-<span id="cb9-7"><a href=""></a>observado <span class="ot">&lt;-</span> <span class="fu">indicador</span>(datos<span class="sc">$</span>n_per)</span>
-<span id="cb9-8"><a href=""></a>ids <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">round</span>(<span class="fu">seq</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(y_rep), <span class="at">length.out =</span> <span class="fu">min</span>(<span class="dv">500</span>, <span class="fu">nrow</span>(y_rep)))))</span>
-<span id="cb9-9"><a href=""></a>simulado <span class="ot">&lt;-</span> <span class="fu">apply</span>(y_rep[ids, , <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="dv">1</span>, indicador)</span>
-<span id="cb9-10"><a href=""></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">observado =</span> observado, <span class="fu">quantile</span>(simulado, <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span>))))</span>
-<span id="cb9-11"><a href=""></a><span class="fu">hist</span>(simulado, <span class="at">breaks =</span> <span class="dv">30</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>,</span>
-<span id="cb9-12"><a href=""></a>  <span class="at">main =</span> <span class="st">"Variacion reproducida por el Poisson"</span>, <span class="at">xlab =</span> <span class="st">"Indicador de variacion"</span>,</span>
-<span id="cb9-13"><a href=""></a>  <span class="at">xlim =</span> <span class="fu">range</span>(<span class="fu">c</span>(simulado, observado)))</span>
-<span id="cb9-14"><a href=""></a><span class="fu">abline</span>(<span class="at">v =</span> observado, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb9-15"><a href=""></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="st">"Datos observados"</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="co"># Un conteo replicado por segmento y simulacion bajo el modelo ajustado.</span></span>
+<span id="cb6-2"><a href=""></a>y_rep <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(ajuste, <span class="at">pars =</span> <span class="st">"y_rep"</span>)</span>
+<span id="cb6-3"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(y_rep <span class="sc">&gt;=</span> <span class="dv">0</span>))</span>
+<span id="cb6-4"><a href=""></a>mu <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">exp</span>(beta <span class="sc">%*%</span> <span class="fu">t</span>(X))) <span class="sc">*</span> datos<span class="sc">$</span>n_vpo</span>
+<span id="cb6-5"><a href=""></a><span class="co"># Indicador preparado: comparar variacion observada con variacion simulada.</span></span>
+<span id="cb6-6"><a href=""></a>indicador <span class="ot">&lt;-</span> <span class="cf">function</span>(y) <span class="fu">sum</span>((y <span class="sc">-</span> mu)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> mu) <span class="sc">/</span> (<span class="fu">length</span>(y) <span class="sc">-</span> <span class="fu">ncol</span>(X))</span>
+<span id="cb6-7"><a href=""></a>observado <span class="ot">&lt;-</span> <span class="fu">indicador</span>(datos<span class="sc">$</span>n_per)</span>
+<span id="cb6-8"><a href=""></a>ids <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">round</span>(<span class="fu">seq</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(y_rep), <span class="at">length.out =</span> <span class="fu">min</span>(<span class="dv">500</span>, <span class="fu">nrow</span>(y_rep)))))</span>
+<span id="cb6-9"><a href=""></a>simulado <span class="ot">&lt;-</span> <span class="fu">apply</span>(y_rep[ids, , <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="dv">1</span>, indicador)</span>
+<span id="cb6-10"><a href=""></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">observado =</span> observado, <span class="fu">quantile</span>(simulado, <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span>))))</span>
+<span id="cb6-11"><a href=""></a><span class="fu">hist</span>(simulado, <span class="at">breaks =</span> <span class="dv">30</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>,</span>
+<span id="cb6-12"><a href=""></a>  <span class="at">main =</span> <span class="st">"Variacion reproducida por el Poisson"</span>, <span class="at">xlab =</span> <span class="st">"Indicador de variacion"</span>,</span>
+<span id="cb6-13"><a href=""></a>  <span class="at">xlim =</span> <span class="fu">range</span>(<span class="fu">c</span>(simulado, observado)))</span>
+<span id="cb6-14"><a href=""></a><span class="fu">abline</span>(<span class="at">v =</span> observado, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb6-15"><a href=""></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="st">"Datos observados"</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>El bloque calcula un indicador de variación entre segmentos. No necesitan memorizar su fórmula.</p>
 <ol type="1">
@@ -549,18 +501,70 @@ Andrés Gutiérrez · Stalyn Guerrero
 <section id="guardar-y-comunicar-lo-aprendido" class="slide level2">
 <h2>Guardar y comunicar lo aprendido</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="fu">write.csv</span>(resumen_zona, <span class="st">"resultados/practica_poisson/densidad_zona.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb10-2"><a href=""></a><span class="fu">saveRDS</span>(<span class="fu">list</span>(<span class="at">diagnostico =</span> diagnostico, <span class="at">divergencias =</span> divergencias,</span>
-<span id="cb10-3"><a href=""></a>  <span class="at">limite_profundidad =</span> limite_profundidad, <span class="at">densidad_zona =</span> resumen_zona,</span>
-<span id="cb10-4"><a href=""></a>  <span class="at">viviendas_nuevas =</span> viviendas_nuevas,</span>
-<span id="cb10-5"><a href=""></a>  <span class="at">prediccion =</span> <span class="fu">quantile</span>(poblacion_simulada, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>)),</span>
-<span id="cb10-6"><a href=""></a>  <span class="at">dispersion_observada =</span> observado,</span>
-<span id="cb10-7"><a href=""></a>  <span class="at">dispersion_simulada =</span> <span class="fu">quantile</span>(simulado, <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span>)), <span class="at">seed =</span> <span class="dv">2411</span>),</span>
-<span id="cb10-8"><a href=""></a>  <span class="st">"resultados/practica_poisson/resumen.rds"</span>)</span>
-<span id="cb10-9"><a href=""></a><span class="fu">capture.output</span>(<span class="fu">sessionInfo</span>(), <span class="at">file =</span> <span class="st">"resultados/practica_poisson/sessionInfo.txt"</span>)</span>
-<span id="cb10-10"><a href=""></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">interactive</span>()) <span class="fu">dev.off</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="fu">write.csv</span>(resumen_zona, <span class="st">"resultados/practica_poisson/densidad_zona.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-2"><a href=""></a><span class="fu">saveRDS</span>(<span class="fu">list</span>(<span class="at">diagnostico =</span> diagnostico, <span class="at">divergencias =</span> divergencias,</span>
+<span id="cb7-3"><a href=""></a>  <span class="at">limite_profundidad =</span> limite_profundidad, <span class="at">densidad_zona =</span> resumen_zona,</span>
+<span id="cb7-4"><a href=""></a>  <span class="at">viviendas_nuevas =</span> viviendas_nuevas,</span>
+<span id="cb7-5"><a href=""></a>  <span class="at">prediccion =</span> <span class="fu">quantile</span>(poblacion_simulada, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>)),</span>
+<span id="cb7-6"><a href=""></a>  <span class="at">dispersion_observada =</span> observado,</span>
+<span id="cb7-7"><a href=""></a>  <span class="at">dispersion_simulada =</span> <span class="fu">quantile</span>(simulado, <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span>)), <span class="at">seed =</span> <span class="dv">2411</span>),</span>
+<span id="cb7-8"><a href=""></a>  <span class="st">"resultados/practica_poisson/resumen.rds"</span>)</span>
+<span id="cb7-9"><a href=""></a><span class="fu">capture.output</span>(<span class="fu">sessionInfo</span>(), <span class="at">file =</span> <span class="st">"resultados/practica_poisson/sessionInfo.txt"</span>)</span>
+<span id="cb7-10"><a href=""></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">interactive</span>()) <span class="fu">dev.off</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Pregunta final:</strong> ¿qué diferencia hay entre lograr que Stan ejecute el modelo y justificar que ese modelo es útil para el objetivo censal?</p>
+</section></section>
+<section>
+<section id="ejercicio-5-extensión-poissonlognormal" class="title-slide slide level1 center">
+<h1>Ejercicio 5: extensión Poisson–lognormal</h1>
+
+</section>
+<section id="y-si-los-segmentos-de-una-zona-son-distintos" class="slide level2">
+<h2>¿Y si los segmentos de una zona son distintos?</h2>
+<p>En el Poisson, dos segmentos de la misma zona y con igual número de viviendas tienen el mismo conteo esperado. El <strong>Poisson–lognormal</strong> permite que tengan tasas distintas de personas por vivienda, incluso dentro de la misma zona.</p>
+<p><span class="math display">\[
+Y_i \sim \operatorname{Poisson}(\lambda_i), \qquad
+\log\lambda_i=\log V_i + \mathbf{x}_i^\top\boldsymbol\beta+\sigma z_i,
+\quad z_i\sim N(0,1).
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\sigma\)</span> mide cuánto varían esas tasas entre segmentos en la escala logarítmica. Su distribución previa es normal positiva, con escala 0,5.</li>
+<li>Ambos ajustes usan los mismos datos, covariables y viviendas. Se mantiene el supuesto de que, a igual tasa, duplicar las viviendas duplica el conteo esperado.</li>
+</ul>
+</section>
+<section id="ajustar-el-poissonlognormal-en-stan" class="slide level2">
+<h2>Ajustar el Poisson–lognormal en Stan</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>modelo_pln <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/poisson_lognormal.stan"</span>)</span>
+<span id="cb8-2"><a href=""></a>beta_pln_inicial <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(beta)</span>
+<span id="cb8-3"><a href=""></a>ajuste_pln <span class="ot">&lt;-</span> <span class="fu">sampling</span>(modelo_pln, <span class="at">data =</span> datos_stan,</span>
+<span id="cb8-4"><a href=""></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">beta =</span> beta_pln_inicial <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">ncol</span>(X), <span class="dv">0</span>, <span class="fl">0.02</span>),</span>
+<span id="cb8-5"><a href=""></a>                        <span class="at">sigma =</span> <span class="fl">0.15</span>, <span class="at">z =</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">nrow</span>(X))),</span>
+<span id="cb8-6"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">seed =</span> <span class="dv">2413</span>, <span class="at">refresh =</span> <span class="dv">500</span>,</span>
+<span id="cb8-7"><a href=""></a>  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">adapt_delta =</span> <span class="fl">0.95</span>, <span class="at">max_treedepth =</span> <span class="dv">12</span>),</span>
+<span id="cb8-8"><a href=""></a>  <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"beta"</span>, <span class="st">"sigma"</span>, <span class="st">"z"</span>, <span class="st">"y_rep"</span>, <span class="st">"rng_out_of_range"</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Ejecuten después el bloque <code>taller-pln-diagnostico</code> del script. Revisen R-hat, ESS, divergencias y profundidad del árbol. La estimación de <span class="math inline">\(\sigma\)</span> se interpreta después de revisar el muestreo.</p>
+</section>
+<section id="comparar-con-el-mismo-indicador" class="slide level2">
+<h2>Comparar con el mismo indicador</h2>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a>y_rep_pln <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(ajuste_pln, <span class="at">pars =</span> <span class="st">"y_rep"</span>)</span>
+<span id="cb9-2"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(y_rep_pln <span class="sc">&gt;=</span> <span class="dv">0</span>))</span>
+<span id="cb9-3"><a href=""></a><span class="co"># El mismo indicador, los mismos segmentos y la misma referencia Poisson.</span></span>
+<span id="cb9-4"><a href=""></a>simulado_pln <span class="ot">&lt;-</span> <span class="fu">apply</span>(y_rep_pln[ids, , <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="dv">1</span>, indicador)</span>
+<span id="cb9-5"><a href=""></a>intervalos <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="at">Poisson =</span> <span class="fu">quantile</span>(simulado, <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span>)),</span>
+<span id="cb9-6"><a href=""></a>                    <span class="st">`</span><span class="at">Poisson–lognormal</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">quantile</span>(simulado_pln, <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span>)))</span>
+<span id="cb9-7"><a href=""></a><span class="fu">print</span>(intervalos)</span>
+<span id="cb9-8"><a href=""></a><span class="fu">print</span>(observado)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Stan genera un efecto nuevo para cada segmento simulado, conservando sus viviendas y su zona. R calcula el mismo indicador de variación para las réplicas de ambos modelos, usando como referencia el conteo esperado del Poisson original.</p>
+<p>Ejecuten <code>taller-pln-guardar</code> para generar el gráfico y guardar el resumen.</p>
+</section>
+<section id="resultados-en-magallanes" class="slide level2">
+<h2>Resultados en Magallanes</h2>
+
+<img data-src="resultados/practica_poisson/comparacion_pln.png" class="quarto-figure quarto-figure-center r-stretch" style="width:80.0%"><p>La línea roja marca el valor observado (<strong>1,58</strong>). Comparen dónde cae respecto de las réplicas de cada modelo. <strong>¿Cuál reproduce mejor este aspecto de la variación entre segmentos?</strong></p>
 </section>
 <section id="muchas-gracias" class="slide level2">
 <h2>Muchas gracias</h2>

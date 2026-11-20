@@ -112,3 +112,63 @@ saveRDS(list(diagnostico = diagnostico, divergencias = divergencias,
   "resultados/practica_poisson/resumen.rds")
 capture.output(sessionInfo(), file = "resultados/practica_poisson/sessionInfo.txt")
 if (!interactive()) dev.off()
+
+## ---- taller-pln-ajuste ----
+modelo_pln <- stan_model("stan/poisson_lognormal.stan")
+beta_pln_inicial <- colMeans(beta)
+ajuste_pln <- sampling(modelo_pln, data = datos_stan,
+  init = function() list(beta = beta_pln_inicial + rnorm(ncol(X), 0, 0.02),
+                        sigma = 0.15, z = rep(0, nrow(X))),
+  chains = 4, iter = 2000, warmup = 1000, seed = 2413, refresh = 500,
+  control = list(adapt_delta = 0.95, max_treedepth = 12),
+  pars = c("beta", "sigma", "z", "y_rep", "rng_out_of_range"))
+
+## ---- taller-pln-diagnostico ----
+parametros_pln <- as.array(ajuste_pln, pars = c("beta", "sigma", "z"))
+diagnostico_pln <- posterior::summarise_draws(
+  posterior::as_draws_array(parametros_pln), "mean", "sd", "rhat", "ess_bulk", "ess_tail")
+sampler_pln <- get_sampler_params(ajuste_pln, inc_warmup = FALSE)
+control_pln <- c(Rhat_max = max(diagnostico_pln$rhat),
+  ESS_bulk_min = min(diagnostico_pln$ess_bulk),
+  ESS_tail_min = min(diagnostico_pln$ess_tail),
+  divergencias = sum(vapply(sampler_pln, function(x) sum(x[, "divergent__"]), numeric(1))),
+  limite_profundidad = sum(vapply(sampler_pln,
+    function(x) sum(x[, "treedepth__"] >= 12), numeric(1))))
+print(round(control_pln, 3))
+print(as.data.frame(diagnostico_pln[diagnostico_pln$variable == "sigma", ]), digits = 3)
+stopifnot(all(is.finite(control_pln)), control_pln["Rhat_max"] < 1.01,
+          control_pln["ESS_bulk_min"] >= 400, control_pln["ESS_tail_min"] >= 400,
+          control_pln["divergencias"] == 0, control_pln["limite_profundidad"] == 0,
+          all(as.matrix(ajuste_pln, pars = "rng_out_of_range") == 0))
+
+## ---- taller-pln-chequeo ----
+y_rep_pln <- as.matrix(ajuste_pln, pars = "y_rep")
+stopifnot(all(y_rep_pln >= 0))
+# El mismo indicador, los mismos segmentos y la misma referencia Poisson.
+simulado_pln <- apply(y_rep_pln[ids, , drop = FALSE], 1, indicador)
+intervalos <- rbind(Poisson = quantile(simulado, c(0.05, 0.5, 0.95)),
+                    `Poisson–lognormal` = quantile(simulado_pln, c(0.05, 0.5, 0.95)))
+print(intervalos)
+print(observado)
+
+## ---- taller-pln-guardar ----
+ruta_pln <- "resultados/practica_poisson"
+graficar_comparacion <- function() {
+  limites <- range(simulado, simulado_pln, observado)
+  cortes <- seq(limites[1], limites[2], length.out = 33)
+  op <- par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+  on.exit(par(op))
+  for (modelo in rownames(intervalos)) {
+    valores <- if (modelo == "Poisson") simulado else simulado_pln
+    hist(valores, breaks = cortes, xlim = limites, col = "lightblue",
+         main = modelo, xlab = "Indicador de variación", ylab = "Réplicas")
+    abline(v = observado, col = "firebrick", lwd = 3)
+  }
+}
+png(file.path(ruta_pln, "comparacion_pln.png"), width = 1380, height = 520, res = 120)
+graficar_comparacion()
+invisible(dev.off())
+if (interactive()) graficar_comparacion()
+saveRDS(list(intervalos = intervalos, observado = observado, control = control_pln,
+             sigma = quantile(as.matrix(ajuste_pln, pars = "sigma"), c(0.05, 0.5, 0.95))),
+        file.path(ruta_pln, "comparacion_pln.rds"))
