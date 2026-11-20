@@ -8,7 +8,7 @@ parameters {
   real<lower=0> sigma;         // desviacion estandar de log(delta)
 }
 model {
-  mu ~ normal(0, 10);          // previas debilmente informativas
+  mu ~ normal(0, 10);          // distribuciones previas débilmente informativas
   sigma ~ cauchy(0, 2.5);      // media Cauchy positiva por la restriccion lower=0
   y ~ normal(mu, sigma);
 }

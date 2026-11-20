@@ -43,23 +43,46 @@ posterior_beta <- function(a, b) {
 }
 
 modelo_bern <- stan_model("stan/bernoulli_beta.stan")
-fit_ej1 <- sampling(modelo_bern, data = list(n = length(y), y = y, a = 1, b = 1),
-                    chains = 4, iter = 2000, warmup = 1000, seed = 101, refresh = 0)
+fit_ej1 <- sampling(
+  modelo_bern,
+  data = list(
+    n = length(y),
+    y = y,
+    a = 1,
+    b = 1
+  ),
+  chains = 4,
+  iter = 2000,
+  warmup = 1000,
+  seed = 101,
+  refresh = 0
+)
 
-fit_ej1_sens <- sampling(modelo_bern,
-  data = list(n = length(y), y = y, a = 1, b = 99),
-  chains = 4, iter = 2000, warmup = 1000, seed = 102, refresh = 0)
+fit_ej1_sens <- sampling(
+  modelo_bern,
+  data = list(
+    n = length(y),
+    y = y,
+    a = 1,
+    b = 99
+  ),
+  chains = 4,
+  iter = 2000,
+  warmup = 1000,
+  seed = 102,
+  refresh = 0
+)
 
 ## ---- ej1-resultado ----
 summary_theta <- function(fit) {
-  draws <- as.data.frame(fit)$theta
-  c(media = mean(draws), q025 = unname(quantile(draws, 0.025)),
-    q975 = unname(quantile(draws, 0.975)))
+  replicas <- as.data.frame(fit)$theta
+  c(media = mean(replicas), q025 = unname(quantile(replicas, 0.025)),
+    q975 = unname(quantile(replicas, 0.975)))
 }
-ej1 <- rbind(`Analítica Beta(1, 1)` = posterior_beta(1, 1),
-             `Stan Beta(1, 1)` = summary_theta(fit_ej1),
-             `Analítica Beta(1, 99)` = posterior_beta(1, 99),
-             `Stan Beta(1, 99)` = summary_theta(fit_ej1_sens)) %>%
+ej1 <- rbind("Analítica Beta(1, 1)" = posterior_beta(1, 1),
+             "Stan Beta(1, 1)" = summary_theta(fit_ej1),
+             "Analítica Beta(1, 99)" = posterior_beta(1, 99),
+             "Stan Beta(1, 99)" = summary_theta(fit_ej1_sens)) %>%
   as.data.frame() %>% rownames_to_column("metodo")
 ej1
 
@@ -100,7 +123,7 @@ guardar(ej2, "ej2")
 grafico_ej2 <- ggplot(tibble(diferencia), aes(diferencia)) +
   geom_histogram(bins = 50, fill = "#2e75b6", colour = "white") +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  labs(x = "delta Magallanes − delta Aysén (personas por vivienda)", y = "Draws")
+  labs(x = "delta Magallanes − delta Aysén (personas por vivienda)", y = "Réplicas")
 guardar_figura(grafico_ej2, "grafico_ej2", alto = 4.2)
 
 ## ---- ej2-dispersion ----
@@ -157,38 +180,7 @@ grafico_ej3 <- ppc_dens_overlay(y_urbana, y_rep) +
 guardar_figura(grafico_ej3, "grafico_ej3", alto = 4.6)
 
 # =============================================================================
-# Ejercicio 4: segmentos por zona
-# =============================================================================
-
-## ---- ej4 ----
-zone_levels <- c("urbana", "aldea", "rural")
-stopifnot(all(magallanes$zona %in% zone_levels))
-conteos <- table(factor(magallanes$zona, levels = zone_levels))
-modelo_multi <- stan_model("stan/multinomial_dirichlet.stan")
-fit_ej4 <- sampling(modelo_multi,
-                    data = list(K = length(conteos), y = as.integer(conteos), alpha = rep(1, length(conteos))),
-                    chains = 4, iter = 2000, warmup = 1000, seed = 401, refresh = 0)
-
-## ---- ej4-resultado ----
-theta <- as.data.frame(fit_ej4) %>% select(starts_with("theta")) %>% setNames(names(conteos))
-
-ej4 <- tibble(zona = names(conteos), segmentos = as.integer(conteos),
-              media_stan = colMeans(theta),
-              media_analitica = (1 + as.integer(conteos)) / (3 + sum(conteos)))
-ej4
-prob_urbana <- mean(theta$urbana > 0.75)
-alpha_post <- 1 + as.integer(conteos)
-urban_index <- match("urbana", names(conteos))
-prob_urbana_exacta <- pbeta(0.75, alpha_post[urban_index],
-                            sum(alpha_post) - alpha_post[urban_index], lower.tail = FALSE)
-
-## ---- guardar-ej4 ----
-guardar(ej4, "ej4")
-guardar_valor("prob_urbana", prob_urbana)
-guardar_valor("prob_urbana_exacta", prob_urbana_exacta)
-
-# =============================================================================
-# Ejercicio 5 (desafio): Metropolis para la densidad
+# Ejercicio 4 (desafio): Metropolis para la densidad
 # =============================================================================
 
 ## ---- ej5 ----
@@ -206,9 +198,9 @@ metropolis_pg <- function(inicio, y, v, n_iter = 5000, paso = 0.01) {
     }
     cadena[t] <- actual
   }
-  draws <- exp(cadena)
-  attr(draws, "accepted") <- accepted
-  draws
+  replicas <- exp(cadena)
+  attr(replicas, "accepted") <- accepted
+  replicas
 }
 
 ## ---- ej5-resultado ----
@@ -231,7 +223,7 @@ guardar(ej5, "ej5")
 ## ---- diagnostics ----
 fits <- list(ej1_uniform = fit_ej1, ej1_sensitivity = fit_ej1_sens,
              ej2_magallanes = fit_mag, ej2_aysen = fit_ays,
-             ej3_urban = fit_urbana, ej3_rural = fit_rural, ej4_zones = fit_ej4)
+             ej3_urban = fit_urbana, ej3_rural = fit_rural)
 diagnostic_tables <- purrr::imap(fits, function(fit, name) {
   posterior::summarise_draws(posterior::as_draws_array(fit),
                            "rhat", "ess_bulk", "ess_tail", "mcse_mean") %>%

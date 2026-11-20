@@ -229,7 +229,7 @@
 Andrés Gutiérrez · Stalyn Guerrero 
 </div>
         <p class="quarto-title-affiliation">
-            CEPAL · UNFPA América Latina y el Caribe · INE Chile
+            CEPAL · UNFPA · INE Chile
           </p>
     </div>
 </div>
@@ -238,11 +238,10 @@ Andrés Gutiérrez · Stalyn Guerrero
 </section>
 <section id="de-un-parámetro-a-una-distribución-conjunta" class="slide level2">
 <h2>De un parámetro a una distribución conjunta</h2>
-<p>En D1S2 se fijó la desviación estándar para estudiar una sola media. Ahora aprendemos sobre <strong>media y variabilidad simultáneamente</strong>.</p>
+<p>En esta sesión estudiamos <strong>media y variabilidad simultáneamente</strong>.</p>
 <ol type="1">
-<li>Distinguir posteriores conjuntas, marginales y condicionales.</li>
-<li>Obtener funciones y predicciones a partir de draws conjuntos.</li>
-<li>Comprender la actualización Multinomial–Dirichlet.</li>
+<li>Distinguir distribuciones posteriores conjuntas, marginales y condicionales.</li>
+<li>Obtener funciones y predicciones a partir de réplicas conjuntas.</li>
 <li>Construir un Metropolis sencillo y reconocer problemas de exploración.</li>
 <li>Interpretar los diagnósticos y la estructura de un programa Stan.</li>
 </ol>
@@ -258,14 +257,14 @@ Andrés Gutiérrez · Stalyn Guerrero
 <p><span class="math display">\[
 p(\boldsymbol\theta \mid \mathbf{Y}) \propto p(\mathbf{Y} \mid \boldsymbol\theta)\, p(\boldsymbol\theta),
 \]</span></p>
-<p>pero la posterior es una distribución <strong>conjunta</strong> en <span class="math inline">\(\mathbb{R}^k\)</span>. De ella se obtienen:</p>
+<p>pero la distribución posterior es <strong>conjunta</strong> en <span class="math inline">\(\mathbb{R}^k\)</span>. De ella se obtienen:</p>
 <ul>
 <li><strong>Marginales</strong>: <span class="math inline">\(p(\theta_1 \mid \mathbf{Y}) = \int p(\theta_1, \boldsymbol\theta_{-1} \mid \mathbf{Y})\, d\boldsymbol\theta_{-1}\)</span>. Resumen cada parámetro teniendo en cuenta la incertidumbre de los demás.</li>
 <li><strong>Condicionales</strong>: <span class="math inline">\(p(\theta_1 \mid \boldsymbol\theta_{-1}, \mathbf{Y})\)</span>. Base del muestreador de Gibbs.</li>
-<li><strong>Funciones</strong>: cualquier <span class="math inline">\(g(\boldsymbol\theta)\)</span>, por ejemplo <span class="math inline">\(e^{\mu + \sigma^2/2}\)</span>, tiene su propia posterior.</li>
+<li><strong>Funciones</strong>: cualquier <span class="math inline">\(g(\boldsymbol\theta)\)</span>, por ejemplo <span class="math inline">\(e^{\mu + \sigma^2/2}\)</span>, tiene su propia distribución posterior.</li>
 </ul>
 <div class="caja">
-<p>Con <strong>draws</strong> de la posterior conjunta todo es inmediato: la marginal de <span class="math inline">\(\theta_1\)</span> es la columna de sus draws, y la posterior de <span class="math inline">\(g(\boldsymbol\theta)\)</span> se obtiene aplicando <span class="math inline">\(g\)</span> a cada draw.</p>
+<p>Con <strong>réplicas</strong> de la distribución posterior conjunta todo es inmediato: la marginal de <span class="math inline">\(\theta_1\)</span> es la columna de sus réplicas, y la distribución posterior de <span class="math inline">\(g(\boldsymbol\theta)\)</span> se obtiene aplicando <span class="math inline">\(g\)</span> a cada réplica.</p>
 </div>
 </section>
 <section id="parámetros-de-interés-y-parámetros-auxiliares" class="slide level2">
@@ -274,7 +273,7 @@ p(\boldsymbol\theta \mid \mathbf{Y}) \propto p(\mathbf{Y} \mid \boldsymbol\theta
 <p><span class="math display">\[
 p(\boldsymbol\phi \mid \mathbf{Y}) = \int p(\boldsymbol\phi \mid \boldsymbol\eta, \mathbf{Y})\, p(\boldsymbol\eta \mid \mathbf{Y})\, d\boldsymbol\eta,
 \]</span></p>
-<p>un <strong>promedio</strong> de las condicionales ponderado por la posterior de <span class="math inline">\(\boldsymbol\eta\)</span>.</p>
+<p>un <strong>promedio</strong> de las condicionales ponderado por la distribución posterior de <span class="math inline">\(\boldsymbol\eta\)</span>.</p>
 <ul>
 <li>A diferencia de fijar <span class="math inline">\(\boldsymbol\eta\)</span> en un estimador, la marginal <strong>propaga</strong> su incertidumbre.</li>
 <li>En el modelo de población, las densidades latentes <span class="math inline">\(\delta_i\)</span> de los segmentos aptos son parámetros auxiliares cuando interesa <span class="math inline">\(\boldsymbol\beta\)</span>; y <span class="math inline">\(\boldsymbol\beta\)</span> es de ruido cuando interesa la predicción de un segmento.</li>
@@ -301,19 +300,6 @@ p(\mathbf{y} \mid \mu, \sigma^2) = (2\pi\sigma^2)^{-n/2}\exp\!\Big(-\frac{1}{2\s
 </section>
 <section id="por-qué-el-logaritmo" class="slide level2">
 <h2>¿Por qué el logaritmo?</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>grafico_log <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">tibble</span>(<span class="at">escala =</span> <span class="st">"delta: personas por vivienda"</span>, <span class="at">valor =</span> aptos<span class="sc">$</span>delta),</span>
-<span id="cb1-2"><a href=""></a>                         <span class="fu">tibble</span>(<span class="at">escala =</span> <span class="st">"log delta"</span>, <span class="at">valor =</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta))) <span class="sc">%&gt;%</span></span>
-<span id="cb1-3"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(valor)) <span class="sc">+</span></span>
-<span id="cb1-4"><a href=""></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">40</span>, <span class="at">fill =</span> <span class="st">"#2e75b6"</span>, <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb1-5"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> escala, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb1-6"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Segmentos"</span>)</span>
-<span id="cb1-7"><a href=""></a><span class="fu">guardar_figura</span>(grafico_log, <span class="st">"grafico_log"</span>, <span class="at">alto =</span> <span class="fl">4.5</span>)</span>
-<span id="cb1-8"><a href=""></a>asimetria <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">mean</span>((x <span class="sc">-</span> <span class="fu">mean</span>(x))<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="fu">sd</span>(x)<span class="sc">^</span><span class="dv">3</span></span>
-<span id="cb1-9"><a href=""></a><span class="fu">guardar</span>(<span class="fu">tibble</span>(<span class="at">escala =</span> <span class="fu">c</span>(<span class="st">"delta"</span>, <span class="st">"log(delta)"</span>),</span>
-<span id="cb1-10"><a href=""></a>               <span class="at">asimetria =</span> <span class="fu">c</span>(<span class="fu">asimetria</span>(aptos<span class="sc">$</span>delta), <span class="fu">asimetria</span>(<span class="fu">log</span>(aptos<span class="sc">$</span>delta)))),</span>
-<span id="cb1-11"><a href=""></a>        <span class="st">"tabla_asimetria"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <div class="columns">
 <div class="column" style="width:70%;">
 <div class="cell" data-layout-align="center">
@@ -349,7 +335,7 @@ p(\mathbf{y} \mid \mu, \sigma^2) = (2\pi\sigma^2)^{-n/2}\exp\!\Big(-\frac{1}{2\s
 </div>
 </div>
 </div></div>
-<p><span class="math inline">\(\delta_i\)</span> es <strong>positiva y asimétrica</strong>; en escala log su distribución es más simétrica, y los efectos de las covariables se vuelven <strong>multiplicativos</strong> sobre <span class="math inline">\(\delta_i\)</span>.</p>
+<p><span class="math inline">\(\delta_i\)</span> es <strong>positiva y asimétrica</strong>; los efectos de las covariables se vuelven <strong>multiplicativos</strong> sobre <span class="math inline">\(\delta_i\)</span>.</p>
 </section>
 <section id="descomposición-de-la-suma-de-cuadrados" class="slide level2">
 <h2>Descomposición de la suma de cuadrados</h2>
@@ -364,9 +350,9 @@ p(\mathbf{y} \mid \mu, \sigma^2) \propto (\sigma^2)^{-n/2}\exp\!\Big(-\frac{(n-1
 <p><span class="math inline">\((\bar y, s^2)\)</span> son <strong>estadísticos suficientes</strong>.</p>
 </section>
 <section id="posterior-con-previa-de-referencia" class="slide level2">
-<h2>Posterior con previa de referencia</h2>
-<p>La previa de referencia <span class="math inline">\(p(\mu, \sigma^2) \propto 1/\sigma^2\)</span> es <strong>impropia</strong> y está expresada respecto de <span class="math inline">\(d\mu\,d\sigma^2\)</span>. Con <span class="math inline">\(n\ge2\)</span> y variación observada positiva, la posterior es propia:</p>
-<p>La posterior conjunta es</p>
+<h2>Distribución posterior con distribución previa de referencia</h2>
+<p>La distribución previa de referencia <span class="math inline">\(p(\mu, \sigma^2) \propto 1/\sigma^2\)</span> es <strong>impropia</strong> y está expresada respecto de <span class="math inline">\(d\mu\,d\sigma^2\)</span>. Con <span class="math inline">\(n\ge2\)</span> y variación observada positiva, la distribución posterior es propia:</p>
+<p>La distribución posterior conjunta es</p>
 <p><span class="math display">\[
 p(\mu, \sigma^2 \mid \mathbf{y}) \propto (\sigma^2)^{-n/2 - 1}\exp\!\Big(-\frac{(n-1)s^2 + n(\bar y - \mu)^2}{2\sigma^2}\Big).
 \]</span></p>
@@ -395,30 +381,30 @@ p(\mu \mid \mathbf{y}) &amp;= \int_0^\infty p(\mu, \sigma^2 \mid \mathbf{y})\,d\
 </div>
 </section>
 <section id="previas-débilmente-informativas-en-stan" class="slide level2">
-<h2>Previas débilmente informativas en Stan</h2>
-<p>En la práctica se usan previas propias y débilmente informativas:</p>
+<h2>Distribuciones previas débilmente informativas en Stan</h2>
+<p>En la práctica se usan distribuciones previas propias y débilmente informativas:</p>
 <p><span class="math display">\[
-\mu \sim N(0, 10^2), \qquad \sigma \sim \text{Cauchy}^+(0;\ 2{,}5).
+\mu \sim N(0, 10^2), \qquad \sigma \sim \text{Cauchy}^+(0;\ 2,5).
 \]</span></p>
 <ul>
-<li>Es un modelo con previas distintas de la referencia: su posterior no es la misma solución analítica. MCMC permite aproximarla.</li>
-<li>Son previas amplias para esta escala: <span class="math inline">\(N(0,10^2)\)</span> para <span class="math inline">\(\mu\)</span> induce valores extremos de <span class="math inline">\(e^\mu\)</span> y la media Cauchy tiene cola pesada. Se conservan para comparar los algoritmos bajo el mismo modelo; deben evaluarse con predicción previa <span class="citation" data-cites="gelman2013">(<a href="#/referencias" role="doc-biblioref" onclick="">Gelman et&nbsp;al. 2013</a>)</span>.</li>
+<li>Es un modelo con distribuciones previas distintas de la referencia: su distribución posterior no es la misma solución analítica. MCMC permite aproximarla.</li>
+<li>Son distribuciones previas amplias para esta escala: <span class="math inline">\(N(0,10^2)\)</span> para <span class="math inline">\(\mu\)</span> induce valores extremos de <span class="math inline">\(e^\mu\)</span> y la media Cauchy tiene cola pesada. Se conservan para comparar los algoritmos bajo el mismo modelo; deben evaluarse con la distribución predictiva previa <span class="citation" data-cites="gelman2013">(<a href="#/referencias" role="doc-biblioref" onclick="">Gelman et&nbsp;al. 2013</a>)</span>.</li>
 <li>Con 1.455 segmentos, comparamos los resúmenes con la referencia; su cercanía debe comprobarse y no se deduce solo del tamaño de los datos.</li>
 </ul>
 </section>
 <section id="solución-exacta-con-la-previa-de-referencia" class="slide level2">
-<h2>Solución exacta con la previa de referencia</h2>
+<h2>Solución exacta con la distribución previa de referencia</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a><span class="co"># Con la previa no informativa p(mu, sigma^2) proporcional a 1/sigma^2:</span></span>
-<span id="cb2-2"><a href=""></a><span class="co">#   mu | y ~ t_{n-1}(ybar, s^2/n)     sigma^2 | y ~ Inv-chi^2(n-1, s^2)</span></span>
-<span id="cb2-3"><a href=""></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(y); ybar <span class="ot">&lt;-</span> <span class="fu">mean</span>(y); s2 <span class="ot">&lt;-</span> <span class="fu">var</span>(y)</span>
-<span id="cb2-4"><a href=""></a>normal_exacta <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb2-5"><a href=""></a>  <span class="at">parametro =</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"sigma"</span>),</span>
-<span id="cb2-6"><a href=""></a>  <span class="at">media =</span> <span class="fu">c</span>(ybar, <span class="fu">sqrt</span>(s2) <span class="sc">*</span> <span class="fu">sqrt</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">lgamma</span>((n <span class="sc">-</span> <span class="dv">2</span>) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">-</span> <span class="fu">lgamma</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span>))),</span>
-<span id="cb2-7"><a href=""></a>  <span class="at">q2.5 =</span> <span class="fu">c</span>(ybar <span class="sc">+</span> <span class="fu">qt</span>(<span class="fl">0.025</span>, n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">sqrt</span>(s2 <span class="sc">/</span> n), <span class="fu">sqrt</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> s2 <span class="sc">/</span> <span class="fu">qchisq</span>(<span class="fl">0.975</span>, n <span class="sc">-</span> <span class="dv">1</span>))),</span>
-<span id="cb2-8"><a href=""></a>  <span class="at">q97.5 =</span> <span class="fu">c</span>(ybar <span class="sc">+</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">sqrt</span>(s2 <span class="sc">/</span> n), <span class="fu">sqrt</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> s2 <span class="sc">/</span> <span class="fu">qchisq</span>(<span class="fl">0.025</span>, n <span class="sc">-</span> <span class="dv">1</span>)))</span>
-<span id="cb2-9"><a href=""></a>)</span>
-<span id="cb2-10"><a href=""></a>normal_exacta</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="co"># Con la distribución previa no informativa p(mu, sigma^2) proporcional a 1/sigma^2:</span></span>
+<span id="cb1-2"><a href=""></a><span class="co">#   mu | y ~ t_{n-1}(ybar, s^2/n)     sigma^2 | y ~ Inv-chi^2(n-1, s^2)</span></span>
+<span id="cb1-3"><a href=""></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(y); ybar <span class="ot">&lt;-</span> <span class="fu">mean</span>(y); s2 <span class="ot">&lt;-</span> <span class="fu">var</span>(y)</span>
+<span id="cb1-4"><a href=""></a>normal_exacta <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb1-5"><a href=""></a>  <span class="at">parametro =</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"sigma"</span>),</span>
+<span id="cb1-6"><a href=""></a>  <span class="at">media =</span> <span class="fu">c</span>(ybar, <span class="fu">sqrt</span>(s2) <span class="sc">*</span> <span class="fu">sqrt</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">*</span> <span class="fu">exp</span>(<span class="fu">lgamma</span>((n <span class="sc">-</span> <span class="dv">2</span>) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">-</span> <span class="fu">lgamma</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span>))),</span>
+<span id="cb1-7"><a href=""></a>  <span class="at">q2.5 =</span> <span class="fu">c</span>(ybar <span class="sc">+</span> <span class="fu">qt</span>(<span class="fl">0.025</span>, n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">sqrt</span>(s2 <span class="sc">/</span> n), <span class="fu">sqrt</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> s2 <span class="sc">/</span> <span class="fu">qchisq</span>(<span class="fl">0.975</span>, n <span class="sc">-</span> <span class="dv">1</span>))),</span>
+<span id="cb1-8"><a href=""></a>  <span class="at">q97.5 =</span> <span class="fu">c</span>(ybar <span class="sc">+</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">sqrt</span>(s2 <span class="sc">/</span> n), <span class="fu">sqrt</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> s2 <span class="sc">/</span> <span class="fu">qchisq</span>(<span class="fl">0.025</span>, n <span class="sc">-</span> <span class="dv">1</span>)))</span>
+<span id="cb1-9"><a href=""></a>)</span>
+<span id="cb1-10"><a href=""></a>normal_exacta</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -455,43 +441,43 @@ p(\mu \mid \mathbf{y}) &amp;= \int_0^\infty p(\mu, \sigma^2 \mid \mathbf{y})\,d\
 <div class="column" style="width:50%;">
 <div class="cell" data-layout-align="center">
 <div class="cell-output cell-output-stdout">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb3-1"><a href=""></a><span class="co">// Modelo Normal con media y varianza desconocidas: log(personas por vivienda)</span></span>
-<span id="cb3-2"><a href=""></a><span class="kw">data</span> {</span>
-<span id="cb3-3"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n;</span>
-<span id="cb3-4"><a href=""></a>  <span class="dt">vector</span>[n] y;                 <span class="co">// log(delta_i)</span></span>
-<span id="cb3-5"><a href=""></a>}</span>
-<span id="cb3-6"><a href=""></a><span class="kw">parameters</span> {</span>
-<span id="cb3-7"><a href=""></a>  <span class="dt">real</span> mu;                     <span class="co">// media de log(delta)</span></span>
-<span id="cb3-8"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sigma;         <span class="co">// desviacion estandar de log(delta)</span></span>
-<span id="cb3-9"><a href=""></a>}</span>
-<span id="cb3-10"><a href=""></a><span class="kw">model</span> {</span>
-<span id="cb3-11"><a href=""></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">10</span>);          <span class="co">// previas debilmente informativas</span></span>
-<span id="cb3-12"><a href=""></a>  sigma ~ cauchy(<span class="dv">0</span>, <span class="fl">2.5</span>);      <span class="co">// media Cauchy positiva por la restriccion lower=0</span></span>
-<span id="cb3-13"><a href=""></a>  y ~ normal(mu, sigma);</span>
-<span id="cb3-14"><a href=""></a>}</span>
-<span id="cb3-15"><a href=""></a><span class="kw">generated quantities</span> {</span>
-<span id="cb3-16"><a href=""></a>  <span class="co">// Personas por vivienda en un segmento nuevo</span></span>
-<span id="cb3-17"><a href=""></a>  <span class="dt">real</span> delta_nuevo = exp(normal_rng(mu, sigma));</span>
-<span id="cb3-18"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb2-1"><a href=""></a><span class="co">// Modelo Normal con media y varianza desconocidas: log(personas por vivienda)</span></span>
+<span id="cb2-2"><a href=""></a><span class="kw">data</span> {</span>
+<span id="cb2-3"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; n;</span>
+<span id="cb2-4"><a href=""></a>  <span class="dt">vector</span>[n] y;                 <span class="co">// log(delta_i)</span></span>
+<span id="cb2-5"><a href=""></a>}</span>
+<span id="cb2-6"><a href=""></a><span class="kw">parameters</span> {</span>
+<span id="cb2-7"><a href=""></a>  <span class="dt">real</span> mu;                     <span class="co">// media de log(delta)</span></span>
+<span id="cb2-8"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sigma;         <span class="co">// desviacion estandar de log(delta)</span></span>
+<span id="cb2-9"><a href=""></a>}</span>
+<span id="cb2-10"><a href=""></a><span class="kw">model</span> {</span>
+<span id="cb2-11"><a href=""></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">10</span>);          <span class="co">// distribuciones previas débilmente informativas</span></span>
+<span id="cb2-12"><a href=""></a>  sigma ~ cauchy(<span class="dv">0</span>, <span class="fl">2.5</span>);      <span class="co">// media Cauchy positiva por la restriccion lower=0</span></span>
+<span id="cb2-13"><a href=""></a>  y ~ normal(mu, sigma);</span>
+<span id="cb2-14"><a href=""></a>}</span>
+<span id="cb2-15"><a href=""></a><span class="kw">generated quantities</span> {</span>
+<span id="cb2-16"><a href=""></a>  <span class="co">// Personas por vivienda en un segmento nuevo</span></span>
+<span id="cb2-17"><a href=""></a>  <span class="dt">real</span> delta_nuevo = exp(normal_rng(mu, sigma));</span>
+<span id="cb2-18"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>modelo_normal <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/normal_media_varianza.stan"</span>)</span>
-<span id="cb4-2"><a href=""></a></span>
-<span id="cb4-3"><a href=""></a>datos_normal <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">nrow</span>(aptos), <span class="at">y =</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta))</span>
-<span id="cb4-4"><a href=""></a></span>
-<span id="cb4-5"><a href=""></a>fit_normal <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
-<span id="cb4-6"><a href=""></a>  modelo_normal, <span class="at">data =</span> datos_normal,</span>
-<span id="cb4-7"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
-<span id="cb4-8"><a href=""></a>  <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
-<span id="cb4-9"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>modelo_normal <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/normal_media_varianza.stan"</span>)</span>
+<span id="cb3-2"><a href=""></a></span>
+<span id="cb3-3"><a href=""></a>datos_normal <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">nrow</span>(aptos), <span class="at">y =</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta))</span>
+<span id="cb3-4"><a href=""></a></span>
+<span id="cb3-5"><a href=""></a>fit_normal <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
+<span id="cb3-6"><a href=""></a>  modelo_normal, <span class="at">data =</span> datos_normal,</span>
+<span id="cb3-7"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb3-8"><a href=""></a>  <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="cb3-9"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>resumen_normal <span class="ot">&lt;-</span> <span class="fu">resumen_stan</span>(fit_normal, <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"sigma"</span>))</span>
-<span id="cb5-2"><a href=""></a>resumen_normal</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>resumen_normal <span class="ot">&lt;-</span> <span class="fu">resumen_stan</span>(fit_normal, <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"sigma"</span>))</span>
+<span id="cb4-2"><a href=""></a>resumen_normal</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="cell" data-layout-align="center">
+</div><div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
@@ -531,21 +517,13 @@ p(\mu \mid \mathbf{y}) &amp;= \int_0^\infty p(\mu, \sigma^2 \mid \mathbf{y})\,d\
 </table>
 </div>
 </div>
-</div></div>
+</div>
 </section>
 <section id="posterior-conjunta-y-marginales" class="slide level2">
-<h2>Posterior conjunta y marginales</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>draws_normal <span class="ot">&lt;-</span> <span class="fu">as_draws_df</span>(fit_normal)</span>
-<span id="cb6-2"><a href=""></a>grafico_conjunta <span class="ot">&lt;-</span> <span class="fu">mcmc_scatter</span>(fit_normal, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"sigma"</span>), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb6-3"><a href=""></a>  <span class="fu">mcmc_hist</span>(fit_normal, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"sigma"</span>)) <span class="sc">+</span></span>
-<span id="cb6-4"><a href=""></a>  <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">1.6</span>))</span>
-<span id="cb6-5"><a href=""></a><span class="fu">guardar_figura</span>(grafico_conjunta, <span class="st">"grafico_conjunta"</span>, <span class="at">alto =</span> <span class="dv">5</span>)</span>
-<span id="cb6-6"><a href=""></a><span class="fu">guardar_valor</span>(<span class="st">"cor_mu_sigma"</span>, <span class="fu">cor</span>(draws_normal<span class="sc">$</span>mu, draws_normal<span class="sc">$</span>sigma))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
+<h2>Distribución posterior conjunta y marginales</h2>
+<p>Correlación en la distribución posterior entre <span class="math inline">\(\mu\)</span> y <span class="math inline">\(\sigma\)</span>: -0,007. La independencia muestral de <span class="math inline">\(\bar y\)</span> y <span class="math inline">\(s^2\)</span> no implica independencia en la distribución posterior de <span class="math inline">\(\mu\)</span> y <span class="math inline">\(\sigma\)</span>. Incluso con la distribución previa de referencia, la varianza de <span class="math inline">\(\mu\mid\sigma^2,\mathbf y\)</span> depende de <span class="math inline">\(\sigma^2\)</span>. Una correlación cercana a cero no demuestra independencia.</p>
 
-<img data-src="resultados/grafico_conjunta.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%"><p>Correlación posterior entre <span class="math inline">\(\mu\)</span> y <span class="math inline">\(\sigma\)</span>: -0,007. La independencia muestral de <span class="math inline">\(\bar y\)</span> y <span class="math inline">\(s^2\)</span> no implica independencia posterior de <span class="math inline">\(\mu\)</span> y <span class="math inline">\(\sigma\)</span>. Incluso con la previa de referencia, la varianza de <span class="math inline">\(\mu\mid\sigma^2,\mathbf y\)</span> depende de <span class="math inline">\(\sigma^2\)</span>. Una correlación cercana a cero no demuestra independencia.</p>
-</section>
+<img data-src="resultados/grafico_conjunta.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%"></section>
 <section id="funciones-de-los-parámetros" class="slide level2">
 <h2>Funciones de los parámetros</h2>
 <p>Si <span class="math inline">\(\log\delta \sim N(\mu, \sigma^2)\)</span>, la <strong>mediana</strong> de <span class="math inline">\(\delta\)</span> es <span class="math inline">\(e^{\mu}\)</span> y la <strong>media</strong> es</p>
@@ -553,14 +531,6 @@ p(\mu \mid \mathbf{y}) &amp;= \int_0^\infty p(\mu, \sigma^2 \mid \mathbf{y})\,d\
 E(\delta) = E\big(e^{\log\delta}\big) = e^{\mu + \sigma^2/2},
 \]</span></p>
 <p>porque la función generadora de momentos de la Normal es <span class="math inline">\(E(e^{tX}) = e^{t\mu + t^2\sigma^2/2}\)</span>.</p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>tabla_funciones <span class="ot">&lt;-</span> draws_normal <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">mediana_delta =</span> <span class="fu">exp</span>(mu),</span>
-<span id="cb7-3"><a href=""></a>         <span class="at">media_delta =</span> <span class="fu">exp</span>(mu <span class="sc">+</span> sigma<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-4"><a href=""></a>  <span class="fu">select</span>(mediana_delta, media_delta, delta_nuevo) <span class="sc">%&gt;%</span></span>
-<span id="cb7-5"><a href=""></a>  <span class="fu">summarise_draws</span>(mean, sd, <span class="sc">~</span> <span class="fu">quantile</span>(.x, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)))</span>
-<span id="cb7-6"><a href=""></a>tabla_funciones</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
@@ -602,7 +572,7 @@ E(\delta) = E\big(e^{\log\delta}\big) = e^{\mu + \sigma^2/2},
 </section>
 <section id="predecir-un-segmento-frente-a-estimar-el-promedio" class="slide level2">
 <h2>Predecir un segmento frente a estimar el promedio</h2>
-<p>La predictiva de la densidad de un segmento nuevo es</p>
+<p>La distribución predictiva de la densidad de un segmento nuevo es</p>
 <p><span class="math display">\[
 p(\tilde\delta \mid \mathbf{y}) = \iint p(\tilde\delta \mid \mu, \sigma)\,p(\mu, \sigma \mid \mathbf{y})\,d\mu\,d\sigma,
 \qquad \tilde\delta^{(s)} = \exp\big(\mu^{(s)} + \sigma^{(s)}\varepsilon^{(s)}\big).
@@ -616,202 +586,10 @@ p(\tilde\delta \mid \mathbf{y}) = \iint p(\tilde\delta \mid \mu, \sigma)\,p(\mu,
 </div>
 </section>
 <section id="chequeo-predictivo-posterior" class="slide level2">
-<h2>Chequeo predictivo posterior</h2>
+<h2>Chequeo con la distribución predictiva posterior</h2>
 <p>¿Reproducen datos simulados con el modelo la distribución observada de <span class="math inline">\(\log\delta_i\)</span>?</p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb8-2"><a href=""></a>idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(draws_normal), <span class="dv">50</span>)</span>
-<span id="cb8-3"><a href=""></a>y_rep <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">sapply</span>(idx, <span class="cf">function</span>(s)</span>
-<span id="cb8-4"><a href=""></a>  <span class="fu">rnorm</span>(<span class="fu">nrow</span>(aptos), draws_normal<span class="sc">$</span>mu[s], draws_normal<span class="sc">$</span>sigma[s])))</span>
-<span id="cb8-5"><a href=""></a></span>
-<span id="cb8-6"><a href=""></a>grafico_ppc <span class="ot">&lt;-</span> <span class="fu">ppc_dens_overlay</span>(<span class="fu">log</span>(aptos<span class="sc">$</span>delta), y_rep) <span class="sc">+</span></span>
-<span id="cb8-7"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"log(personas por vivienda)"</span>)</span>
-<span id="cb8-8"><a href=""></a><span class="fu">guardar_figura</span>(grafico_ppc, <span class="st">"grafico_ppc"</span>, <span class="at">alto =</span> <span class="fl">4.6</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 
 <img data-src="resultados/grafico_ppc.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"><p>La superposición de densidades permite revisar el ajuste global; no basta para validar colas, subgrupos o patrones territoriales. La media y la varianza del modelo son <strong>las mismas para todos los segmentos</strong>. El día 2 se agregan covariables: <span class="math inline">\(\mu_i = \mathbf{x}_i^\top\boldsymbol\beta\)</span>.</p>
-</section></section>
-<section>
-<section id="modelo-multinomialdirichlet" class="title-slide slide level1 center">
-<h1>Modelo Multinomial–Dirichlet</h1>
-
-</section>
-<section id="planteamiento-1" class="slide level2">
-<h2>Planteamiento</h2>
-<p><strong>Pregunta didáctica:</strong> ¿cómo aprender sobre las probabilidades de tres clases de cobertura para segmentos comparables?</p>
-<p>Las proporciones del conjunto observado se conocen al contar sus categorías. La posterior describe los parámetros del modelo multinomial, no incertidumbre sobre esos porcentajes descriptivos.</p>
-<p>Con <span class="math inline">\(\mathbf{y} = (y_1, y_2, y_3)\)</span> los segmentos de cada clase, <span class="math inline">\(n = \sum_k y_k\)</span>, y <span class="math inline">\(\boldsymbol\theta = (\theta_1, \theta_2, \theta_3)\)</span> sus proporciones con <span class="math inline">\(\sum_k \theta_k = 1\)</span>:</p>
-<p><span class="math display">\[
-p(\mathbf{y} \mid \boldsymbol\theta) = \frac{n!}{y_1!\,y_2!\,y_3!}\,\theta_1^{y_1}\theta_2^{y_2}\theta_3^{y_3}.
-\]</span></p>
-<p>La previa <strong>Dirichlet</strong> extiende la Beta a <span class="math inline">\(K\)</span> categorías:</p>
-<p><span class="math display">\[
-p(\boldsymbol\theta) = \frac{\Gamma\big(\sum_k \alpha_k\big)}{\prod_k \Gamma(\alpha_k)}\prod_{k=1}^K \theta_k^{\alpha_k - 1},
-\qquad
-E(\theta_k) = \frac{\alpha_k}{\alpha_0}, \quad \alpha_0 = \sum_k \alpha_k.
-\]</span></p>
-</section>
-<section id="derivación-de-la-posterior" class="slide level2">
-<h2>Derivación de la posterior</h2>
-<p><span class="math display">\[
-p(\boldsymbol\theta \mid \mathbf{y}) \propto \prod_{k=1}^K \theta_k^{y_k}\cdot\prod_{k=1}^K \theta_k^{\alpha_k - 1} = \prod_{k=1}^K \theta_k^{(\alpha_k + y_k) - 1},
-\]</span></p>
-<p>así que</p>
-<p><span class="math display">\[
-\boldsymbol\theta \mid \mathbf{y} \sim \text{Dirichlet}(\alpha_1 + y_1, \dots, \alpha_K + y_K),
-\]</span></p>
-<p>con marginales Beta:</p>
-<p><span class="math display">\[
-\theta_k \mid \mathbf{y} \sim \text{Beta}\big(\alpha_k + y_k,\ \alpha_0 + n - \alpha_k - y_k\big),
-\qquad
-\text{Cov}(\theta_j, \theta_k \mid \mathbf{y}) = -\frac{\alpha'_j\alpha'_k}{\alpha_0'^2(\alpha_0' + 1)} &lt; 0.
-\]</span></p>
-</section>
-<section id="ajuste-en-stan" class="slide level2">
-<h2>Ajuste en Stan</h2>
-<div class="columns">
-<div class="column" style="width:45%;">
-<div class="cell" data-layout-align="center">
-<div class="cell-output cell-output-stdout">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb9-1"><a href=""></a><span class="co">// Modelo Multinomial-Dirichlet: distribucion de segmentos por cobertura</span></span>
-<span id="cb9-2"><a href=""></a><span class="kw">data</span> {</span>
-<span id="cb9-3"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; K;              <span class="co">// numero de categorias</span></span>
-<span id="cb9-4"><a href=""></a>  <span class="dt">array</span>[K] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; y;     <span class="co">// segmentos en cada categoria</span></span>
-<span id="cb9-5"><a href=""></a>  <span class="dt">vector</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt;[K] alpha;    <span class="co">// previa Dirichlet(alpha)</span></span>
-<span id="cb9-6"><a href=""></a>}</span>
-<span id="cb9-7"><a href=""></a><span class="kw">parameters</span> {</span>
-<span id="cb9-8"><a href=""></a>  <span class="dt">simplex</span>[K] theta;            <span class="co">// proporciones: positivas y suman 1</span></span>
-<span id="cb9-9"><a href=""></a>}</span>
-<span id="cb9-10"><a href=""></a><span class="kw">model</span> {</span>
-<span id="cb9-11"><a href=""></a>  theta ~ dirichlet(alpha);</span>
-<span id="cb9-12"><a href=""></a>  y ~ multinomial(theta);</span>
-<span id="cb9-13"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</div>
-<p><code>simplex[K]</code> declara un vector de proporciones: positivas y que suman 1.</p>
-</div><div class="column" style="width:55%;">
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>conteos <span class="ot">&lt;-</span> <span class="fu">table</span>(segmentos<span class="sc">$</span>clasificacion_cobertura)</span>
-<span id="cb10-2"><a href=""></a></span>
-<span id="cb10-3"><a href=""></a>modelo_multi <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/multinomial_dirichlet.stan"</span>)</span>
-<span id="cb10-4"><a href=""></a>fit_multi <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
-<span id="cb10-5"><a href=""></a>  modelo_multi,</span>
-<span id="cb10-6"><a href=""></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">K =</span> <span class="fu">length</span>(conteos), <span class="at">y =</span> <span class="fu">as.integer</span>(conteos),</span>
-<span id="cb10-7"><a href=""></a>              <span class="at">alpha =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(conteos))),</span>
-<span id="cb10-8"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
-<span id="cb10-9"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</div></div>
-</section>
-<section id="stan-frente-a-la-solución-exacta" class="slide level2">
-<h2>Stan frente a la solución exacta</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>alpha_post <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">as.integer</span>(conteos)</span>
-<span id="cb11-2"><a href=""></a>resumen_multi <span class="ot">&lt;-</span> <span class="fu">resumen_stan</span>(fit_multi, <span class="st">"theta"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">categoria =</span> <span class="fu">names</span>(conteos),</span>
-<span id="cb11-4"><a href=""></a>         <span class="at">media_exacta =</span> alpha_post <span class="sc">/</span> <span class="fu">sum</span>(alpha_post),</span>
-<span id="cb11-5"><a href=""></a>         <span class="at">desv_exacta =</span> <span class="fu">sqrt</span>(media_exacta <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> media_exacta) <span class="sc">/</span> (<span class="fu">sum</span>(alpha_post) <span class="sc">+</span> <span class="dv">1</span>)),</span>
-<span id="cb11-6"><a href=""></a>         <span class="at">.after =</span> parametro) <span class="sc">%&gt;%</span></span>
-<span id="cb11-7"><a href=""></a>  <span class="fu">select</span>(parametro, categoria, media, media_exacta, desv_est, desv_exacta, Rhat)</span>
-<span id="cb11-8"><a href=""></a>resumen_multi</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">parametro</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">categoria</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">media</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">media_exacta</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">desv_est</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">desv_exacta</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Rhat</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">theta[1]</td>
-<td style="text-align: left;">Completa</td>
-<td style="text-align: right;">0,4391</td>
-<td style="text-align: right;">0,4387</td>
-<td style="text-align: right;">0,0111</td>
-<td style="text-align: right;">0,0109</td>
-<td style="text-align: right;">1,0021</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">theta[2]</td>
-<td style="text-align: left;">Parcial</td>
-<td style="text-align: right;">0,3628</td>
-<td style="text-align: right;">0,3630</td>
-<td style="text-align: right;">0,0108</td>
-<td style="text-align: right;">0,0105</td>
-<td style="text-align: right;">1,0007</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">theta[3]</td>
-<td style="text-align: left;">Incompleta</td>
-<td style="text-align: right;">0,1982</td>
-<td style="text-align: right;">0,1983</td>
-<td style="text-align: right;">0,0087</td>
-<td style="text-align: right;">0,0087</td>
-<td style="text-align: right;">1,0006</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</section>
-<section id="las-proporciones-están-correlacionadas" class="slide level2">
-<h2>Las proporciones están correlacionadas</h2>
-<p>Como suman 1, si una proporción sube otra debe bajar: la posterior conjunta tiene <strong>correlación negativa</strong>.</p>
-<div class="columns">
-<div class="column" style="width:65%;">
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="resultados/grafico_pares.png" class="quarto-figure quarto-figure-center" style="width:92.0%"></p>
-</figure>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:35%;">
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">categoria</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Completa</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Parcial</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Incompleta</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Completa</td>
-<td style="text-align: right;">1,00</td>
-<td style="text-align: right;">-0,69</td>
-<td style="text-align: right;">-0,42</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Parcial</td>
-<td style="text-align: right;">-0,69</td>
-<td style="text-align: right;">1,00</td>
-<td style="text-align: right;">-0,37</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Incompleta</td>
-<td style="text-align: right;">-0,42</td>
-<td style="text-align: right;">-0,37</td>
-<td style="text-align: right;">1,00</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div></div>
 </section></section>
 <section>
 <section id="métodos-mcmc" class="title-slide slide level1 center">
@@ -821,11 +599,11 @@ p(\boldsymbol\theta \mid \mathbf{y}) \propto \prod_{k=1}^K \theta_k^{y_k}\cdot\p
 <section id="por-qué-simular" class="slide level2">
 <h2>¿Por qué simular?</h2>
 <ul>
-<li>En los modelos conjugados la posterior tiene forma conocida. En el modelo de población <strong>no</strong>: tiene miles de parámetros y ninguna forma cerrada.</li>
+<li>En los modelos conjugados la distribución posterior tiene forma conocida. En el modelo de población <strong>no</strong>: tiene miles de parámetros y ninguna forma cerrada.</li>
 <li>Calcular <span class="math inline">\(p(\mathbf{Y}) = \int p(\mathbf{Y} \mid \boldsymbol\theta)p(\boldsymbol\theta)\,d\boldsymbol\theta\)</span> en miles de dimensiones es inviable numéricamente.</li>
-<li>Los métodos de <strong>Monte Carlo por cadenas de Markov</strong> (MCMC) generan <span class="math inline">\(\boldsymbol\theta^{(1)}, \boldsymbol\theta^{(2)}, \dots\)</span> cuya distribución converge a la posterior, <strong>sin conocer</strong> <span class="math inline">\(p(\mathbf{Y})\)</span>.</li>
+<li>Los métodos de <strong>Monte Carlo por cadenas de Markov</strong> (MCMC) generan <span class="math inline">\(\boldsymbol\theta^{(1)}, \boldsymbol\theta^{(2)}, \dots\)</span> cuya distribución converge a la distribución posterior, <strong>sin conocer</strong> <span class="math inline">\(p(\mathbf{Y})\)</span>.</li>
 </ul>
-<p>Con <span class="math inline">\(S\)</span> draws, cualquier esperanza posterior se aproxima con un promedio:</p>
+<p>Con <span class="math inline">\(S\)</span> réplicas, cualquier esperanza bajo la distribución posterior se aproxima con un promedio:</p>
 <p><span class="math display">\[
 E\big[g(\boldsymbol\theta) \mid \mathbf{Y}\big] \approx \frac{1}{S}\sum_{s=1}^S g\big(\boldsymbol\theta^{(s)}\big).
 \]</span></p>
@@ -862,49 +640,49 @@ E\big[g(\boldsymbol\theta) \mid \mathbf{Y}\big] \approx \frac{1}{S}\sum_{s=1}^S 
 </section>
 <section id="metropolis-a-mano-para-mu-sigma" class="slide level2">
 <h2>Metropolis a mano para <span class="math inline">\((\mu, \sigma)\)</span></h2>
-<p>Se muestrea <span class="math inline">\((\mu, \log\sigma)\)</span> en <span class="math inline">\(\mathbb{R}^2\)</span>. El cambio de variable <span class="math inline">\(\sigma = e^{u}\)</span> agrega el <strong>jacobiano</strong> <span class="math inline">\(\lvert d\sigma/du\rvert = e^{u}\)</span>, es decir, usando una <span class="math inline">\(t\)</span> con localización y <strong>escala al cuadrado</strong> como segundo argumento, <span class="math inline">\(+\log\sigma\)</span> en la log-posterior:</p>
+<p>Se muestrea <span class="math inline">\((\mu, \log\sigma)\)</span> en <span class="math inline">\(\mathbb{R}^2\)</span>. El cambio de variable <span class="math inline">\(\sigma = e^{u}\)</span> agrega el <strong>jacobiano</strong> <span class="math inline">\(\lvert d\sigma/du\rvert = e^{u}\)</span>, es decir, usando una <span class="math inline">\(t\)</span> con localización y <strong>escala al cuadrado</strong> como segundo argumento, <span class="math inline">\(+\log\sigma\)</span> en el logaritmo de la distribución posterior:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>log_posterior <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, log_sigma) {</span>
-<span id="cb12-2"><a href=""></a>  sigma <span class="ot">&lt;-</span> <span class="fu">exp</span>(log_sigma)</span>
-<span id="cb12-3"><a href=""></a>  <span class="fu">sum</span>(<span class="fu">dnorm</span>(y, mu, sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span>             <span class="co"># verosimilitud</span></span>
-<span id="cb12-4"><a href=""></a>    <span class="fu">dnorm</span>(mu, <span class="dv">0</span>, <span class="dv">10</span>, <span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">+</span>                    <span class="co"># previa de mu</span></span>
-<span id="cb12-5"><a href=""></a>    <span class="fu">log</span>(<span class="dv">2</span>) <span class="sc">+</span> <span class="fu">dcauchy</span>(sigma, <span class="dv">0</span>, <span class="fl">2.5</span>, <span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> log_sigma       <span class="co"># previa de sigma + jacobiano</span></span>
-<span id="cb12-6"><a href=""></a>}</span>
-<span id="cb12-7"><a href=""></a></span>
-<span id="cb12-8"><a href=""></a>metropolis <span class="ot">&lt;-</span> <span class="cf">function</span>(inicio, <span class="at">n_iter =</span> <span class="dv">3000</span>, <span class="at">paso =</span> <span class="fl">0.01</span>) {</span>
-<span id="cb12-9"><a href=""></a>  cadena <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, n_iter, <span class="dv">2</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"log_sigma"</span>)))</span>
-<span id="cb12-10"><a href=""></a>  accepted <span class="ot">&lt;-</span> <span class="fu">logical</span>(n_iter)</span>
-<span id="cb12-11"><a href=""></a>  actual <span class="ot">&lt;-</span> inicio</span>
-<span id="cb12-12"><a href=""></a>  lp_actual <span class="ot">&lt;-</span> <span class="fu">log_posterior</span>(actual[<span class="dv">1</span>], actual[<span class="dv">2</span>])</span>
-<span id="cb12-13"><a href=""></a>  <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_iter) {</span>
-<span id="cb12-14"><a href=""></a>    propuesta <span class="ot">&lt;-</span> actual <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">2</span>, <span class="dv">0</span>, paso)</span>
-<span id="cb12-15"><a href=""></a>    lp_prop <span class="ot">&lt;-</span> <span class="fu">log_posterior</span>(propuesta[<span class="dv">1</span>], propuesta[<span class="dv">2</span>])</span>
-<span id="cb12-16"><a href=""></a>    <span class="cf">if</span> (<span class="fu">is.finite</span>(lp_prop) <span class="sc">&amp;&amp;</span> <span class="fu">log</span>(<span class="fu">runif</span>(<span class="dv">1</span>)) <span class="sc">&lt;</span> lp_prop <span class="sc">-</span> lp_actual) {</span>
-<span id="cb12-17"><a href=""></a>      actual <span class="ot">&lt;-</span> propuesta; lp_actual <span class="ot">&lt;-</span> lp_prop; accepted[t] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb12-18"><a href=""></a>    }</span>
-<span id="cb12-19"><a href=""></a>    cadena[t, ] <span class="ot">&lt;-</span> actual</span>
-<span id="cb12-20"><a href=""></a>  }</span>
-<span id="cb12-21"><a href=""></a>  <span class="fu">attr</span>(cadena, <span class="st">"accepted"</span>) <span class="ot">&lt;-</span> accepted</span>
-<span id="cb12-22"><a href=""></a>  cadena</span>
-<span id="cb12-23"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>log_posterior <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, log_sigma) {</span>
+<span id="cb5-2"><a href=""></a>  sigma <span class="ot">&lt;-</span> <span class="fu">exp</span>(log_sigma)</span>
+<span id="cb5-3"><a href=""></a>  <span class="fu">sum</span>(<span class="fu">dnorm</span>(y, mu, sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span>             <span class="co"># verosimilitud</span></span>
+<span id="cb5-4"><a href=""></a>    <span class="fu">dnorm</span>(mu, <span class="dv">0</span>, <span class="dv">10</span>, <span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">+</span>                    <span class="co"># distribución previa de mu</span></span>
+<span id="cb5-5"><a href=""></a>    <span class="fu">log</span>(<span class="dv">2</span>) <span class="sc">+</span> <span class="fu">dcauchy</span>(sigma, <span class="dv">0</span>, <span class="fl">2.5</span>, <span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> log_sigma       <span class="co"># distribución previa de sigma + jacobiano</span></span>
+<span id="cb5-6"><a href=""></a>}</span>
+<span id="cb5-7"><a href=""></a></span>
+<span id="cb5-8"><a href=""></a>metropolis <span class="ot">&lt;-</span> <span class="cf">function</span>(inicio, <span class="at">n_iter =</span> <span class="dv">3000</span>, <span class="at">paso =</span> <span class="fl">0.01</span>) {</span>
+<span id="cb5-9"><a href=""></a>  cadena <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, n_iter, <span class="dv">2</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"log_sigma"</span>)))</span>
+<span id="cb5-10"><a href=""></a>  accepted <span class="ot">&lt;-</span> <span class="fu">logical</span>(n_iter)</span>
+<span id="cb5-11"><a href=""></a>  actual <span class="ot">&lt;-</span> inicio</span>
+<span id="cb5-12"><a href=""></a>  lp_actual <span class="ot">&lt;-</span> <span class="fu">log_posterior</span>(actual[<span class="dv">1</span>], actual[<span class="dv">2</span>])</span>
+<span id="cb5-13"><a href=""></a>  <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_iter) {</span>
+<span id="cb5-14"><a href=""></a>    propuesta <span class="ot">&lt;-</span> actual <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">2</span>, <span class="dv">0</span>, paso)</span>
+<span id="cb5-15"><a href=""></a>    lp_prop <span class="ot">&lt;-</span> <span class="fu">log_posterior</span>(propuesta[<span class="dv">1</span>], propuesta[<span class="dv">2</span>])</span>
+<span id="cb5-16"><a href=""></a>    <span class="cf">if</span> (<span class="fu">is.finite</span>(lp_prop) <span class="sc">&amp;&amp;</span> <span class="fu">log</span>(<span class="fu">runif</span>(<span class="dv">1</span>)) <span class="sc">&lt;</span> lp_prop <span class="sc">-</span> lp_actual) {</span>
+<span id="cb5-17"><a href=""></a>      actual <span class="ot">&lt;-</span> propuesta; lp_actual <span class="ot">&lt;-</span> lp_prop; accepted[t] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb5-18"><a href=""></a>    }</span>
+<span id="cb5-19"><a href=""></a>    cadena[t, ] <span class="ot">&lt;-</span> actual</span>
+<span id="cb5-20"><a href=""></a>  }</span>
+<span id="cb5-21"><a href=""></a>  <span class="fu">attr</span>(cadena, <span class="st">"accepted"</span>) <span class="ot">&lt;-</span> accepted</span>
+<span id="cb5-22"><a href=""></a>  cadena</span>
+<span id="cb5-23"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="cuatro-cadenas-desde-puntos-distintos" class="slide level2">
 <h2>Cuatro cadenas desde puntos distintos</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb13-2"><a href=""></a>inicios <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="fu">log</span>(<span class="fl">0.05</span>)), <span class="fu">c</span>(<span class="dv">2</span>, <span class="fu">log</span>(<span class="dv">1</span>)), <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">log</span>(<span class="fl">0.5</span>)), <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fu">log</span>(<span class="fl">0.1</span>)))</span>
-<span id="cb13-3"><a href=""></a>cadenas <span class="ot">&lt;-</span> <span class="fu">map</span>(inicios, metropolis)</span>
-<span id="cb13-4"><a href=""></a></span>
-<span id="cb13-5"><a href=""></a>grafico_cadenas <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">seq_along</span>(cadenas), <span class="sc">~</span> <span class="fu">tibble</span>(<span class="at">cadena =</span> <span class="fu">factor</span>(.x), <span class="at">iteracion =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3000</span>,</span>
-<span id="cb13-6"><a href=""></a>                                                        <span class="at">mu =</span> cadenas[[.x]][, <span class="st">"mu"</span>],</span>
-<span id="cb13-7"><a href=""></a>                                                        <span class="at">sigma =</span> <span class="fu">exp</span>(cadenas[[.x]][, <span class="st">"log_sigma"</span>]))) <span class="sc">%&gt;%</span></span>
-<span id="cb13-8"><a href=""></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(mu, sigma)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-9"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(iteracion, value, <span class="at">colour =</span> cadena)) <span class="sc">+</span></span>
-<span id="cb13-10"><a href=""></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb13-11"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> name, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb13-12"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Iteración"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">colour =</span> <span class="st">"Cadena"</span>)</span>
-<span id="cb13-13"><a href=""></a><span class="fu">guardar_figura</span>(grafico_cadenas, <span class="st">"grafico_cadenas"</span>, <span class="at">alto =</span> <span class="fl">4.8</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb6-2"><a href=""></a>inicios <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="fu">log</span>(<span class="fl">0.05</span>)), <span class="fu">c</span>(<span class="dv">2</span>, <span class="fu">log</span>(<span class="dv">1</span>)), <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">log</span>(<span class="fl">0.5</span>)), <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fu">log</span>(<span class="fl">0.1</span>)))</span>
+<span id="cb6-3"><a href=""></a>cadenas <span class="ot">&lt;-</span> <span class="fu">map</span>(inicios, metropolis)</span>
+<span id="cb6-4"><a href=""></a></span>
+<span id="cb6-5"><a href=""></a>grafico_cadenas <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">seq_along</span>(cadenas), <span class="sc">~</span> <span class="fu">tibble</span>(<span class="at">cadena =</span> <span class="fu">factor</span>(.x), <span class="at">iteracion =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3000</span>,</span>
+<span id="cb6-6"><a href=""></a>                                                        <span class="at">mu =</span> cadenas[[.x]][, <span class="st">"mu"</span>],</span>
+<span id="cb6-7"><a href=""></a>                                                        <span class="at">sigma =</span> <span class="fu">exp</span>(cadenas[[.x]][, <span class="st">"log_sigma"</span>]))) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href=""></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(mu, sigma)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-9"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(iteracion, value, <span class="at">colour =</span> cadena)) <span class="sc">+</span></span>
+<span id="cb6-10"><a href=""></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb6-11"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> name, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb6-12"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Iteración"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">colour =</span> <span class="st">"Cadena"</span>)</span>
+<span id="cb6-13"><a href=""></a><span class="fu">guardar_figura</span>(grafico_cadenas, <span class="st">"grafico_cadenas"</span>, <span class="at">alto =</span> <span class="fl">4.8</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 <img data-src="resultados/grafico_cadenas.png" class="quarto-figure quarto-figure-center r-stretch" style="width:85.0%"><p>Las primeras 1.000 iteraciones se descartan como calentamiento en este ejercicio. Descartar iteraciones no garantiza convergencia: hay que revisar las cadenas retenidas. En Stan el calentamiento incluye además adaptación del algoritmo.</p>
@@ -912,19 +690,6 @@ E\big[g(\boldsymbol\theta) \mid \mathbf{Y}\big] \approx \frac{1}{S}\sum_{s=1}^S 
 <section id="convergieron-las-cadenas" class="slide level2">
 <h2>¿Convergieron las cadenas?</h2>
 <p>Con las iteraciones 1.001 a 3.000 de cada cadena:</p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a>post <span class="ot">&lt;-</span> <span class="fu">map</span>(cadenas, <span class="sc">~</span> .x[<span class="dv">1001</span><span class="sc">:</span><span class="dv">3000</span>, ])</span>
-<span id="cb14-2"><a href=""></a>arreglo <span class="ot">&lt;-</span> <span class="fu">simplify2array</span>(post) <span class="sc">%&gt;%</span> <span class="fu">aperm</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">2</span>))   <span class="co"># iteracion x cadena x parametro</span></span>
-<span id="cb14-3"><a href=""></a></span>
-<span id="cb14-4"><a href=""></a>diagnostico_metropolis <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb14-5"><a href=""></a>  <span class="at">parametro =</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"log_sigma"</span>),</span>
-<span id="cb14-6"><a href=""></a>  <span class="at">Rhat =</span> <span class="fu">c</span>(<span class="fu">rhat</span>(arreglo[, , <span class="dv">1</span>]), <span class="fu">rhat</span>(arreglo[, , <span class="dv">2</span>])),</span>
-<span id="cb14-7"><a href=""></a>  <span class="at">ESS_bulk =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">ess_bulk</span>(arreglo[, , <span class="dv">1</span>]), <span class="fu">ess_bulk</span>(arreglo[, , <span class="dv">2</span>]))),</span>
-<span id="cb14-8"><a href=""></a>  <span class="at">ESS_tail =</span> <span class="fu">round</span>(<span class="fu">c</span>(posterior<span class="sc">::</span><span class="fu">ess_tail</span>(arreglo[, , <span class="dv">1</span>]), posterior<span class="sc">::</span><span class="fu">ess_tail</span>(arreglo[, , <span class="dv">2</span>]))),</span>
-<span id="cb14-9"><a href=""></a>  <span class="at">tasa_aceptacion =</span> <span class="fu">mean</span>(<span class="fu">unlist</span>(<span class="fu">map</span>(cadenas, <span class="sc">~</span> <span class="fu">attr</span>(.x, <span class="st">"accepted"</span>)[<span class="dv">1001</span><span class="sc">:</span><span class="dv">3000</span>])))</span>
-<span id="cb14-10"><a href=""></a>)</span>
-<span id="cb14-11"><a href=""></a>diagnostico_metropolis</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
@@ -957,61 +722,41 @@ E\big[g(\boldsymbol\theta) \mid \mathbf{Y}\big] \approx \frac{1}{S}\sum_{s=1}^S 
 </div>
 </div>
 <ul>
-<li><span class="math inline">\(\hat R\)</span> <span class="citation" data-cites="vehtari2021">(<a href="#/referencias" role="doc-biblioref" onclick="">Vehtari et&nbsp;al. 2021</a>)</span> detecta discrepancias entre cadenas; un valor cercano a 1 es necesario como diagnóstico práctico, pero no prueba que se haya explorado toda la posterior.</li>
-<li>El <strong>tamaño efectivo de muestra</strong> (ESS) descuenta la autocorrelación de los draws.</li>
+<li><span class="math inline">\(\hat R\)</span> <span class="citation" data-cites="vehtari2021">(<a href="#/referencias" role="doc-biblioref" onclick="">Vehtari et&nbsp;al. 2021</a>)</span> detecta discrepancias entre cadenas; un valor cercano a 1 es necesario como diagnóstico práctico, pero no prueba que se haya explorado toda la distribución posterior.</li>
+<li><strong>ESS_bulk.</strong> ¿Tenemos suficientes réplicas efectivas para estimar valores típicos del parámetro, como su mediana?</li>
+<li><strong>ESS_tail.</strong> ¿Tenemos suficientes réplicas efectivas para estimar los percentiles 5 y 95? La columna muestra el menor de los dos ESS.</li>
 </ul>
+<p><strong>Qué nos dice esta tabla.</strong> Con 400 como referencia, <code>mu</code> supera el umbral en ambas columnas. Para <code>log_sigma</code>, el centro queda corto (362) y los extremos superan la referencia (551). Conviene mejorar el muestreo de <code>log_sigma</code> antes de usar estas cadenas para la inferencia final.</p>
 </section>
 <section id="lo-que-muestra-el-diagnóstico-de-metropolis" class="slide level2">
 <h2>Lo que muestra el diagnóstico de Metropolis</h2>
-<div class="caja">
 <p>En esta ejecución, R-hat de <code>log_sigma</code> es 1,012: supera el criterio de 1,01. El ejemplo muestra que un resultado aceptable para <code>mu</code> no garantiza buena exploración de todos los parámetros. Antes de usar estas cadenas para inferencia final, habría que mejorar la exploración y volver a comprobar los diagnósticos.</p>
-</div>
 </section>
 <section id="hat-r-y-ess-intuición-y-cálculo" class="slide level2">
 <h2><span class="math inline">\(\hat R\)</span> y ESS: intuición y cálculo</h2>
-<p>La siguiente fórmula clásica ilustra la comparación entre y dentro de cadenas. Con <span class="math inline">\(M\)</span> cadenas de <span class="math inline">\(N\)</span> draws, <span class="math inline">\(\bar\theta_{\cdot m}\)</span> la media de la cadena <span class="math inline">\(m\)</span> y <span class="math inline">\(\bar\theta_{\cdot\cdot}\)</span> la media global:</p>
+<p>La siguiente fórmula clásica ilustra la comparación entre y dentro de cadenas. Con <span class="math inline">\(M\)</span> cadenas de <span class="math inline">\(N\)</span> réplicas, <span class="math inline">\(\bar\theta_{\cdot m}\)</span> la media de la cadena <span class="math inline">\(m\)</span> y <span class="math inline">\(\bar\theta_{\cdot\cdot}\)</span> la media global:</p>
 <p><span class="math display">\[
 B = \frac{N}{M-1}\sum_{m=1}^M(\bar\theta_{\cdot m} - \bar\theta_{\cdot\cdot})^2, \qquad
-W = \frac{1}{M}\sum_{m=1}^M s_m^2, \qquad
-\hat R = \sqrt{\frac{\frac{N-1}{N}W + \frac{1}{N}B}{W}}.
+W = \frac{1}{M}\sum_{m=1}^M s_m^2, \qquad \hat R = \sqrt{\frac{\frac{N-1}{N}W + \frac{1}{N}B}{W}} \qquad \text{ESS} = \frac{MN}{1 + 2\sum_{t=1}^{\infty}\rho_t},
 \]</span></p>
-<p><span class="math display">\[
-\text{ESS} = \frac{MN}{1 + 2\sum_{t=1}^{\infty}\rho_t},
-\]</span></p>
-<p>con <span class="math inline">\(\rho_t\)</span> la autocorrelación a distancia <span class="math inline">\(t\)</span>. El código usa <code>posterior::rhat</code>, con división de cadenas, normalización por rangos y plegado, y distingue <strong>ESS_bulk</strong> y <strong>ESS_tail</strong> <span class="citation" data-cites="vehtari2021">(<a href="#/referencias" role="doc-biblioref" onclick="">Vehtari et&nbsp;al. 2021</a>)</span>.</p>
-<p>Como guía para cuatro cadenas: <span class="math inline">\(\hat R &lt; 1{,}01\)</span> y ESS_bulk y ESS_tail de al menos 400. Revise también trazas, error Monte Carlo y, en NUTS, divergencias y profundidad del árbol. Estos criterios evalúan el muestreo, no la validez del modelo.</p>
-</section>
-<section id="autocorrelación-metropolis-frente-a-stan" class="slide level2">
-<h2>Autocorrelación: Metropolis frente a Stan</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>acf_datos <span class="ot">&lt;-</span> <span class="cf">function</span>(x, nombre) {</span>
-<span id="cb15-2"><a href=""></a>  a <span class="ot">&lt;-</span> <span class="fu">acf</span>(x, <span class="at">lag.max =</span> <span class="dv">60</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb15-3"><a href=""></a>  <span class="fu">tibble</span>(<span class="at">algoritmo =</span> nombre, <span class="at">rezago =</span> <span class="fu">drop</span>(a<span class="sc">$</span>lag), <span class="at">autocorrelacion =</span> <span class="fu">drop</span>(a<span class="sc">$</span>acf))</span>
-<span id="cb15-4"><a href=""></a>}</span>
-<span id="cb15-5"><a href=""></a>mu_stan <span class="ot">&lt;-</span> <span class="fu">as.array</span>(fit_normal)[, <span class="dv">1</span>, <span class="st">"mu"</span>]</span>
-<span id="cb15-6"><a href=""></a>grafico_acf <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">acf_datos</span>(arreglo[, <span class="dv">1</span>, <span class="dv">1</span>], <span class="st">"Metropolis"</span>),</span>
-<span id="cb15-7"><a href=""></a>                         <span class="fu">acf_datos</span>(mu_stan, <span class="st">"Stan (NUTS)"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-8"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(rezago, autocorrelacion, <span class="at">fill =</span> algoritmo)) <span class="sc">+</span></span>
-<span id="cb15-9"><a href=""></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb15-10"><a href=""></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#c55a11"</span>, <span class="st">"#1f4e79"</span>)) <span class="sc">+</span></span>
-<span id="cb15-11"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Rezago"</span>, <span class="at">y =</span> <span class="st">"Autocorrelación de mu"</span>, <span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb15-12"><a href=""></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
-<span id="cb15-13"><a href=""></a><span class="fu">guardar_figura</span>(grafico_acf, <span class="st">"grafico_acf"</span>, <span class="at">alto =</span> <span class="fl">4.5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="caja">
+<p><strong>Guía para cuatro cadenas</strong></p>
+<p><strong><span class="math inline">\(\hat R &lt; 1,01\)</span></strong>, <strong>ESS_bulk ≥ 400</strong> y <strong>ESS_tail ≥ 400</strong>.</p>
+<p>Revise también las trazas, el error Monte Carlo y, en NUTS, las divergencias y la profundidad del árbol. Estos criterios evalúan el muestreo. La validez del modelo se evalúa por separado.</p>
 </div>
-
-<img data-src="resultados/grafico_acf.png" class="quarto-figure quarto-figure-center r-stretch" style="width:80.0%"></section>
+</section>
 <section id="el-tamaño-del-paso" class="slide level2">
 <h2>El tamaño del paso</h2>
 <p>Pasos pequeños se aceptan casi siempre pero avanzan poco; pasos grandes avanzan mucho pero se rechazan casi siempre:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
-<span id="cb16-2"><a href=""></a>experimento_paso <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">c</span>(<span class="fl">0.001</span>, <span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.03</span>, <span class="fl">0.1</span>), <span class="cf">function</span>(p) {</span>
-<span id="cb16-3"><a href=""></a>  cs <span class="ot">&lt;-</span> <span class="fu">map</span>(inicios, metropolis, <span class="at">paso =</span> p)</span>
-<span id="cb16-4"><a href=""></a>  arr <span class="ot">&lt;-</span> <span class="fu">simplify2array</span>(<span class="fu">map</span>(cs, <span class="sc">~</span> .x[<span class="dv">1001</span><span class="sc">:</span><span class="dv">3000</span>, ])) <span class="sc">%&gt;%</span> <span class="fu">aperm</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">2</span>))</span>
-<span id="cb16-5"><a href=""></a>  <span class="fu">tibble</span>(<span class="at">paso =</span> p, <span class="at">tasa_aceptacion =</span> <span class="fu">mean</span>(<span class="fu">unlist</span>(<span class="fu">map</span>(cs, <span class="sc">~</span> <span class="fu">attr</span>(.x, <span class="st">"accepted"</span>)[<span class="dv">1001</span><span class="sc">:</span><span class="dv">3000</span>]))),</span>
-<span id="cb16-6"><a href=""></a>         <span class="at">Rhat_mu =</span> <span class="fu">rhat</span>(arr[, , <span class="dv">1</span>]), <span class="at">ESS_mu =</span> <span class="fu">round</span>(<span class="fu">ess_bulk</span>(arr[, , <span class="dv">1</span>])))</span>
-<span id="cb16-7"><a href=""></a>})</span>
-<span id="cb16-8"><a href=""></a>experimento_paso</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
+<span id="cb7-2"><a href=""></a>experimento_paso <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">c</span>(<span class="fl">0.001</span>, <span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.03</span>, <span class="fl">0.1</span>), <span class="cf">function</span>(p) {</span>
+<span id="cb7-3"><a href=""></a>  cs <span class="ot">&lt;-</span> <span class="fu">map</span>(inicios, metropolis, <span class="at">paso =</span> p)</span>
+<span id="cb7-4"><a href=""></a>  arr <span class="ot">&lt;-</span> <span class="fu">simplify2array</span>(<span class="fu">map</span>(cs, <span class="sc">~</span> .x[<span class="dv">1001</span><span class="sc">:</span><span class="dv">3000</span>, ])) <span class="sc">%&gt;%</span> <span class="fu">aperm</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">2</span>))</span>
+<span id="cb7-5"><a href=""></a>  <span class="fu">tibble</span>(<span class="at">paso =</span> p, <span class="at">tasa_aceptacion =</span> <span class="fu">mean</span>(<span class="fu">unlist</span>(<span class="fu">map</span>(cs, <span class="sc">~</span> <span class="fu">attr</span>(.x, <span class="st">"accepted"</span>)[<span class="dv">1001</span><span class="sc">:</span><span class="dv">3000</span>]))),</span>
+<span id="cb7-6"><a href=""></a>         <span class="at">Rhat_mu =</span> <span class="fu">rhat</span>(arr[, , <span class="dv">1</span>]), <span class="at">ESS_mu =</span> <span class="fu">round</span>(<span class="fu">ess_bulk</span>(arr[, , <span class="dv">1</span>])))</span>
+<span id="cb7-7"><a href=""></a>})</span>
+<span id="cb7-8"><a href=""></a>experimento_paso</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1063,33 +808,30 @@ W = \frac{1}{M}\sum_{m=1}^M s_m^2, \qquad
 </section>
 <section id="monte-carlo-hamiltoniano" class="slide level2">
 <h2>Monte Carlo Hamiltoniano</h2>
-<p>HMC <span class="citation" data-cites="betancourt2017">(<a href="#/referencias" role="doc-biblioref" onclick="">Betancourt 2017</a>)</span> agrega un <strong>momento</strong> <span class="math inline">\(\mathbf{p}\)</span> y simula la dinámica de una partícula sobre la superficie <span class="math inline">\(U(\boldsymbol\theta) = -\log p(\boldsymbol\theta \mid \mathbf{Y})\)</span>:</p>
-<p><span class="math display">\[
-H(\boldsymbol\theta, \mathbf{p}) = U(\boldsymbol\theta) + \tfrac{1}{2}\mathbf{p}^\top\mathbf{M}^{-1}\mathbf{p}.
-\]</span></p>
-<p>Integrador <em>leapfrog</em> con paso <span class="math inline">\(\epsilon\)</span>:</p>
-<p><span class="math display">\[
-\mathbf{p} \leftarrow \mathbf{p} - \tfrac{\epsilon}{2}\nabla U(\boldsymbol\theta), \qquad
-\boldsymbol\theta \leftarrow \boldsymbol\theta + \epsilon\,\mathbf{M}^{-1}\mathbf{p}, \qquad
-\mathbf{p} \leftarrow \mathbf{p} - \tfrac{\epsilon}{2}\nabla U(\boldsymbol\theta).
-\]</span></p>
-<ul>
-<li>Usa el <strong>gradiente</strong> de la log-posterior: propone saltos largos siguiendo la geometría.</li>
-<li>Se acepta con probabilidad <span class="math inline">\(\min\big(1, e^{H(\boldsymbol\theta, \mathbf{p}) - H(\boldsymbol\theta^*, \mathbf{p}^*)}\big)\)</span>, dependiendo del error de integración.</li>
-<li><strong>NUTS</strong> <span class="citation" data-cites="hoffman2014">(<a href="#/referencias" role="doc-biblioref" onclick="">Hoffman y Gelman 2014</a>)</span> elige automáticamente el número de pasos: duplica la trayectoria hasta que “da la vuelta”. La <strong>profundidad máxima del árbol</strong> limita esas duplicaciones.</li>
-</ul>
+<p><strong>¿Cómo encontramos otros valores plausibles?</strong> Supongamos que queremos explorar cuántas personas por vivienda estima el modelo.</p>
+<p>HMC <span class="citation" data-cites="betancourt2017">(<a href="#/referencias" role="doc-biblioref" onclick="">Betancourt 2017</a>)</span> parte del valor actual y sortea una dirección inicial. Luego recorre varios valores en pasos cortos. En cada paso, la información del modelo ayuda a orientar el recorrido hacia valores plausibles.</p>
+<p><strong>Cada recorrido sirve para proponer un nuevo valor.</strong> Al repetir el proceso, reunimos muchos valores posibles y podemos ver cuánto varía la estimación.</p>
+</section>
+<section id="nuts-cuándo-detener-la-trayectoria" class="slide level2">
+<h2>NUTS: ¿cuándo detener la trayectoria?</h2>
+<p><strong>NUTS</strong> <span class="citation" data-cites="hoffman2014">(<a href="#/referencias" role="doc-biblioref" onclick="">Hoffman y Gelman 2014</a>)</span> decide cuánto dura el recorrido. Imagina que empezamos en 3 personas por vivienda y, para seguir el ejemplo, miramos solo el extremo que avanza hacia valores mayores.</p>
+<ol type="1">
+<li><strong>Avanza mientras explora.</strong> El recorrido pasa por 3,1, luego 3,2 y después 3,3.</li>
+<li><strong>Detecta que empieza a volver.</strong> Al llegar a 3,3, el siguiente movimiento apunta de vuelta hacia 3,2. Ese cambio de dirección es el <strong>giro en U</strong>. NUTS deja de alargar el recorrido.</li>
+<li><strong>Elige un valor del recorrido.</strong> Podría elegir 3,2. Ese valor se guarda y será el punto de partida del siguiente recorrido.</li>
+</ol>
 </section>
 <section id="metropolis-frente-a-nuts" class="slide level2">
 <h2>Metropolis frente a NUTS</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a>ess_stan <span class="ot">&lt;-</span> <span class="fu">summarise_draws</span>(<span class="fu">as_draws_array</span>(fit_normal), <span class="st">"ess_bulk"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb17-2"><a href=""></a>  <span class="fu">filter</span>(variable <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"sigma"</span>))</span>
-<span id="cb17-3"><a href=""></a></span>
-<span id="cb17-4"><a href=""></a>comparacion_ess <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb17-5"><a href=""></a>  <span class="at">algoritmo =</span> <span class="fu">c</span>(<span class="st">"Metropolis (4 x 2.000 draws)"</span>, <span class="st">"Stan NUTS (4 x 1.000 draws)"</span>),</span>
-<span id="cb17-6"><a href=""></a>  <span class="at">ESS_mu =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">ess_bulk</span>(arreglo[, , <span class="dv">1</span>]), ess_stan<span class="sc">$</span>ess_bulk[<span class="fu">match</span>(<span class="st">"mu"</span>, ess_stan<span class="sc">$</span>variable)])),</span>
-<span id="cb17-7"><a href=""></a>  <span class="at">ESS_sigma =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">ess_bulk</span>(<span class="fu">exp</span>(arreglo[, , <span class="dv">2</span>])), ess_stan<span class="sc">$</span>ess_bulk[<span class="fu">match</span>(<span class="st">"sigma"</span>, ess_stan<span class="sc">$</span>variable)])))</span>
-<span id="cb17-8"><a href=""></a>comparacion_ess</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>ess_stan <span class="ot">&lt;-</span> <span class="fu">summarise_draws</span>(<span class="fu">as_draws_array</span>(fit_normal), <span class="st">"ess_bulk"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href=""></a>  <span class="fu">filter</span>(variable <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"sigma"</span>))</span>
+<span id="cb8-3"><a href=""></a></span>
+<span id="cb8-4"><a href=""></a>comparacion_ess <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb8-5"><a href=""></a>  <span class="at">algoritmo =</span> <span class="fu">c</span>(<span class="st">"Metropolis (4 x 2.000 réplicas)"</span>, <span class="st">"Stan NUTS (4 x 1.000 réplicas)"</span>),</span>
+<span id="cb8-6"><a href=""></a>  <span class="at">ESS_mu =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">ess_bulk</span>(arreglo[, , <span class="dv">1</span>]), ess_stan<span class="sc">$</span>ess_bulk[<span class="fu">match</span>(<span class="st">"mu"</span>, ess_stan<span class="sc">$</span>variable)])),</span>
+<span id="cb8-7"><a href=""></a>  <span class="at">ESS_sigma =</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">ess_bulk</span>(<span class="fu">exp</span>(arreglo[, , <span class="dv">2</span>])), ess_stan<span class="sc">$</span>ess_bulk[<span class="fu">match</span>(<span class="st">"sigma"</span>, ess_stan<span class="sc">$</span>variable)])))</span>
+<span id="cb8-8"><a href=""></a>comparacion_ess</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1103,12 +845,12 @@ H(\boldsymbol\theta, \mathbf{p}) = U(\boldsymbol\theta) + \tfrac{1}{2}\mathbf{p}
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Metropolis (4 x 2.000 draws)</td>
+<td style="text-align: left;">Metropolis (4 x 2.000 réplicas)</td>
 <td style="text-align: right;">1.598</td>
 <td style="text-align: right;">362</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Stan NUTS (4 x 1.000 draws)</td>
+<td style="text-align: left;">Stan NUTS (4 x 1.000 réplicas)</td>
 <td style="text-align: right;">3.542</td>
 <td style="text-align: right;">3.061</td>
 </tr>
@@ -1116,77 +858,7 @@ H(\boldsymbol\theta, \mathbf{p}) = U(\boldsymbol\theta) + \tfrac{1}{2}\mathbf{p}
 </table>
 </div>
 </div>
-<p>La tabla compara ESS para <strong>mu y sigma en ambos algoritmos</strong>, junto al número de draws retenidos. No mide eficiencia por segundo: cada iteración tiene distinto costo. En modelos de gran dimensión, el paseo aleatorio puede explorar lentamente; NUTS suele aprovechar mejor la geometría.</p>
-</section>
-<section id="diagnósticos-del-ajuste-en-stan" class="slide level2">
-<h2>Diagnósticos del ajuste en Stan</h2>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">rhat</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">ess_bulk</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">ess_tail</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">mcse_mean</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">mu</td>
-<td style="text-align: right;">1,002</td>
-<td style="text-align: right;">3.542</td>
-<td style="text-align: right;">2.608</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">sigma</td>
-<td style="text-align: right;">1,004</td>
-<td style="text-align: right;">3.061</td>
-<td style="text-align: right;">2.802</td>
-<td style="text-align: right;">0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr class="header">
-<th style="text-align: right;" data-quarto-table-cell-role="th">chain</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">divergences</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">max_treedepth_hits</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Estos controles se complementan con las trazas y el chequeo predictivo. Una ejecución sin advertencias de muestreo aún puede corresponder a un modelo inadecuado.</p>
+<p>La tabla compara ESS para <strong>mu y sigma en ambos algoritmos</strong>, junto al número de réplicas retenidas. No mide eficiencia por segundo: cada iteración tiene distinto costo. En modelos de gran dimensión, el paseo aleatorio puede explorar lentamente; NUTS suele aprovechar mejor la geometría.</p>
 </section>
 <section id="estructura-de-un-programa-stan" class="slide level2">
 <h2>Estructura de un programa Stan</h2>
@@ -1226,12 +898,12 @@ H(\boldsymbol\theta, \mathbf{p}) = U(\boldsymbol\theta) + \tfrac{1}{2}\mathbf{p}
 </tr>
 <tr class="odd">
 <td><code>model</code></td>
-<td>Previas y verosimilitud</td>
+<td>Distribuciones previas y verosimilitud</td>
 <td><span class="math inline">\(Y_i \sim \text{Poisson}(\lambda_i)\)</span></td>
 </tr>
 <tr class="even">
 <td><code>generated quantities</code></td>
-<td>Cantidades por draw, tras el muestreo</td>
+<td>Cantidades por réplica, tras el muestreo</td>
 <td>predicción <span class="math inline">\(\hat Y_i\)</span> en todos los segmentos</td>
 </tr>
 </tbody>
@@ -1248,10 +920,9 @@ H(\boldsymbol\theta, \mathbf{p}) = U(\boldsymbol\theta) + \tfrac{1}{2}\mathbf{p}
 <section id="resumen-de-la-sesión" class="slide level2">
 <h2>Resumen de la sesión</h2>
 <ul>
-<li>Un modelo con varios parámetros tiene una posterior <strong>conjunta</strong>; marginales y funciones se obtienen de los draws.</li>
-<li>Con previa de referencia, la media de una Normal con varianza desconocida tiene posterior <span class="math inline">\(t\)</span>: la incertidumbre de <span class="math inline">\(\sigma\)</span> se propaga.</li>
-<li>La <strong>Dirichlet</strong> es conjugada de la Multinomial; las proporciones tienen correlación posterior negativa.</li>
-<li><strong>MCMC</strong> genera draws de la posterior sin conocer <span class="math inline">\(p(\mathbf{Y})\)</span>; Metropolis cumple el balance detallado.</li>
+<li>Un modelo con varios parámetros tiene una distribución posterior <strong>conjunta</strong>; marginales y funciones se obtienen de las réplicas.</li>
+<li>Con la distribución previa de referencia, la media de una Normal con varianza desconocida tiene distribución posterior <span class="math inline">\(t\)</span>: la incertidumbre de <span class="math inline">\(\sigma\)</span> se propaga.</li>
+<li><strong>MCMC</strong> genera réplicas de la distribución posterior sin conocer <span class="math inline">\(p(\mathbf{Y})\)</span>; Metropolis cumple el balance detallado.</li>
 <li>Se usan varias cadenas, se descarta el calentamiento y se revisan <span class="math inline">\(\hat R\)</span> y ESS.</li>
 <li><strong>HMC/NUTS</strong> (Stan) usa el gradiente y es mucho más eficiente: es la herramienta del resto del taller.</li>
 </ul>

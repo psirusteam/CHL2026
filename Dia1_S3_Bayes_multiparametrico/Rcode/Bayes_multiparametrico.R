@@ -43,7 +43,7 @@ guardar(tibble(escala = c("delta", "log(delta)"),
         "tabla_asimetria")
 
 ## ---- normal-analitica ----
-# Con la previa no informativa p(mu, sigma^2) proporcional a 1/sigma^2:
+# Con la distribución previa no informativa p(mu, sigma^2) proporcional a 1/sigma^2:
 #   mu | y ~ t_{n-1}(ybar, s^2/n)     sigma^2 | y ~ Inv-chi^2(n-1, s^2)
 n <- length(y); ybar <- mean(y); s2 <- var(y)
 normal_exacta <- tibble(
@@ -152,8 +152,8 @@ guardar(as.data.frame(cor_theta) %>% rownames_to_column("categoria"), "cor_theta
 log_posterior <- function(mu, log_sigma) {
   sigma <- exp(log_sigma)
   sum(dnorm(y, mu, sigma, log = TRUE)) +             # verosimilitud
-    dnorm(mu, 0, 10, log = TRUE) +                    # previa de mu
-    log(2) + dcauchy(sigma, 0, 2.5, log = TRUE) + log_sigma       # previa de sigma + jacobiano
+    dnorm(mu, 0, 10, log = TRUE) +                    # distribución previa de mu
+    log(2) + dcauchy(sigma, 0, 2.5, log = TRUE) + log_sigma       # distribución previa de sigma + jacobiano
 }
 
 metropolis <- function(inicio, n_iter = 3000, paso = 0.01) {
@@ -237,7 +237,7 @@ ess_stan <- summarise_draws(as_draws_array(fit_normal), "ess_bulk") %>%
   filter(variable %in% c("mu", "sigma"))
 
 comparacion_ess <- tibble(
-  algoritmo = c("Metropolis (4 x 2.000 draws)", "Stan NUTS (4 x 1.000 draws)"),
+  algoritmo = c("Metropolis (4 x 2.000 réplicas)", "Stan NUTS (4 x 1.000 réplicas)"),
   ESS_mu = round(c(ess_bulk(arreglo[, , 1]), ess_stan$ess_bulk[match("mu", ess_stan$variable)])),
   ESS_sigma = round(c(ess_bulk(exp(arreglo[, , 2])), ess_stan$ess_bulk[match("sigma", ess_stan$variable)])))
 comparacion_ess
