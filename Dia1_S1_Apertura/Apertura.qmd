@@ -2,7 +2,7 @@
 title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
 subtitle: "Apertura · Día 1, sesión 1"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
-institute: "CEPAL  UNFPA  América Latina y el Caribe  INE Chile"
+institute: "CEPAL · UNFPA · INE Chile"
 date: 2026-11-23
 date-format: "D [de] MMMM [de] YYYY"
 lang: es
@@ -26,16 +26,13 @@ format:
 
 Intervenciones previstas en la nota conceptual:
 
-- CEPAL: Rolando Ocampo.
-- UNFPA: Andrés Alban.
-- INE Chile: Denise López.
+- CEPAL.
+- UNFPA.
+- INE Chile.
 
 **23 al 26 de noviembre de 2026**  
 Sala Carmen Miró · CEPAL · Santiago de Chile.
 
-::: {.notes}
-Los nombres corresponden al programa de la nota conceptual de referencia. Esta lámina presenta las intervenciones institucionales; no atribuye a sus participantes la autoría del contenido técnico. La nota no distribuye minutos entre las intervenciones.
-:::
 
 ## Un trabajo conjunto para fortalecer capacidades
 
@@ -62,10 +59,6 @@ El modelo aporta una **herramienta complementaria** para evaluar la omisión cen
 
 Estas estimaciones contribuyen a la reconciliación de la población base para la actualización de las **proyecciones nacionales y subnacionales**.
 
-::: {.notes}
-Evitar presentar 2026 como horizonte de las proyecciones. La nota conceptual sitúa en 2026 la cooperación técnica y el taller, y vincula el modelo con la actualización de las proyecciones sin fijar un horizonte.
-:::
-
 ## Objetivo general
 
 ::: {.caja}
@@ -75,10 +68,10 @@ Fortalecer las capacidades técnicas del INE de Chile para **especificar, implem
 ## Objetivos específicos
 
 1. Comprender los fundamentos de la inferencia bayesiana en modelos uniparamétricos y multiparamétricos.
-2. Especificar un modelo Poisson con vínculo loglineal e incorporar un *offset* de viviendas particulares ocupadas.
+2. Especificar un modelo Poisson con vínculo loglineal.
 3. Incorporar covariables satelitales como predictores auxiliares de la densidad poblacional latente.
 4. Implementar y ejecutar el modelo en Stan: sintaxis, compilación y muestreo MCMC.
-5. Diagnosticar la convergencia y el ajuste, y generar predicciones de población.
+5. Diagnosticar la convergencia de las cadenas y el ajuste del modelo en cada región de Chile, y generar predicciones de población.
 
 ## Resultado esperado
 
@@ -102,16 +95,12 @@ $$
 
 El taller desarrollará progresivamente esta idea hasta el modelo **Poisson–lognormal** del caso chileno.
 
-::: {.notes}
-La definición operativa de cobertura, la elegibilidad, las previas, las correcciones de exposición y los escenarios predictivos se revisarán con el código del modelo en las sesiones técnicas. No se presentan aquí como especificaciones ya validadas por la nota conceptual.
-:::
-
 ## Aprender mediante el caso de Chile
 
 - Exposiciones teóricas y prácticas computacionales guiadas.
 - Datos censales y covariables del propio caso de Chile.
 - Material actual: Aysén para los ejemplos y Magallanes para ejercicios de réplica.
-- Revisión de supuestos, diagnóstico, validación e interpretación de predicciones.
+- Revisión de supuestos, validación e interpretación de predicciones. Los diagnósticos de convergencia y ajuste se extenderán a todas las regiones de Chile.
 
 **Equipo docente:** especialistas de la Unidad de Estadísticas Sociales de la División de Estadísticas de CEPAL y del equipo regional en Datos y Dinámicas de Población de UNFPA.
 
@@ -149,7 +138,7 @@ La definición operativa de cobertura, la elegibilidad, las previas, las correcc
 | 09:30–11:00 | Diagnóstico del modelo · Andrés Gutiérrez y Stalyn Guerrero |
 | 11:30–13:00 | Predicción en los segmentos censales · Andrés Gutiérrez y Stalyn Guerrero |
 | 14:30–16:00 | Práctica computacional en RStan · Stalyn Guerrero |
-| 16:30–18:00 | Cierre del evento · CEPAL: Xavier Mancero; UNFPA: Sabrina Jurán |
+| 16:30–18:00 | Cierre del evento.|
 
 ## Organización de las jornadas
 
@@ -169,7 +158,15 @@ Traer computador con internet y R, RStudio y Stan previamente instalados.
 
 Se entregarán presentaciones, guías paso a paso, bases de trabajo, scripts de ajuste y ejercicios de implementación y diagnóstico.
 
+## Cómo copiar el repositorio en RStudio
+
+1. Ve a **File → New Project → Version Control → Git**.
+2. En **Repository URL**, pega `https://github.com/psirusteam/CHL2026.git`.
+3. Elige dónde guardar la carpeta del proyecto y haz clic en **Create Project**.
+
 ## Cómo seguir las prácticas
+
+**Una vez abierto el proyecto**
 
 1. Abrir la carpeta de la sesión y su script en `Rcode/`.
 2. Ejecutar el código por bloques y revisar los resultados con el equipo docente.
@@ -178,9 +175,7 @@ Se entregarán presentaciones, guías paso a paso, bases de trabajo, scripts de 
 
 Los scripts conservan los análisis disponibles en el material anterior. El desarrollo técnico de la apertura original permanece en la carpeta inicial `Taller/Dia1_S1_Apertura/`.
 
-::: {.notes}
-La carpeta inicial conserva íntegramente la apertura original como fuente de consulta docente; no constituye una especificación actualizada ni validada del modelo. El control de cambios de esta sesión indica qué temas se revisarán después.
-:::
+
 
 ## Para comenzar
 

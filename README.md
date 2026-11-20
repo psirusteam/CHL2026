@@ -1,4 +1,4 @@
-# Taller de fortalecimiento de capacidades en modelación estadística de población en Chile
+# Taller de Fortalecimiento de Capacidades en Modelación Estadística de Población en Chile
 
 **Comisión Económica para América Latina y el Caribe (CEPAL) · Fondo de Población de las Naciones Unidas (UNFPA) · Instituto Nacional de Estadísticas de Chile (INE)**
 
