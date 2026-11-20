@@ -1187,7 +1187,7 @@ margin-right: 0; }
 Andrés Gutiérrez · Stalyn Guerrero 
 </div>
         <p class="quarto-title-affiliation">
-            CEPAL · UNFPA América Latina y el Caribe · INE Chile
+            CEPAL · UNFPA · INE Chile
           </p>
     </div>
 </div>
@@ -1202,8 +1202,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <section id="referencia-del-modelo-final-de-chile" class="slide level2">
 <h2>Referencia del modelo final de Chile</h2>
 <p>Se conserva la especificación implementada: <strong>40 covariables, zona fija y efectos de comuna</strong>, con matrices y exposición originales.</p>
-<p><strong>Estado del ajuste guardado:</strong> presenta problemas fuertes de convergencia. Las cifras permiten reproducir y revisar el procedimiento. Su uso para inferir población queda pendiente de validación.</p>
-<p>La sesión de diagnóstico conserva todas las alertas. Los escenarios posteriores son ejercicios de cálculo sobre esa misma referencia.</p>
 </section>
 <section id="lo-que-aprenderemos-en-esta-sesión" class="slide level2">
 <h2>Lo que aprenderemos en esta sesión</h2>
@@ -1214,7 +1212,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li>Preparar y ejecutar una demostración regional.</li>
 <li>Interpretar resultados y reconocer decisiones pendientes.</li>
 </ol>
-<p>El recorrido es guiado para personal técnico censal que comienza con modelos bayesianos y Stan.</p>
 </section>
 <section id="un-problema-conocido-por-el-equipo-censal" class="slide level2">
 <h2>Un problema conocido por el equipo censal</h2>
@@ -1224,7 +1221,7 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li>Diferencias entre comunas que las covariables no describen por completo.</li>
 <li>Diferencias propias de cada segmento, aun dentro de una comuna.</li>
 </ul>
-<p><strong>Pregunta guiada:</strong> ¿cuáles de estas diferencias podrían describir con información censal y cuáles necesitan fuentes complementarias?</p>
+<p><strong>Pregunta:</strong> ¿cuáles de estas diferencias podrían describir con información censal y cuáles necesitan fuentes complementarias?</p>
 </section>
 <section id="la-idea-central-del-modelo" class="slide level2">
 <h2>La idea central del modelo</h2>
@@ -1258,16 +1255,16 @@ Andrés Gutiérrez · Stalyn Guerrero
 </table>
 <p>No supone que cada vivienda tenga el mismo número de personas.</p>
 </section>
-<section id="dos-niveles-para-leer-con-ayuda-del-docente" class="slide level2">
-<h2>Dos niveles para leer con ayuda del docente</h2>
+<section id="dos-niveles-para-leer" class="slide level2">
+<h2>Dos niveles para leer</h2>
 <p><span class="math display">\[
 Y_i\mid\delta_i\sim\operatorname{Poisson}(V_i\delta_i),\qquad
-\log\delta_i\sim N(\mathbf{x}_i^\top\boldsymbol\beta+\gamma_{g(i)},\sigma^2).
+\log\delta_i\sim N(\mathbf{x}_i^\top\boldsymbol\beta+u_{g(i)},\sigma^2).
 \]</span></p>
 <ul>
 <li><span class="math inline">\(Y_i\)</span>: personas censadas; <span class="math inline">\(V_i\)</span>: viviendas particulares ocupadas.</li>
 <li><span class="math inline">\(\delta_i\)</span>: relación latente personas/vivienda; se aprende a partir de los datos.</li>
-<li><span class="math inline">\(\mathbf{x}_i\boldsymbol\beta\)</span>: zona y covariables; <span class="math inline">\(\gamma_{g(i)}\)</span>: efecto de la comuna.</li>
+<li><span class="math inline">\(\mathbf{x}_i\boldsymbol\beta\)</span>: zona y covariables; <span class="math inline">\(u_{g(i)}\)</span>: efecto de la comuna.</li>
 <li><span class="math inline">\(\sigma\)</span>: variación entre segmentos que no explica el predictor.</li>
 </ul>
 <p>La fórmula expresa la estructura conceptual. El archivo operativo añade límites a la intensidad; los revisaremos más adelante.</p>
@@ -1315,7 +1312,7 @@ Y_i\mid\delta_i\sim\operatorname{Poisson}(V_i\delta_i),\qquad
 </tr>
 <tr class="even">
 <td>04 · Ajuste regional</td>
-<td>Parámetros y simulaciones posteriores</td>
+<td>Parámetros y réplicas de la distribución posterior</td>
 </tr>
 <tr class="odd">
 <td>05 · Predicción</td>
@@ -1558,7 +1555,7 @@ Y_i\mid\delta_i\sim\operatorname{Poisson}(V_i\delta_i),\qquad
 <span id="cb3-3"><a href></a>sigma  ~ cauchy(<span class="dv">0</span>, <span class="fl">2.5</span>);</span>
 <span id="cb3-4"><a href></a>sigmaU ~ normal(<span class="dv">0</span>, <span class="dv">10</span>);</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Las restricciones positivas de <code>sigma</code> y <code>sigmaU</code> dejan solo la parte positiva de esas distribuciones.</p>
-<p>Estas previas son amplias. Se conservan para leer el programa actual; <strong>no se presentan como una elección ya validada</strong>. Su sensibilidad y el comportamiento predictivo previo deben revisarse antes de una aplicación institucional.</p>
+<p>Estas distribuciones previas son amplias. Se conservan para leer el programa actual; <strong>no se presentan como una elección ya validada</strong>. Su sensibilidad y la distribución predictiva previa deben revisarse antes de una aplicación institucional.</p>
 </section>
 <section id="límites-del-programa-decisiones-que-afectan-resultados" class="slide level2">
 <h2>Límites del programa: decisiones que afectan resultados</h2>
@@ -1579,7 +1576,7 @@ Y_i\mid\delta_i\sim\operatorname{Poisson}(V_i\delta_i),\qquad
 <td>Evita valores fuera del rango operativo; modifica la especificación conceptual</td>
 </tr>
 <tr class="even">
-<td>Densidad predictiva limitada a <code>delta_max = 4.35</code></td>
+<td>Distribución predictiva de la densidad limitada a <code>delta_max = 4.35</code></td>
 <td>Reduce valores altos; requiere justificar el umbral y estudiar sensibilidad</td>
 </tr>
 <tr class="odd">
@@ -1689,10 +1686,16 @@ Y_i\mid\delta_i\sim\operatorname{Poisson}(V_i\delta_i),\qquad
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 42%">
+<col style="width: 15%">
+<col style="width: 16%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: right;">Censado en el destino</th>
-<th style="text-align: right;">Media predictiva</th>
+<th style="text-align: right;">Media de la distribución predictiva</th>
 <th style="text-align: right;">Límite 2,5 %</th>
 <th style="text-align: right;">Límite 97,5 %</th>
 </tr>

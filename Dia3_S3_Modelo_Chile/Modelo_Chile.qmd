@@ -2,7 +2,7 @@
 title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
 subtitle: "El modelo de población en Chile: de los datos censales a Stan"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
-institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+institute: "CEPAL · UNFPA · INE Chile"
 date: 2026-11-25
 date-format: "D [de] MMMM [de] YYYY"
 lang: es
@@ -34,9 +34,6 @@ res <- readRDS("resultados/resumen.rds")
 
 Se conserva la especificación implementada: **40 covariables, zona fija y efectos de comuna**, con matrices y exposición originales.
 
-**Estado del ajuste guardado:** presenta problemas fuertes de convergencia. Las cifras permiten reproducir y revisar el procedimiento. Su uso para inferir población queda pendiente de validación.
-
-La sesión de diagnóstico conserva todas las alertas. Los escenarios posteriores son ejercicios de cálculo sobre esa misma referencia.
 
 ## Lo que aprenderemos en esta sesión
 
@@ -47,7 +44,6 @@ En D2S4 ajustamos un Poisson con personas, viviendas y zona. Ahora incorporaremo
 3. Preparar y ejecutar una demostración regional.
 4. Interpretar resultados y reconocer decisiones pendientes.
 
-El recorrido es guiado para personal técnico censal que comienza con modelos bayesianos y Stan.
 
 ## Un problema conocido por el equipo censal
 
@@ -57,7 +53,7 @@ Dos segmentos con las mismas viviendas ocupadas pueden tener distinta población
 - Diferencias entre comunas que las covariables no describen por completo.
 - Diferencias propias de cada segmento, aun dentro de una comuna.
 
-**Pregunta guiada:** ¿cuáles de estas diferencias podrían describir con información censal y cuáles necesitan fuentes complementarias?
+**Pregunta:** ¿cuáles de estas diferencias podrían describir con información censal y cuáles necesitan fuentes complementarias?
 
 ## La idea central del modelo
 
@@ -73,16 +69,16 @@ La relación personas/vivienda depende de zona, covariables satelitales, comuna 
 
 No supone que cada vivienda tenga el mismo número de personas.
 
-## Dos niveles para leer con ayuda del docente
+## Dos niveles para leer
 
 $$
 Y_i\mid\delta_i\sim\operatorname{Poisson}(V_i\delta_i),\qquad
-\log\delta_i\sim N(\mathbf{x}_i^\top\boldsymbol\beta+\gamma_{g(i)},\sigma^2).
+\log\delta_i\sim N(\mathbf{x}_i^\top\boldsymbol\beta+u_{g(i)},\sigma^2).
 $$
 
 - $Y_i$: personas censadas; $V_i$: viviendas particulares ocupadas.
 - $\delta_i$: relación latente personas/vivienda; se aprende a partir de los datos.
-- $\mathbf{x}_i\boldsymbol\beta$: zona y covariables; $\gamma_{g(i)}$: efecto de la comuna.
+- $\mathbf{x}_i\boldsymbol\beta$: zona y covariables; $u_{g(i)}$: efecto de la comuna.
 - $\sigma$: variación entre segmentos que no explica el predictor.
 
 La fórmula expresa la estructura conceptual. El archivo operativo añade límites a la intensidad; los revisaremos más adelante.
@@ -112,7 +108,7 @@ En el flujo regional, cada región tiene su propio ajuste. No hay aprendizaje co
 | 01 · Revisión de insumos | Diccionario y completitud de covariables |
 | 02 · Estandarización | Covariables en unidades comparables, con referencia nacional |
 | 03 · Preparación censal | Clasificación, exposición, densidad descriptiva y elegibilidad |
-| 04 · Ajuste regional | Parámetros y simulaciones posteriores |
+| 04 · Ajuste regional | Parámetros y réplicas de la distribución posterior |
 | 05 · Predicción | Resultados por segmento y agregados bajo una configuración documentada |
 
 La información censal se valida **antes** del ajuste. Stan no sustituye la revisión de llaves, universos y coherencia de conteos.
@@ -256,7 +252,7 @@ sigmaU ~ normal(0, 10);
 
 Las restricciones positivas de `sigma` y `sigmaU` dejan solo la parte positiva de esas distribuciones.
 
-Estas previas son amplias. Se conservan para leer el programa actual; **no se presentan como una elección ya validada**. Su sensibilidad y el comportamiento predictivo previo deben revisarse antes de una aplicación institucional.
+Estas distribuciones previas son amplias. Se conservan para leer el programa actual; **no se presentan como una elección ya validada**. Su sensibilidad y la distribución predictiva previa deben revisarse antes de una aplicación institucional.
 
 
 
@@ -265,7 +261,7 @@ Estas previas son amplias. Se conservan para leer el programa actual; **no se pr
 | Regla | Consecuencia |
 |---|---|
 | Intensidad del conteo entre 1 y $10^7$ | Evita valores fuera del rango operativo; modifica la especificación conceptual |
-| Densidad predictiva limitada a `delta_max = 4.35` | Reduce valores altos; requiere justificar el umbral y estudiar sensibilidad |
+| Distribución predictiva de la densidad limitada a `delta_max = 4.35` | Reduce valores altos; requiere justificar el umbral y estudiar sensibilidad |
 | Piso de intensidad igual a 1 | Con cero viviendas, el programa generaría en promedio una persona |
 
 Se conserva el universo del proyecto, incluidos los casos con exposición cero. El piso de intensidad también se conserva: identifiquen cuántos casos afecta y evalúen su consecuencia. Reproducir esta regla no valida su adecuación ni resuelve la población colectiva.
@@ -338,7 +334,7 @@ El total utiliza el universo regional del ajuste final. Su interpretación pobla
 ```{r, eval=TRUE, echo=FALSE}
 t <- res$resumen_total
 knitr::kable(t[c("censado_mismo_subconjunto", "media_predictiva", "inferior", "superior")],
-  digits=0, col.names=c("Censado en el destino", "Media predictiva", "Límite 2,5 %", "Límite 97,5 %"),
+  digits=0, col.names=c("Censado en el destino", "Media de la distribución predictiva", "Límite 2,5 %", "Límite 97,5 %"),
   format.args=list(big.mark=".", scientific=FALSE))
 ```
 
