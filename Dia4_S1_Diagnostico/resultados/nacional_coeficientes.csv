@@ -1,0 +1,65 @@
+"codigo","region","variable","etiqueta","parametro","inferior","mediana","superior","revisar"
+"01","Tarapacá","zona_urbana","Urbana vs. rural","beta[2]",0.10866024249305,0.160556568700089,0.220817491007158,TRUE
+"01","Tarapacá","zona_aldea","Aldea vs. rural","beta[3]",0.0702778119751365,0.134340264159026,0.197781979012921,TRUE
+"01","Tarapacá","nlav_mean_std","Luces nocturnas","beta[36]",0.0188107351055092,0.0394270346912253,0.0663670019484738,TRUE
+"01","Tarapacá","dens_len_allroads_std","Densidad vial","beta[9]",-16.7806169821673,-5.82994828643863,3.93946372312846,TRUE
+"02","Antofagasta","zona_urbana","Urbana vs. rural","beta[2]",0.162148912576605,0.202134025506268,0.243002595990746,TRUE
+"02","Antofagasta","zona_aldea","Aldea vs. rural","beta[3]",-0.0172455935898489,0.0847757721754021,0.139407796177624,TRUE
+"02","Antofagasta","nlav_mean_std","Luces nocturnas","beta[36]",-0.0158484386506401,-0.00483842023264565,0.00390237410653337,TRUE
+"02","Antofagasta","dens_len_allroads_std","Densidad vial","beta[9]",-12.3678420179703,15.6367697921963,31.3768618558221,TRUE
+"03","Atacama","zona_urbana","Urbana vs. rural","beta[2]",0.141205706249221,0.182016574233393,0.236814656031852,TRUE
+"03","Atacama","zona_aldea","Aldea vs. rural","beta[3]",0.0538254041682071,0.115372803248394,0.174767172867673,TRUE
+"03","Atacama","nlav_mean_std","Luces nocturnas","beta[36]",-0.0558128967142105,-0.0370287376911878,-0.0187731189871306,TRUE
+"03","Atacama","dens_len_allroads_std","Densidad vial","beta[9]",-1.59078299768883,0.766737476517593,2.98925956767698,TRUE
+"04","Coquimbo","zona_urbana","Urbana vs. rural","beta[2]",0.0285435795333967,0.0476416329361887,0.0722144434085101,TRUE
+"04","Coquimbo","zona_aldea","Aldea vs. rural","beta[3]",0.0254360159314395,0.0408756050294928,0.0570684878604237,TRUE
+"04","Coquimbo","nlav_mean_std","Luces nocturnas","beta[36]",-0.0334853145534403,-0.0249148491411458,-0.018783594208095,TRUE
+"04","Coquimbo","dens_len_allroads_std","Densidad vial","beta[9]",7.00089383398079,11.3360388692619,28.4251244685885,TRUE
+"05","Valparaíso","zona_urbana","Urbana vs. rural","beta[2]",-0.0208578149296224,-0.00336485692732947,0.0143626865497524,TRUE
+"05","Valparaíso","zona_aldea","Aldea vs. rural","beta[3]",-0.0277582206215485,-0.0055143166155013,0.0189105673943645,TRUE
+"05","Valparaíso","nlav_mean_std","Luces nocturnas","beta[36]",-0.0174337056088846,-0.0109454021739474,-0.00449917506836048,TRUE
+"05","Valparaíso","dens_len_allroads_std","Densidad vial","beta[9]",-2.88594177252674,0.466917867812746,3.19878716588963,TRUE
+"06","O’Higgins","zona_urbana","Urbana vs. rural","beta[2]",-0.0198157169919613,-0.00653928266355959,0.00635048637013647,TRUE
+"06","O’Higgins","zona_aldea","Aldea vs. rural","beta[3]",-0.0184698155372704,-0.00275647916376441,0.00592960521577663,TRUE
+"06","O’Higgins","nlav_mean_std","Luces nocturnas","beta[36]",-0.0172800568389735,-0.00600719763917074,-0.0023002049117488,TRUE
+"06","O’Higgins","dens_len_allroads_std","Densidad vial","beta[9]",-12.8071751850046,7.94392902856263,15.409255065717,TRUE
+"07","Maule","zona_urbana","Urbana vs. rural","beta[2]",-0.0324845191687553,-0.0174590037619822,-0.00411472945456401,TRUE
+"07","Maule","zona_aldea","Aldea vs. rural","beta[3]",-0.0337028138529531,-0.0164790493998904,0.000986226839665759,TRUE
+"07","Maule","nlav_mean_std","Luces nocturnas","beta[36]",-0.0143536547935575,-0.00239695434818591,0.00315941570203381,TRUE
+"07","Maule","dens_len_allroads_std","Densidad vial","beta[9]",-25.1737477345902,3.25622207042635,13.2592018587877,TRUE
+"08","Biobío","zona_urbana","Urbana vs. rural","beta[2]",0.0156470621125824,0.0274048151631576,0.0400182489539284,TRUE
+"08","Biobío","zona_aldea","Aldea vs. rural","beta[3]",-0.0021912108579319,0.0205104587017482,0.0449246488474022,TRUE
+"08","Biobío","nlav_mean_std","Luces nocturnas","beta[36]",-0.0017615147443971,0.000590973579527926,0.00783092086163325,TRUE
+"08","Biobío","dens_len_allroads_std","Densidad vial","beta[9]",-21.2143612367599,-3.97506084033079,18.2601356889319,TRUE
+"09","La Araucanía","zona_urbana","Urbana vs. rural","beta[2]",-0.0379364356994582,-0.0263447166843849,-0.0116274391165812,TRUE
+"09","La Araucanía","zona_aldea","Aldea vs. rural","beta[3]",-0.0746361289914145,-0.0486584141029372,-0.0261963925646247,TRUE
+"09","La Araucanía","nlav_mean_std","Luces nocturnas","beta[36]",-0.0437718946022533,-0.0302770129441509,-0.0215288687313476,TRUE
+"09","La Araucanía","dens_len_allroads_std","Densidad vial","beta[9]",-3.2458189558741,-1.54519161876953,23.3526287931763,TRUE
+"10","Los Lagos","zona_urbana","Urbana vs. rural","beta[2]",-0.0110493570802987,0.0146546150545783,0.0437575097440251,TRUE
+"10","Los Lagos","zona_aldea","Aldea vs. rural","beta[3]",-0.0482600023070159,-0.0297330708219506,0.00626254034474025,TRUE
+"10","Los Lagos","nlav_mean_std","Luces nocturnas","beta[36]",-0.0127653323478849,-0.00541758480956239,0.00120166002853323,TRUE
+"10","Los Lagos","dens_len_allroads_std","Densidad vial","beta[9]",-24.5920706138771,6.1896885625664,24.6920919159291,TRUE
+"11","Aysén","zona_urbana","Urbana vs. rural","beta[2]",-0.070681613294959,-0.00577179896565384,0.0711565304299526,TRUE
+"11","Aysén","zona_aldea","Aldea vs. rural","beta[3]",-0.138471315819443,-0.0779369950821905,-0.0182091627151257,TRUE
+"11","Aysén","nlav_mean_std","Luces nocturnas","beta[36]",-0.12721634257445,-0.0777790134874447,0.0163132734605796,TRUE
+"11","Aysén","dens_len_allroads_std","Densidad vial","beta[9]",-52.4122239337425,3.01962095377307,30.8443062258184,TRUE
+"12","Magallanes","zona_urbana","Urbana vs. rural","beta[2]",0.126821176744715,0.154043321559803,0.194459772510132,TRUE
+"12","Magallanes","zona_aldea","Aldea vs. rural","beta[3]",0.235145970113569,0.322188352516396,0.37947561584773,TRUE
+"12","Magallanes","nlav_mean_std","Luces nocturnas","beta[36]",-0.0363143743702838,-0.0142533179535077,0.00139227064275526,TRUE
+"12","Magallanes","dens_len_allroads_std","Densidad vial","beta[9]",-33.7471197882686,-6.99126431794629,50.0878397209203,TRUE
+"13","Metropolitana","zona_urbana","Urbana vs. rural","beta[2]",-0.0575742532719693,-0.0370826799111179,-0.0177619602335514,TRUE
+"13","Metropolitana","zona_aldea","Aldea vs. rural","beta[3]",-0.0687914465183632,-0.0336321603810543,-0.0150535475119349,TRUE
+"13","Metropolitana","nlav_mean_std","Luces nocturnas","beta[36]",-0.02079750876857,-0.0174516618927252,-0.0138647137863157,TRUE
+"13","Metropolitana","dens_len_allroads_std","Densidad vial","beta[9]",-7.75464267859396,-2.14334960926475,11.5973410572065,TRUE
+"14","Los Ríos","zona_urbana","Urbana vs. rural","beta[2]",-0.0710683784050764,-0.0240679475668583,0.00321544743124072,TRUE
+"14","Los Ríos","zona_aldea","Aldea vs. rural","beta[3]",-0.0347190556611468,0.00334660442902753,0.0328442311383762,TRUE
+"14","Los Ríos","nlav_mean_std","Luces nocturnas","beta[36]",0.0391732284799601,0.052796461344178,0.0804685695468519,TRUE
+"14","Los Ríos","dens_len_allroads_std","Densidad vial","beta[9]",-22.2406270062027,-2.46504542766826,6.57468206225197,TRUE
+"15","Arica y Parinacota","zona_urbana","Urbana vs. rural","beta[2]",0.0810439887406916,0.136952635813193,0.23014345387123,TRUE
+"15","Arica y Parinacota","zona_aldea","Aldea vs. rural","beta[3]",-0.0299454163168747,0.0602873512711938,0.152164476144103,TRUE
+"15","Arica y Parinacota","nlav_mean_std","Luces nocturnas","beta[36]",-0.0829802643351136,-0.0634299789577833,-0.0402970264056282,TRUE
+"15","Arica y Parinacota","dens_len_allroads_std","Densidad vial","beta[9]",-43.7900111473649,16.1722583345278,43.2041772512761,TRUE
+"16","Ñuble","zona_urbana","Urbana vs. rural","beta[2]",-0.0152328913608959,0.00438281035076695,0.0438416087633231,TRUE
+"16","Ñuble","zona_aldea","Aldea vs. rural","beta[3]",0.0167893246243751,0.0351674081314341,0.0807812512242025,TRUE
+"16","Ñuble","nlav_mean_std","Luces nocturnas","beta[36]",-0.0254638921537089,-0.0179236752232289,-0.0083767336545541,TRUE
+"16","Ñuble","dens_len_allroads_std","Densidad vial","beta[9]",-19.1173596976253,-1.72755083868728,6.90475689665329,TRUE
