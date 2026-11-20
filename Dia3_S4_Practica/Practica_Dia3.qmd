@@ -2,7 +2,7 @@
 title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
 subtitle: "Práctica en Stan: modelo de población en Magallanes"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
-institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+institute: "CEPAL · UNFPA · INE Chile"
 date: 2026-11-25
 date-format: "D [de] MMMM [de] YYYY"
 lang: es
@@ -39,7 +39,6 @@ Cada pareja debe **reproducir la estructura final de Chile** con los insumos y c
 3. Interpretar una asociación y calcular totales por comuna.
 4. Cambiar un supuesto de exposición sin volver a ajustar el modelo.
 
-Los bloques están preparados. Ustedes deben ejecutarlos, revisar las salidas y justificar las decisiones con su conocimiento del censo.
 
 ## Abrir solo los archivos de esta sesión
 
@@ -109,7 +108,7 @@ densidad ~ lognormal(lp, sigma);
 
 No cambien esas líneas durante el ajuste inicial. El archivo es una copia del programa del proyecto utilizado en D3S3; la selección de covariables de la práctica es más corta que la nacional.
 
-## Compilar y ajustar en su computador {.smaller}
+## Compilar y ajustar en su computador
 
 ```{r practica-ajuste}
 ```
@@ -180,7 +179,7 @@ La clasificación permite describir resultados. La exposición base conserva la 
 
 ## Un escenario que no requiere otro ajuste
 
-El bloque de apoyo `practica-escenario-funcion` reproduce en R la regla predictiva del archivo Stan, usando los efectos de **todas las comunas**.
+El bloque de apoyo `practica-escenario-funcion` reproduce en R la regla de simulación de la distribución predictiva del archivo Stan, usando los efectos de **todas las comunas**.
 
 Ejecútenlo una vez. Después ejecuten:
 

@@ -2,7 +2,7 @@
 title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
 subtitle: "Diagnóstico del modelo: cálculo, especificación y datos censales"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
-institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+institute: "CEPAL · UNFPA · INE Chile"
 date: 2026-11-26
 date-format: "D [de] MMMM [de] YYYY"
 lang: es
@@ -26,13 +26,14 @@ knitr::read_chunk("Rcode/Diagnostico.R")
 knitr::opts_chunk$set(eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE,
   comment="", fig.align="center", out.width="90%")
 res <- readRDS("resultados/resumen.rds")
+nacional <- readRDS("resultados/diagnosticos_regionales.rds")
 ```
 
 # Antes de utilizar una estimación
 
 ## El problema de hoy
 
-En D3S4 ajustamos un modelo de población por segmentos de Magallanes. Que Stan haya terminado no basta para utilizar sus resultados.
+En D3S4 ajustamos un modelo de población por segmentos de Magallanes. Extendemos los diagnósticos a las **16 regiones de Chile**, con Magallanes como ejemplo para leer las gráficas. Que Stan haya terminado no basta para utilizar sus resultados.
 
 Hoy distinguiremos:
 
@@ -43,10 +44,10 @@ Hoy distinguiremos:
 
 ## Qué material vamos a revisar
 
-Usaremos las **cadenas originales del ajuste final de Magallanes**: 40 covariables, zona fija y efectos de comuna.
+Usaremos las **cadenas originales de las 16 regiones** para la revisión regional. En Magallanes veremos en detalle el ajuste con 40 covariables, zona fija y efectos de comuna.
 
 - Mismas matrices y archivo Stan del proyecto.
-- Cuatro cadenas, 5000 iteraciones y 4500 de calentamiento: 500 draws posteriores por cadena.
+- En Magallanes, cuatro cadenas, 5.000 iteraciones y 4.500 de calentamiento: 500 réplicas de la distribución posterior por cadena.
 - Se conservan orden, parámetros y controles NUTS originales.
 - Los diagnósticos muestran problemas de convergencia. La tarea es detectarlos, describirlos y proponer una revisión.
 
@@ -60,7 +61,7 @@ Abran `Rcode/Diagnostico.R` desde la carpeta `Dia4_S1_Diagnostico`.
 ```{r diagnostico-paquetes}
 ```
 
-Ejecuten por bloques `data/ajuste_magallanes.rds` contiene las cadenas y los datos necesarios.
+Ejecuten `Rcode/Diagnostico.R` por bloques para el ejemplo de Magallanes. El script `Rcode/Diagnostico_regional.R` lee las exportaciones originales de las 16 regiones y guarda las tablas regionales en `resultados/`.
 
 
 # Controles del cálculo
@@ -119,7 +120,7 @@ Referencia: [documentación de R-hat en posterior](https://mc-stan.org/posterior
 
 ESS no es el número de segmentos ni una medida de calidad del censo. Más iteraciones pueden mejorar precisión cuando el muestreo funciona, pero no reparan datos mal definidos o un modelo insuficiente.
 
-**Actividad:** localicen una variable con menor ESS y comparen su MCSE con su desviación posterior.
+**Actividad:** localicen una variable con menor ESS y comparen su MCSE con su desviación estándar en la distribución posterior.
 
 ## Calcular y leer la tabla de parámetros
 
@@ -161,13 +162,55 @@ Se conservan los resultados por cadena: un promedio puede ocultar una cadena pro
 
 | Señal | Primera revisión |
 |---|---|
-| Divergencias | Geometría del modelo, escalas, previas y parametrización; ajustes del algoritmo con apoyo del docente |
+| Divergencias | Geometría del modelo, escalas, distribuciones previas y parametrización; ajustes del algoritmo con apoyo del docente |
 | R-hat alto o trazas separadas | Recorridos, inicialización, parámetros relacionados y duración |
 | ESS bajo sin otras alertas | Persistencia y precisión requerida; valorar más simulaciones |
 | Profundidad elevada | Eficiencia, escalamiento y estructura del modelo |
 | E-BFMI bajo | Energías por cadena, escalas y parametrización |
 
 No existe un único cambio de configuración que resuelva todos los problemas. Se documenta la causa propuesta y se repite la revisión después de actuar.
+
+## Diagnósticos de muestreo en las 16 regiones
+
+El script calcula R-hat, ESS bulk, ESS tail y error de Monte Carlo para cada parámetro, **por región**, conservando todas las iteraciones y el identificador de cada cadena.
+
+```{r}
+source("Rcode/Diagnostico_regional.R", encoding = "UTF-8")
+regional <- readRDS("resultados/diagnosticos_regionales.rds")
+regional$resumen
+```
+
+En **`r sum(nacional$resumen$parametros_con_alerta > 0)` de 16 regiones**, al menos un parámetro requiere revisión según los umbrales de la sesión. Un ajuste regional debe evaluarse con sus propias cadenas.
+
+## R-hat y ESS por región (01–08)
+
+```{r, eval=TRUE, echo=FALSE}
+tabla_muestreo <- function(i) {
+  t <- nacional$resumen[i, ]
+  knitr::kable(t[c("region", "rhat_max", "ess_bulk_min", "ess_tail_min",
+    "parametros_con_alerta", "parametros")], digits = c(0, 3, 0, 0, 0, 0),
+    col.names = c("Región", "R-hat máx.", "ESS bulk mín.", "ESS tail mín.",
+      "Con alerta", "Parámetros"), format.args = list(decimal.mark = ","))
+}
+tabla_muestreo(1:8)
+```
+
+«Con alerta» cuenta los parámetros que no alcanzan al menos uno de los umbrales de R-hat o ESS, o para los que no se puede calcular el indicador.
+
+## R-hat y ESS por región (09–16)
+
+```{r, eval=TRUE, echo=FALSE}
+tabla_muestreo(9:16)
+```
+
+Los máximos y mínimos ayudan a priorizar la revisión. El CSV de parámetros indica cuáles requieren inspección y permite volver a sus trazas.
+
+## Cobertura de los controles internos de NUTS
+
+Las exportaciones compactas de las 16 regiones conservan las réplicas y su cadena. Para calcular **divergencias, llegadas al límite de profundidad y E-BFMI** también se requieren los registros internos del muestreador.
+
+- **Aysén y Magallanes** cuentan con esos registros en los paquetes docentes. Los resultados se guardan por cadena en `resultados/nacional_nuts.csv`.
+- Para las otras **14 regiones**, la verificación de estos controles queda pendiente de extraer los registros de los ajustes originales.
 
 # Leer los gráficos
 
@@ -198,29 +241,14 @@ knitr::kable(res$example, digits=3,
 
 La tabla ayuda a conectar la señal visual con sus indicadores. El R-hat favorable del ejemplo similar no lo convierte en evidencia sobre el modelo censal real.
 
-## Rangos: otra forma de comparar cadenas
-
-![](resultados/rangos.png){width=85%}
-
-Si todas describen una distribución común, esperamos ocupación comparable de rangos. Diferencias persistentes entre colores merecen revisión.
-
-Este gráfico complementa las trazas: no sustituye el resto de los controles.
-
-## Autocorrelación: por qué las simulaciones no son independientes
-
-![](resultados/autocorrelacion.png){width=80%}
-
-El eje horizontal indica separación entre iteraciones. Persistencia alta durante muchos pasos ayuda a explicar un ESS bajo.
-
-**Decisión:** eliminar filas para que el gráfico parezca menos correlacionado no aumenta la información disponible. Conservamos las cadenas completas para diagnosticar.
 
 ## Pares: reconocer parámetros relacionados
 
 ![](resultados/pares.png){width=65%}
 
-El intercepto y un efecto de comuna pueden compensarse parcialmente. Una nube alargada muestra asociación posterior; por sí sola no demuestra que el muestreo haya fallado.
+El intercepto y un efecto de comuna pueden compensarse parcialmente. Una nube alargada muestra asociación en la distribución posterior; por sí sola no demuestra que el muestreo haya fallado.
 
-En el ajuste histórico con una única etiqueta regional, separar ese efecto del intercepto dependía especialmente de las previas. Aquí el agrupamiento es comuna.
+En el ajuste histórico con una única etiqueta regional, separar ese efecto del intercepto dependía especialmente de las distribuciones previas. Aquí el agrupamiento es comuna.
 
 
 # Del cálculo a los datos censales
@@ -293,6 +321,56 @@ En este ajuste, la desviación observada queda **`r if (res$spread_check$observa
 
 Acertar promedios no garantiza reproducir la variación ni las colas. Las viviendas escasas de algunos segmentos también influyen en estos cocientes.
 
+## Chequeo predictivo regional (01–08)
+
+Se simulan 500 conjuntos de conteos por región para los segmentos aptos, con sus viviendas y covariables observadas. Se contrastan **personas por vivienda según zona** y la **dispersión entre segmentos**.
+
+```{r, eval=TRUE, echo=FALSE}
+tabla_ajuste <- function(i) {
+  t <- nacional$resumen[i, ]
+  ppc <- nacional$ppc
+  dispersion <- ppc[ppc$medida == "dispersión", ]
+  dispersion <- dispersion[match(t$codigo, dispersion$codigo), ]
+  zonas <- vapply(t$codigo, function(codigo) {
+    x <- ppc[ppc$codigo == codigo & ppc$medida %in% c("rural", "aldea", "urbana"), ]
+    paste0(sum(!x$dentro), "/", nrow(x))
+  }, character(1))
+  knitr::kable(data.frame(region = t$region, zonas = zonas,
+    observada = dispersion$observado, inferior = dispersion$inferior,
+    superior = dispersion$superior, dentro = ifelse(dispersion$dentro, "Dentro", "Fuera")),
+    digits = 3, col.names = c("Región", "Zonas fuera", "Dispersión observada",
+      "P2,5 simulado", "P97,5 simulado", "Dispersión"),
+    format.args = list(decimal.mark = ","))
+}
+tabla_ajuste(1:8)
+```
+
+«Zonas fuera» indica cuántas tasas observadas quedaron fuera del rango simulado del 95 %, entre las zonas presentes en cada región.
+
+## Chequeo predictivo regional (09–16)
+
+```{r, eval=TRUE, echo=FALSE}
+tabla_ajuste(9:16)
+```
+
+La dispersión observada quedó fuera del rango simulado en **`r sum(!nacional$ppc$dentro[nacional$ppc$medida == "dispersión"])` de 16 regiones**. Estos chequeos describen los segmentos usados para ajustar y deben leerse junto con los diagnósticos de las cadenas.
+
+## Gráficos del chequeo predictivo (01–08)
+
+```{r, eval=TRUE, echo=FALSE, out.width="100%"}
+knitr::include_graphics("resultados/ppc_regiones_01-08.png")
+```
+
+La **cruz naranja** marca el dato observado. El **punto azul** es la mediana de las réplicas y la línea azul abarca sus percentiles 2,5 y 97,5. Si la cruz queda fuera, el modelo simula valores distintos del observado para ese indicador.
+
+## Gráficos del chequeo predictivo (09–16)
+
+```{r, eval=TRUE, echo=FALSE, out.width="100%"}
+knitr::include_graphics("resultados/ppc_regiones_09-16.png")
+```
+
+Cada zona muestra la tasa de personas por vivienda. **Dispersión** muestra la desviación estándar de las tasas entre segmentos aptos. Compare cada panel con el panel correspondiente de la diapositiva anterior.
+
 ## Una señal requiere una investigación concreta
 
 | Lo que encontramos | Qué revisar |
@@ -314,6 +392,38 @@ Para evaluar predicción debemos reservar información y comprobar el desempeño
 - Usar información independiente de cobertura cuando exista.
 
 En esta sesión no se presenta una prueba fuera de muestra como si ya estuviera realizada.
+
+## Distribuciones de personas por vivienda (01–04)
+
+```{r, eval=TRUE, echo=FALSE, out.width="90%", fig.alt="Curvas observadas y simuladas de personas por vivienda en Tarapacá, Antofagasta, Atacama y Coquimbo."}
+knitr::include_graphics("resultados/ppc_curvas_01-04.png")
+```
+
+La **curva oscura** resume las tasas observadas por segmento apto. Cada **curva clara** resume un conjunto de conteos simulados por el modelo para esos mismos segmentos.
+
+## Distribuciones de personas por vivienda (05–08)
+
+```{r, eval=TRUE, echo=FALSE, out.width="90%", fig.alt="Curvas observadas y simuladas de personas por vivienda en Valparaíso, O’Higgins, Maule y Biobío."}
+knitr::include_graphics("resultados/ppc_curvas_05-08.png")
+```
+
+Cada panel muestra la curva observada en azul oscuro y **50 réplicas** en azul claro. El eje horizontal muestra de 0 a 6 personas por vivienda. Las curvas se calculan con todos los valores.
+
+## Distribuciones de personas por vivienda (09–12)
+
+```{r, eval=TRUE, echo=FALSE, out.width="90%", fig.alt="Curvas observadas y simuladas de personas por vivienda en La Araucanía, Los Lagos, Aysén y Magallanes."}
+knitr::include_graphics("resultados/ppc_curvas_09-12.png")
+```
+
+Compare dónde se concentra la curva oscura, qué tan ancha es y si las curvas claras reproducen esas características.
+
+## Distribuciones de personas por vivienda (13–16)
+
+```{r, eval=TRUE, echo=FALSE, out.width="90%", fig.alt="Curvas observadas y simuladas de personas por vivienda en Metropolitana, Los Ríos, Arica y Parinacota y Ñuble."}
+knitr::include_graphics("resultados/ppc_curvas_13-16.png")
+```
+
+La curva oscura muestra los datos y las claras las réplicas. Estos chequeos son preliminares por las alertas de convergencia y se refieren a los segmentos aptos de cada región.
 
 # Decidir y documentar
 
