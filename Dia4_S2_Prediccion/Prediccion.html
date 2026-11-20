@@ -1187,7 +1187,7 @@ margin-right: 0; }
 Andrés Gutiérrez · Stalyn Guerrero 
 </div>
         <p class="quarto-title-affiliation">
-            CEPAL · UNFPA América Latina y el Caribe · INE Chile
+            CEPAL · UNFPA · INE Chile
           </p>
     </div>
 </div>
@@ -1206,15 +1206,15 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li>Generar conteos por segmento desde las cadenas conservadas.</li>
 <li>Distinguir intensidad del conteo y conteo predictivo.</li>
 <li>Incorporar supuestos de cobertura sin confundirlos con datos observados.</li>
-<li>Sumar simulaciones por comuna y comunicar sus intervalos.</li>
+<li>Agregar las réplicas por comuna, por región y para el destino nacional del modelo.</li>
 </ol>
 <p>El recorrido es guiado para personal técnico censal. No volveremos a ajustar Stan: utilizaremos el modelo que ya aprendimos a ejecutar.</p>
 </section>
 <section id="lo-que-ya-sabemos-y-lo-que-sigue-pendiente" class="slide level2">
 <h2>Lo que ya sabemos y lo que sigue pendiente</h2>
-<p>El ajuste conservado en D4S1 pasó los controles de cálculo de la capacitación. Los chequeos mostraron una pequeña discrepancia en la variación entre segmentos.</p>
+<p>D4S1 encontró alertas de muestreo en las 16 regiones, incluido Magallanes. Los chequeos predictivos también mostraron discrepancias entre el modelo y los datos.</p>
 <p>Por eso esta sesión es una <strong>demostración de predicción</strong>, no la presentación de un resultado poblacional validado.</p>
-<p>Un cálculo estable permite continuar el análisis; la adecuación del modelo, la selección de aptos, los datos y la evaluación externa siguen formando parte de la revisión.</p>
+<p>Usaremos las réplicas guardadas para aprender a agregar. Antes de usar las cifras se deben revisar el muestreo, el modelo, la selección de aptos y el alcance del destino.</p>
 </section>
 <section id="un-universo-que-debe-permanecer-explícito" class="slide level2">
 <h2>Un universo que debe permanecer explícito</h2>
@@ -1235,10 +1235,19 @@ Andrés Gutiérrez · Stalyn Guerrero
 <h2>Materiales que vamos a utilizar</h2>
 <p>Abran <code>Rcode/Prediccion.R</code> desde la carpeta <code>Dia4_S2_Prediccion</code>.</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href></a><span class="fu">library</span>(posterior)</span>
-<span id="cb1-2"><a href></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-3"><a href></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>))</span>
-<span id="cb1-4"><a href></a><span class="fu">dir.create</span>(<span class="st">&quot;resultados&quot;</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href></a><span class="co"># posterior convierte las cadenas en una matriz; ggplot2 prepara las figuras.</span></span>
+<span id="cb1-2"><a href></a><span class="fu">library</span>(posterior)</span>
+<span id="cb1-3"><a href></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>))</span>
+<span id="cb1-5"><a href></a><span class="co"># Ubicar la sesión al ejecutar desde el proyecto, la sesión o su carpeta Rcode.</span></span>
+<span id="cb1-6"><a href></a>candidatas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;Dia4_S2_Prediccion&quot;</span>, <span class="st">&quot;..&quot;</span>)</span>
+<span id="cb1-7"><a href></a>sesion <span class="ot">&lt;-</span> candidatas[<span class="fu">file.exists</span>(<span class="fu">file.path</span>(candidatas, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;destino_magallanes.rds&quot;</span>))]</span>
+<span id="cb1-8"><a href></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">length</span>(sesion)) {</span>
+<span id="cb1-9"><a href></a>  <span class="fu">stop</span>(<span class="st">&quot;Abra el proyecto CHL2026ModelosPob o fije la carpeta Dia4_S2_Prediccion como directorio de trabajo.&quot;</span>)</span>
+<span id="cb1-10"><a href></a>}</span>
+<span id="cb1-11"><a href></a><span class="fu">setwd</span>(sesion[<span class="dv">1</span>])</span>
+<span id="cb1-12"><a href></a><span class="fu">source</span>(<span class="st">&quot;Rcode/funciones_prediccion.R&quot;</span>, <span class="at">local =</span> <span class="cn">TRUE</span>, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>)</span>
+<span id="cb1-13"><a href></a><span class="fu">dir.create</span>(<span class="st">&quot;resultados&quot;</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Las cadenas y sus controles se leen de la sesión <strong>D4S1</strong>. El destino local conserva las llaves, matrices y datos definidos en D3S4, sin reutilizar sus simulaciones de parámetros.</p>
 <p>Para ejecutar R, mantengan las carpetas de la revisión en su estructura original.</p>
@@ -1379,22 +1388,31 @@ Andrés Gutiérrez · Stalyn Guerrero
 </tr>
 </tbody>
 </table>
-<p>La intensidad ya varía por los parámetros posteriores y la nueva densidad de segmento: su intervalo no representa únicamente incertidumbre sobre coeficientes.</p>
+<p>La intensidad ya varía por las réplicas de la distribución posterior de los parámetros y la nueva densidad de segmento: su intervalo no representa únicamente incertidumbre sobre coeficientes.</p>
 <p><strong>Actividad:</strong> ¿cuál de los dos intervalos utilizarían para describir la variación de un nuevo conteo de personas?</p>
 </section>
 <section id="leer-la-función-de-apoyo" class="slide level2">
 <h2>Leer la función de apoyo</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href></a>predecir <span class="ot">&lt;-</span> <span class="cf">function</span>(cobertura) {</span>
-<span id="cb3-2"><a href></a>  <span class="fu">stopifnot</span>(<span class="fu">length</span>(cobertura) <span class="sc">==</span> <span class="fu">nrow</span>(destino), <span class="fu">all</span>(<span class="fu">is.finite</span>(cobertura)),</span>
-<span id="cb3-3"><a href></a>            <span class="fu">all</span>(cobertura <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> cobertura <span class="sc">&lt;=</span> <span class="dv">1</span>))</span>
-<span id="cb3-4"><a href></a>  viviendas <span class="ot">&lt;-</span> <span class="fu">round</span>(destino<span class="sc">$</span>V_tot <span class="sc">/</span> cobertura)</span>
-<span id="cb3-5"><a href></a>  lambda <span class="ot">&lt;-</span> <span class="fu">pmin</span>(<span class="fu">pmax</span>(<span class="fu">sweep</span>(density, <span class="dv">2</span>, viviendas, <span class="st">&quot;*&quot;</span>), <span class="dv">1</span>), <span class="fl">1e7</span>)</span>
-<span id="cb3-6"><a href></a>  <span class="co"># qpois transforma los mismos uniformes en conteos Poisson por escenario.</span></span>
-<span id="cb3-7"><a href></a>  y <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">qpois</span>(<span class="fu">as.vector</span>(uniforms), <span class="fu">as.vector</span>(lambda)), <span class="fu">nrow</span>(lambda))</span>
-<span id="cb3-8"><a href></a>  <span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(y)), <span class="fu">all</span>(y <span class="sc">&gt;=</span> <span class="dv">0</span>))</span>
-<span id="cb3-9"><a href></a>  <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">lambda =</span> lambda, <span class="at">viviendas =</span> viviendas, <span class="at">cobertura =</span> cobertura)</span>
-<span id="cb3-10"><a href></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href></a><span class="co">#&#39; Predecir los segmentos de Magallanes</span></span>
+<span id="cb3-2"><a href></a><span class="co">#&#39;</span></span>
+<span id="cb3-3"><a href></a><span class="co">#&#39; @param cobertura Vector de coberturas en (0, 1], una por segmento.</span></span>
+<span id="cb3-4"><a href></a><span class="co">#&#39; @param destino Tabla ordenada de segmentos con la exposición V_tot.</span></span>
+<span id="cb3-5"><a href></a><span class="co">#&#39; @param density Matriz de densidades simuladas, con réplicas en filas.</span></span>
+<span id="cb3-6"><a href></a><span class="co">#&#39; @param uniforms Matriz de uniformes con las mismas dimensiones que density.</span></span>
+<span id="cb3-7"><a href></a><span class="co">#&#39; @return Lista con conteos, intensidades esperadas, viviendas y coberturas.</span></span>
+<span id="cb3-8"><a href></a><span class="co">#&#39; @examples</span></span>
+<span id="cb3-9"><a href></a><span class="co">#&#39; predecir(1, data.frame(V_tot = 50), matrix(3), matrix(0.5))</span></span>
+<span id="cb3-10"><a href></a>predecir <span class="ot">&lt;-</span> <span class="cf">function</span>(cobertura, destino, density, uniforms) {</span>
+<span id="cb3-11"><a href></a>  <span class="fu">stopifnot</span>(<span class="fu">length</span>(cobertura) <span class="sc">==</span> <span class="fu">nrow</span>(destino), <span class="fu">all</span>(<span class="fu">is.finite</span>(cobertura)),</span>
+<span id="cb3-12"><a href></a>            <span class="fu">all</span>(cobertura <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> cobertura <span class="sc">&lt;=</span> <span class="dv">1</span>))</span>
+<span id="cb3-13"><a href></a>  viviendas <span class="ot">&lt;-</span> <span class="fu">round</span>(destino<span class="sc">$</span>V_tot <span class="sc">/</span> cobertura)</span>
+<span id="cb3-14"><a href></a>  lambda <span class="ot">&lt;-</span> <span class="fu">pmin</span>(<span class="fu">pmax</span>(<span class="fu">sweep</span>(density, <span class="dv">2</span>, viviendas, <span class="st">&quot;*&quot;</span>), <span class="dv">1</span>), <span class="fl">1e7</span>)</span>
+<span id="cb3-15"><a href></a>  <span class="co"># qpois transforma los mismos uniformes en conteos Poisson por escenario.</span></span>
+<span id="cb3-16"><a href></a>  y <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">qpois</span>(<span class="fu">as.vector</span>(uniforms), <span class="fu">as.vector</span>(lambda)), <span class="fu">nrow</span>(lambda))</span>
+<span id="cb3-17"><a href></a>  <span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(y)), <span class="fu">all</span>(y <span class="sc">&gt;=</span> <span class="dv">0</span>))</span>
+<span id="cb3-18"><a href></a>  <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">lambda =</span> lambda, <span class="at">viviendas =</span> viviendas, <span class="at">cobertura =</span> cobertura)</span>
+<span id="cb3-19"><a href></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>La función recibe una cobertura por segmento.</p>
 <p><code>qpois()</code> transforma números aleatorios uniformes en conteos Poisson.</p>
@@ -1475,12 +1493,14 @@ V_i^{tot}=\operatorname{round}(VPO_i/c_i).
 <section id="tres-escenarios-para-comparar" class="slide level2">
 <h2>Tres escenarios para comparar</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href></a><span class="co"># Son supuestos didacticos fijos, no tasas de cobertura estimadas.</span></span>
-<span id="cb4-2"><a href></a>c_base <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(destino))</span>
-<span id="cb4-3"><a href></a>c_uniforme <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.95</span>, <span class="fu">nrow</span>(destino))</span>
-<span id="cb4-4"><a href></a>c_focalizada <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">as.character</span>(destino<span class="sc">$</span>clasificacion_cobertura) <span class="sc">==</span> <span class="st">&quot;Incompleta&quot;</span>, <span class="fl">0.90</span>, <span class="dv">1</span>)</span>
-<span id="cb4-5"><a href></a>coverage_scenarios <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">base =</span> c_base, <span class="at">uniforme_095 =</span> c_uniforme,</span>
-<span id="cb4-6"><a href></a>                           <span class="at">focalizada_090 =</span> c_focalizada)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href></a><span class="co"># Comparar el mismo destino: base, 95 % en todos y 90 % solo en Incompleta.</span></span>
+<span id="cb4-2"><a href></a><span class="co"># Son valores de cobertura fijados para el ejercicio.</span></span>
+<span id="cb4-3"><a href></a></span>
+<span id="cb4-4"><a href></a>c_base <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(destino))</span>
+<span id="cb4-5"><a href></a>c_uniforme <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.95</span>, <span class="fu">nrow</span>(destino))</span>
+<span id="cb4-6"><a href></a>c_focalizada <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">as.character</span>(destino<span class="sc">$</span>clasificacion_cobertura) <span class="sc">==</span> <span class="st">&quot;Incompleta&quot;</span>, <span class="fl">0.90</span>, <span class="dv">1</span>)</span>
+<span id="cb4-7"><a href></a>coverage_scenarios <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">base =</span> c_base, <span class="at">uniforme_095 =</span> c_uniforme,</span>
+<span id="cb4-8"><a href></a>                           <span class="at">focalizada_090 =</span> c_focalizada)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
 <li><strong>Base:</strong> exposición observada.</li>
@@ -1594,7 +1614,7 @@ V_i^{tot}=\operatorname{round}(VPO_i/c_i).
 <td>Ajustar nuevamente y revisar</td>
 </tr>
 <tr class="odd">
-<td>Covariables, agrupamiento o previas</td>
+<td>Covariables, agrupamiento o distribuciones previas</td>
 <td>Ajustar nuevamente y revisar</td>
 </tr>
 <tr class="even">
@@ -1658,8 +1678,336 @@ V_i^{tot}=\operatorname{round}(VPO_i/c_i).
 <section id="del-segmento-a-otros-niveles-territoriales" class="slide level2">
 <h2>Del segmento a otros niveles territoriales</h2>
 <p>El mismo procedimiento permite agrupar por comuna, zona u otra clasificación, conservando el orden de las simulaciones y las llaves.</p>
-<p>Para formar un total regional completo debemos resolver los universos excluidos. Para agregar regiones, además se necesita una construcción conjunta coherente con su dependencia o independencia en el modelo.</p>
-<p>No se obtiene un total nacional sumando medianas de archivos regionales ni se presenta un agregado nacional en esta demostración.</p>
+<p>Para formar un total regional completo debemos resolver los universos excluidos. Para agregar regiones, además se necesita una construcción conjunta coherente con su dependencia o independencia en el modelo. A continuación sumaremos una réplica de cada región y calcularemos los intervalos a partir de esas sumas.</p>
+</section>
+<section id="actividad-repetir-la-predicción-en-otra-región" class="slide level2">
+<h2>Actividad: repetir la predicción en otra región</h2>
+<p>Descompriman el paquete de la práctica. En RStudio, fijen como directorio de trabajo la carpeta que contiene <code>Rcode/</code> y <code>data/regiones/</code>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href></a><span class="fu">Sys.setenv</span>(<span class="at">CHL2026_REGION =</span> <span class="st">&quot;05&quot;</span>)  <span class="co"># Valparaíso</span></span>
+<span id="cb6-2"><a href></a><span class="fu">source</span>(<span class="st">&quot;Rcode/Predecir_una_region.R&quot;</span>, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<ol type="1">
+<li>Cambien el código para elegir cualquier región, de <code>&quot;01&quot;</code> a <code>&quot;16&quot;</code>. El script indica qué región y cuántos segmentos del destino está usando.</li>
+<li>Ejecuten la predicción base y el escenario de cobertura del 95 %. Para probar otro supuesto, cambien <code>cobertura</code> en el script.</li>
+<li>Comparen las medianas y los intervalos del 95 % para la región y para sus zonas rural, aldea y urbana. Expliquen qué supuesto cambió.</li>
+</ol>
+</section>
+<section id="qué-reproduce-el-ejercicio-regional" class="slide level2">
+<h2>Qué reproduce el ejercicio regional</h2>
+<ul>
+<li><strong>Base original de Stan.</strong> R vuelve a resumir las 2.000 réplicas guardadas del total regional.</li>
+<li><strong>Base en R.</strong> R simula conteos por segmento a partir de los parámetros ya ajustados y suma dentro de cada réplica.</li>
+<li><strong>Escenario en R.</strong> R repite el cálculo con la exposición modificada. Usa los mismos números aleatorios para comparar los escenarios.</li>
+</ul>
+<p>La base en R genera conteos nuevos. Se comparan sus resúmenes con los originales de Stan. Todo el ejercicio funciona con <strong>R base</strong> y los archivos regionales incluidos. Las alertas de D4S1 mantienen los resultados como preliminares.</p>
+</section>
+<section id="cómo-se-forma-una-réplica-nacional" class="slide level2">
+<h2>Cómo se forma una réplica nacional</h2>
+<ol type="1">
+<li>Lean los totales simulados de las <strong>16 regiones</strong>. Cada total regional ya suma los segmentos de su destino dentro de una réplica.</li>
+<li>Combinen al azar un total de cada región. El ejemplo trata los ajustes regionales como independientes. La combinación se repite hasta usar las 2.000 réplicas de cada región.</li>
+<li>Sumen los 16 valores de cada combinación y agreguen el conteo fijo de 254.224 personas censadas sin segmento asignado. Calculen la mediana y el intervalo predictivo del 95 % sobre esos totales.</li>
+</ol>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href></a><span class="fu">source</span>(<span class="st">&quot;Rcode/Prediccion_nacional.R&quot;</span>, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>)</span>
+<span id="cb7-2"><a href></a><span class="fu">quantile</span>(total_chile, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Los archivos regionales están en <code>data/regiones/</code>. La semilla fija permite repetir el emparejamiento. El número de cadena o de iteración de una región no vincula sus réplicas con las de otra.</p>
+</section>
+<section id="predicción-por-región-0108" class="slide level2">
+<h2>Predicción por región (01–08)</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="caption-top">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 17%">
+<col style="width: 32%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Región</th>
+<th style="text-align: right;">Censado en el destino</th>
+<th style="text-align: right;">Mediana</th>
+<th style="text-align: right;">P2,5</th>
+<th style="text-align: right;">P97,5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">01</td>
+<td style="text-align: left;">Tarapacá</td>
+<td style="text-align: right;">358.910</td>
+<td style="text-align: right;">380.166</td>
+<td style="text-align: right;">374.452</td>
+<td style="text-align: right;">385.807</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">02</td>
+<td style="text-align: left;">Antofagasta</td>
+<td style="text-align: right;">618.389</td>
+<td style="text-align: right;">652.395</td>
+<td style="text-align: right;">646.386</td>
+<td style="text-align: right;">658.224</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">03</td>
+<td style="text-align: left;">Atacama</td>
+<td style="text-align: right;">294.897</td>
+<td style="text-align: right;">312.804</td>
+<td style="text-align: right;">309.937</td>
+<td style="text-align: right;">315.768</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">04</td>
+<td style="text-align: left;">Coquimbo</td>
+<td style="text-align: right;">817.236</td>
+<td style="text-align: right;">861.148</td>
+<td style="text-align: right;">855.908</td>
+<td style="text-align: right;">866.491</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">05</td>
+<td style="text-align: left;">Valparaíso</td>
+<td style="text-align: right;">1.866.910</td>
+<td style="text-align: right;">1.976.805</td>
+<td style="text-align: right;">1.968.921</td>
+<td style="text-align: right;">1.984.230</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">06</td>
+<td style="text-align: left;">O’Higgins</td>
+<td style="text-align: right;">981.737</td>
+<td style="text-align: right;">1.025.346</td>
+<td style="text-align: right;">1.021.268</td>
+<td style="text-align: right;">1.029.943</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">07</td>
+<td style="text-align: left;">Maule</td>
+<td style="text-align: right;">1.114.486</td>
+<td style="text-align: right;">1.160.686</td>
+<td style="text-align: right;">1.156.798</td>
+<td style="text-align: right;">1.164.427</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">08</td>
+<td style="text-align: left;">Biobío</td>
+<td style="text-align: right;">1.606.060</td>
+<td style="text-align: right;">1.696.901</td>
+<td style="text-align: right;">1.690.661</td>
+<td style="text-align: right;">1.703.163</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Las cifras censadas y las predicciones corresponden a los mismos segmentos del destino de cada región.</p>
+</section>
+<section id="predicción-por-región-0916" class="slide level2">
+<h2>Predicción por región (09–16)</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 25%">
+<col style="width: 29%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Región</th>
+<th style="text-align: right;">Censado en el destino</th>
+<th style="text-align: right;">Mediana</th>
+<th style="text-align: right;">P2,5</th>
+<th style="text-align: right;">P97,5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">09</td>
+<td style="text-align: left;">La Araucanía</td>
+<td style="text-align: right;">1.003.546</td>
+<td style="text-align: right;">1.054.684</td>
+<td style="text-align: right;">1.050.295</td>
+<td style="text-align: right;">1.058.774</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Los Lagos</td>
+<td style="text-align: right;">870.825</td>
+<td style="text-align: right;">907.118</td>
+<td style="text-align: right;">903.445</td>
+<td style="text-align: right;">910.664</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">Aysén</td>
+<td style="text-align: right;">98.351</td>
+<td style="text-align: right;">101.966</td>
+<td style="text-align: right;">100.939</td>
+<td style="text-align: right;">103.099</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">Magallanes</td>
+<td style="text-align: right;">163.961</td>
+<td style="text-align: right;">170.407</td>
+<td style="text-align: right;">168.626</td>
+<td style="text-align: right;">172.314</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">13</td>
+<td style="text-align: left;">Metropolitana</td>
+<td style="text-align: right;">7.291.744</td>
+<td style="text-align: right;">7.798.844</td>
+<td style="text-align: right;">7.777.063</td>
+<td style="text-align: right;">7.820.585</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">14</td>
+<td style="text-align: left;">Los Ríos</td>
+<td style="text-align: right;">393.520</td>
+<td style="text-align: right;">412.281</td>
+<td style="text-align: right;">408.434</td>
+<td style="text-align: right;">415.564</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">Arica y Parinacota</td>
+<td style="text-align: right;">237.430</td>
+<td style="text-align: right;">245.871</td>
+<td style="text-align: right;">242.782</td>
+<td style="text-align: right;">249.265</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">16</td>
+<td style="text-align: left;">Ñuble</td>
+<td style="text-align: right;">508.206</td>
+<td style="text-align: right;">529.566</td>
+<td style="text-align: right;">526.458</td>
+<td style="text-align: right;">532.627</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>P2,5 y P97,5 se calculan con las réplicas de cada total regional. Para el intervalo de Chile se vuelven a calcular los percentiles después de sumar.</p>
+</section>
+<section id="resultado-para-el-destino-nacional-del-modelo" class="slide level2">
+<h2>Resultado nacional con el conteo sin segmento</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 21%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Universo</th>
+<th style="text-align: right;">Personas censadas</th>
+<th style="text-align: right;">Media</th>
+<th style="text-align: right;">Mediana</th>
+<th style="text-align: right;">P2,5</th>
+<th style="text-align: right;">P97,5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Segmentos destino</td>
+<td style="text-align: right;">18.226.208</td>
+<td style="text-align: right;">19.286.832</td>
+<td style="text-align: right;">19.286.772</td>
+<td style="text-align: right;">19.258.914</td>
+<td style="text-align: right;">19.314.988</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Con censo sin segmento</td>
+<td style="text-align: right;">18.480.432</td>
+<td style="text-align: right;">19.541.056</td>
+<td style="text-align: right;">19.540.996</td>
+<td style="text-align: right;">19.513.138</td>
+<td style="text-align: right;">19.569.212</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li><strong>Conteo fijo.</strong> Se suman <strong>254.224 personas censadas sin segmento asignado</strong> a cada réplica nacional y al conteo censado de referencia, siguiendo el paso 07 del proyecto. El intervalo conserva su amplitud.</li>
+<li><strong>Alcance.</strong> La predicción cubre los <strong>196.647 segmentos del destino original</strong>, incluidos 4.727 con exposición implementada igual a cero. El programa aplica un mínimo de 1 a su intensidad predictiva. Las alertas de convergencia mantienen el resultado como preliminar.</li>
+</ul>
+</section>
+<section id="resultados-por-zona-en-las-16-regiones" class="slide level2">
+<h2>Resultados por zona en las 16 regiones</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 11%">
+<col style="width: 21%">
+<col style="width: 16%">
+<col style="width: 13%">
+<col style="width: 15%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Zona</th>
+<th style="text-align: right;">Segmentos</th>
+<th style="text-align: right;">Personas censadas</th>
+<th style="text-align: right;">Media de Stan</th>
+<th style="text-align: right;">P2,5 en R</th>
+<th style="text-align: right;">Mediana en R</th>
+<th style="text-align: right;">P97,5 en R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Rural</td>
+<td style="text-align: right;">28.352</td>
+<td style="text-align: right;">2.040.255</td>
+<td style="text-align: right;">2.096.711</td>
+<td style="text-align: right;">2.089.888</td>
+<td style="text-align: right;">2.096.734</td>
+<td style="text-align: right;">2.103.358</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Aldea</td>
+<td style="text-align: right;">8.013</td>
+<td style="text-align: right;">408.212</td>
+<td style="text-align: right;">419.759</td>
+<td style="text-align: right;">417.320</td>
+<td style="text-align: right;">419.732</td>
+<td style="text-align: right;">422.070</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Urbana</td>
+<td style="text-align: right;">160.282</td>
+<td style="text-align: right;">15.777.741</td>
+<td style="text-align: right;">16.770.362</td>
+<td style="text-align: right;">16.743.601</td>
+<td style="text-align: right;">16.770.412</td>
+<td style="text-align: right;">16.795.969</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>La <strong>media de Stan</strong> suma las medias originales por segmento. Para obtener el intervalo y la mediana por zona, R genera conteos nuevos con los mismos parámetros y suma dentro de cada réplica. El conteo sin segmento se incorpora únicamente al total nacional. Para reproducir la tabla, ejecuten <code>Rcode/Prediccion_por_zona.R</code> después del script nacional.</p>
 </section></section>
 <section>
 <section id="interpretar-y-documentar" class="title-slide slide level1 center">
@@ -1681,7 +2029,7 @@ V_i^{tot}=\operatorname{round}(VPO_i/c_i).
 </thead>
 <tbody>
 <tr class="odd">
-<td>Variación posterior de parámetros</td>
+<td>Variación en la distribución posterior de los parámetros</td>
 <td>Error o incertidumbre de las coberturas fijadas</td>
 </tr>
 <tr class="even">

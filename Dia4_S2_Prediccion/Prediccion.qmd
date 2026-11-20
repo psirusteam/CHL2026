@@ -2,7 +2,7 @@
 title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
 subtitle: "Predicción en segmentos censales: escenarios y agregación de incertidumbre"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
-institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+institute: "CEPAL · UNFPA · INE Chile"
 date: 2026-11-26
 date-format: "D [de] MMMM [de] YYYY"
 lang: es
@@ -23,9 +23,11 @@ format:
 
 ```{r setup, include=FALSE}
 knitr::read_chunk("Rcode/Prediccion.R")
+knitr::read_chunk("Rcode/funciones_prediccion.R")
 knitr::opts_chunk$set(eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE,
   comment="", fig.align="center", out.width="90%")
 res <- readRDS("resultados/resumen.rds")
+nacional <- readRDS("resultados/prediccion_chile.rds")
 ```
 
 # De las cadenas a una predicción utilizable
@@ -37,18 +39,18 @@ En D4S1 revisamos el cálculo y su relación con los datos. Ahora aprenderemos a
 1. Generar conteos por segmento desde las cadenas conservadas.
 2. Distinguir intensidad del conteo y conteo predictivo.
 3. Incorporar supuestos de cobertura sin confundirlos con datos observados.
-4. Sumar simulaciones por comuna y comunicar sus intervalos.
+4. Agregar las réplicas por comuna, por región y para el destino nacional del modelo.
 
 El recorrido es guiado para personal técnico censal. No volveremos a ajustar Stan: utilizaremos el modelo que ya aprendimos a ejecutar.
 
 
 ## Lo que ya sabemos y lo que sigue pendiente
 
-El ajuste conservado en D4S1 pasó los controles de cálculo de la capacitación. Los chequeos mostraron una pequeña discrepancia en la variación entre segmentos.
+D4S1 encontró alertas de muestreo en las 16 regiones, incluido Magallanes. Los chequeos predictivos también mostraron discrepancias entre el modelo y los datos.
 
 Por eso esta sesión es una **demostración de predicción**, no la presentación de un resultado poblacional validado.
 
-Un cálculo estable permite continuar el análisis; la adecuación del modelo, la selección de aptos, los datos y la evaluación externa siguen formando parte de la revisión.
+Usaremos las réplicas guardadas para aprender a agregar. Antes de usar las cifras se deben revisar el muestreo, el modelo, la selección de aptos y el alcance del destino.
 
 ## Un universo que debe permanecer explícito
 
@@ -156,7 +158,7 @@ En esta ejecución, **`r format(round(res$cap_pct, 3), nsmall=3)` %** de las den
 | `lambda` | Valor esperado del conteo dado el estado simulado de densidad y exposición |
 | `y` | Añade la variación Poisson de un conteo nuevo |
 
-La intensidad ya varía por los parámetros posteriores y la nueva densidad de segmento: su intervalo no representa únicamente incertidumbre sobre coeficientes.
+La intensidad ya varía por las réplicas de la distribución posterior de los parámetros y la nueva densidad de segmento: su intervalo no representa únicamente incertidumbre sobre coeficientes.
 
 **Actividad:** ¿cuál de los dos intervalos utilizarían para describir la variación de un nuevo conteo de personas?
 
@@ -254,7 +256,7 @@ La proximidad al censo o un intervalo más estrecho no bastan para seleccionar u
 |---|---|
 | Solo cobertura o exposición predictiva del mismo destino | Regenerar predicciones |
 | Aptos, personas o viviendas utilizadas en el ajuste | Ajustar nuevamente y revisar |
-| Covariables, agrupamiento o previas | Ajustar nuevamente y revisar |
+| Covariables, agrupamiento o distribuciones previas | Ajustar nuevamente y revisar |
 | Nuevos segmentos o grupos | Verificar matrices, disponibilidad de efectos y alcance de la extrapolación |
 
 La separación entre ajuste y predicción ahorra trabajo, pero no elimina la revisión metodológica.
@@ -301,9 +303,86 @@ Cada comuna aparece solo con los segmentos de nuestro destino. La escala horizon
 
 El mismo procedimiento permite agrupar por comuna, zona u otra clasificación, conservando el orden de las simulaciones y las llaves.
 
-Para formar un total regional completo debemos resolver los universos excluidos. Para agregar regiones, además se necesita una construcción conjunta coherente con su dependencia o independencia en el modelo.
+Para formar un total regional completo debemos resolver los universos excluidos. Para agregar regiones, además se necesita una construcción conjunta coherente con su dependencia o independencia en el modelo. A continuación sumaremos una réplica de cada región y calcularemos los intervalos a partir de esas sumas.
 
-No se obtiene un total nacional sumando medianas de archivos regionales ni se presenta un agregado nacional en esta demostración.
+## Actividad: repetir la predicción en otra región
+
+Descompriman el paquete de la práctica. En RStudio, fijen como directorio de trabajo la carpeta que contiene `Rcode/` y `data/regiones/`.
+
+```r
+Sys.setenv(CHL2026_REGION = "05")  # Valparaíso
+source("Rcode/Predecir_una_region.R", encoding = "UTF-8")
+```
+
+1. Cambien el código para elegir cualquier región, de `"01"` a `"16"`. El script indica qué región y cuántos segmentos del destino está usando.
+2. Ejecuten la predicción base y el escenario de cobertura del 95 %. Para probar otro supuesto, cambien `cobertura` en el script.
+3. Comparen las medianas y los intervalos del 95 % para la región y para sus zonas rural, aldea y urbana. Expliquen qué supuesto cambió.
+
+## Qué reproduce el ejercicio regional
+
+- **Base original de Stan.** R vuelve a resumir las 2.000 réplicas guardadas del total regional.
+- **Base en R.** R simula conteos por segmento a partir de los parámetros ya ajustados y suma dentro de cada réplica.
+- **Escenario en R.** R repite el cálculo con la exposición modificada. Usa los mismos números aleatorios para comparar los escenarios.
+
+La base en R genera conteos nuevos. Se comparan sus resúmenes con los originales de Stan. Todo el ejercicio funciona con **R base** y los archivos regionales incluidos. Las alertas de D4S1 mantienen los resultados como preliminares.
+
+## Cómo se forma una réplica nacional
+
+1. Lean los totales simulados de las **16 regiones**. Cada total regional ya suma los segmentos de su destino dentro de una réplica.
+2. Combinen al azar un total de cada región. El ejemplo trata los ajustes regionales como independientes. La combinación se repite hasta usar las 2.000 réplicas de cada región.
+3. Sumen los 16 valores de cada combinación y agreguen el conteo fijo de 254.224 personas censadas sin segmento asignado. Calculen la mediana y el intervalo predictivo del 95 % sobre esos totales.
+
+```{r}
+source("Rcode/Prediccion_nacional.R", encoding = "UTF-8")
+quantile(total_chile, c(0.025, 0.5, 0.975))
+```
+
+Los archivos regionales están en `data/regiones/`. La semilla fija permite repetir el emparejamiento. El número de cadena o de iteración de una región no vincula sus réplicas con las de otra.
+
+## Predicción por región (01–08)
+
+```{r, eval=TRUE, echo=FALSE}
+tabla_regiones <- function(i) {
+  knitr::kable(nacional$regiones[i, c("region", "observado", "mediana", "inferior", "superior")],
+    col.names = c("Región", "Censado en el destino", "Mediana", "P2,5", "P97,5"),
+    digits = 0, format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
+}
+tabla_regiones(1:8)
+```
+
+Las cifras censadas y las predicciones corresponden a los mismos segmentos del destino de cada región.
+
+## Predicción por región (09–16)
+
+```{r, eval=TRUE, echo=FALSE}
+tabla_regiones(9:16)
+```
+
+P2,5 y P97,5 se calculan con las réplicas de cada total regional. Para el intervalo de Chile se vuelven a calcular los percentiles después de sumar.
+
+## Resultado nacional con el conteo sin segmento {#resultado-para-el-destino-nacional-del-modelo}
+
+```{r, eval=TRUE, echo=FALSE}
+campos <- c("observado", "media", "mediana", "inferior", "superior")
+t <- rbind(nacional$pais_segmentos[campos], nacional$pais[campos])
+t <- cbind(Componente = c("Segmentos destino", "Con censo sin segmento"), t)
+knitr::kable(t, col.names = c("Universo", "Personas censadas", "Media", "Mediana", "P2,5", "P97,5"),
+  digits = 0, format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
+```
+
+- **Conteo fijo.** Se suman **254.224 personas censadas sin segmento asignado** a cada réplica nacional y al conteo censado de referencia, siguiendo el paso 07 del proyecto. El intervalo conserva su amplitud.
+- **Alcance.** La predicción cubre los **196.647 segmentos del destino original**, incluidos 4.727 con exposición implementada igual a cero. El programa aplica un mínimo de 1 a su intensidad predictiva. Las alertas de convergencia mantienen el resultado como preliminar.
+
+## Resultados por zona en las 16 regiones
+
+```{r, eval=TRUE, echo=FALSE}
+zonas <- readRDS("resultados/prediccion_por_zona.rds")$nacional
+knitr::kable(zonas, col.names = c("Zona", "Segmentos", "Personas censadas", "Media de Stan",
+  "P2,5 en R", "Mediana en R", "P97,5 en R"),
+  digits = 0, format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
+```
+
+La **media de Stan** suma las medias originales por segmento. Para obtener el intervalo y la mediana por zona, R genera conteos nuevos con los mismos parámetros y suma dentro de cada réplica. El conteo sin segmento se incorpora únicamente al total nacional. Para reproducir la tabla, ejecuten `Rcode/Prediccion_por_zona.R` después del script nacional.
 
 # Interpretar y documentar
 
@@ -311,7 +390,7 @@ No se obtiene un total nacional sumando medianas de archivos regionales ni se pr
 
 | Incluye en esta demostración | No queda resuelto por el intervalo |
 |---|---|
-| Variación posterior de parámetros | Error o incertidumbre de las coberturas fijadas |
+| Variación en la distribución posterior de los parámetros | Error o incertidumbre de las coberturas fijadas |
 | Nueva variación de segmento | Sesgo por selección de aptos o mala especificación |
 | Variación Poisson de conteos | Población de los segmentos y universos excluidos |
 
