@@ -4,7 +4,7 @@ data {
   int<lower=1> p;              // columnas de X (incluye el intercepto)
   matrix[n, p] X;              // covariables
   vector[n] y;                 // log(delta_i)
-  real<lower=0> sd_beta;       // desviacion estandar de la previa de beta
+  real<lower=0> sd_beta;       // desviacion estandar de la distribución previa de beta
 }
 parameters {
   vector[p] beta;

@@ -2,7 +2,7 @@
 title: "Taller de fortalecimiento de capacidades en modelación estadística de población en Chile"
 subtitle: "Práctica computacional en RStan: regresión bayesiana de la densidad"
 author: "Andrés Gutiérrez · Stalyn Guerrero"
-institute: "CEPAL · UNFPA América Latina y el Caribe · INE Chile"
+institute: "CEPAL · UNFPA · INE Chile"
 date: 2026-11-24
 date-format: "D [de] MMMM [de] YYYY"
 lang: es
@@ -39,9 +39,6 @@ leer <- function(nombre) readRDS(ruta_resultado(nombre))
 3. Explorar una dispersión distinta por zona.
 4. Revisar las implicaciones de las previas antes de adoptar una especificación.
 
-El ejercicio 4 se conserva como extensión y puente al modelo de conteos.
-
-**Producto por pareja:** una comparación de modelos con su diagnóstico, una conclusión predictiva y una propuesta de revisión de las previas.
 
 
 ## Organización de la práctica
@@ -112,9 +109,13 @@ mostrar("grafico_ej1")
 mostrar("signos", digits = 3, font_size = 19)
 ```
 
-::: {.caja}
-Mantienen el signo: `r with(leer("signos"), paste(termino[mismo_signo], collapse = ", "))`. Cambian de signo: `r with(leer("signos"), paste(termino[!mismo_signo], collapse = ", "))`. Estos signos corresponden a medias posteriores de dos regiones. No prueban una diferencia entre efectos ni justifican por sí solos una especificación para todo el país.
-:::
+## Solución 1: discusión
+
+
+- **Qué muestra la tabla.** Las medias de la distribución posterior tienen el mismo signo en 8 de los 12 términos. Por ejemplo, el coeficiente de `zona_aldea` cambia de −0,071 en Aysén a 0,335 en Magallanes. Es una comparación con la zona rural en cada región.
+- **Cómo evaluar la diferencia.** Reste Aysén de Magallanes réplica a réplica y revise el intervalo de la diferencia. La diapositiva siguiente muestra ese resultado.
+- **Antes de elegir un modelo común o regional.** Compare cómo predice cada opción y compruebe si genera valores plausibles de personas por vivienda. La solución 5 ilustra cómo revisar esa plausibilidad antes de ajustar el modelo.
+
 
 ## Diferencias posteriores entre regiones
 
@@ -136,7 +137,7 @@ En Aysén, compare dos modelos:
 
 1. Ajuste ambos y compare su $\sigma$ posterior.
 2. Calcule en R la **log-verosimilitud puntual** $\log p(y_i \mid \boldsymbol\beta^{(s)}, \sigma^{(s)})$ y compare los modelos con **LOO** [@vehtari2017loo] usando `loo()` y `loo_compare()`.
-3. Revise Pareto-k antes de interpretar diferencias de elpd. Si hay casos señalados, indique cómo comprobaría la comparación mediante reajustes exactos o K-fold.
+3. Explique cómo comprobaría la comparación si la aproximación fuera poco fiable para un segmento.
 :::
 
 ## Recordatorio: validación cruzada dejando uno fuera
@@ -149,14 +150,9 @@ $$
 p(y_i \mid \mathbf{y}_{-i}) = \int p(y_i \mid \boldsymbol\theta)\,p(\boldsymbol\theta \mid \mathbf{y}_{-i})\,d\boldsymbol\theta.
 $$
 
-Reajustar el modelo $n$ veces puede ser costoso; **PSIS-LOO** lo aproxima con los draws de un solo ajuste mediante muestreo por importancia:
+**LOO** deja fuera un segmento por vez y evalúa cuánto respaldo da el modelo al valor observado de ese segmento usando los demás para el ajuste. La suma de los puntajes es `elpd_loo`. Un valor mayor indica un mejor desempeño predictivo estimado para esta tarea.
 
-$$
-p(y_i \mid \mathbf{y}_{-i}) \approx \frac{\sum_s w_i^{(s)}\,p(y_i \mid \boldsymbol\theta^{(s)})}{\sum_s w_i^{(s)}}, \qquad
-w_i^{(s)} \propto \frac{1}{p(y_i \mid \boldsymbol\theta^{(s)})},
-$$
-
-con pesos suavizados por una distribución de Pareto. El umbral de Pareto-k depende del número de draws: $\min(1-1/\log_{10}S,\ 0{,}7)$. Revise las observaciones señaladas y, si procede, use reajustes LOO exactos o validación cruzada K-fold antes de adoptar el ranking.
+**PSIS** es el método que aproxima esos reajustes. Reutiliza las réplicas de un solo ajuste y cambia el peso de cada una para aproximar el resultado de dejar fuera cada segmento.
 
 ## Solución 2: ajustes
 
@@ -176,19 +172,13 @@ mostrar("comparacion_loo")
 mostrar("tabla_loo", digits = 3)
 ```
 
-## Antes de interpretar LOO
 
-```{r, eval = TRUE, echo = FALSE}
-mostrar("diagnostico_loo", digits = 3)
-```
-
-En esta ejecución, el modelo B tiene un Pareto-k superior a 1: la aproximación por importancia es problemática para ese segmento. Las diferencias de elpd mostradas son **provisionales y no justifican adoptar el ranking**. Primero hay que comprobar el caso con un reajuste LOO exacto o una estrategia alternativa de validación.
 
 ## Solución 2: interpretación
 
 ::: {.caja}
 - `elpd_diff` es la diferencia en capacidad predictiva fuera de muestra; el mejor modelo aparece con 0.
-- La diferencia **B menos A** es `r fmt(v$elpd_diff, 1)` unidades de elpd, con error estándar `r fmt(v$se_diff, 1)`. El signo indica la dirección; interprete la magnitud respecto de su incertidumbre y los diagnósticos PSIS.
+- La diferencia **B menos A** es `r fmt(v$elpd_diff, 1)` unidades de elpd, con error estándar `r fmt(v$se_diff, 1)`. El signo indica la dirección; interprete la magnitud respecto de su incertidumbre y la fiabilidad de la aproximación.
 - Esta validación deja fuera un segmento del conjunto apto de Aysén. No evalúa directamente predicción en otra región, en no aptos o en bloques espaciales; esas tareas requieren una partición adecuada.
 - `p_loo` mide complejidad efectiva y puede diferir del número de coeficientes; valores inusuales motivan revisar el ajuste y las observaciones influyentes.
 :::
@@ -239,27 +229,24 @@ mostrar("comparacion_sz")
 
 ## Solución 3: chequeo predictivo
 
-```{r ej3-ppc}
-```
+Compare la desviación observada con las réplicas por zona. Reproducir ese estadístico no garantiza adecuación en colas, medias, otros subgrupos o dependencia espacial.
 
 ```{r, eval = TRUE, echo = FALSE, out.width = "85%"}
 mostrar("grafico_ej3")
 ```
 
-Compare la desviación observada con las réplicas por zona. Reproducir ese estadístico no garantiza adecuación en colas, medias, otros subgrupos o dependencia espacial.
-
-# Ejercicio 4 (extensión): población implícita con viviendas observadas
+# Ejercicio 4: población implícita con viviendas observadas
 
 ## Ejercicio 4
 
 ::: {.ejercicio}
 1. Con el modelo B ajustado en Aysén, simule la predictiva posterior de $\delta_i$ para **todos** los segmentos, aptos y no aptos.
-2. Calcule en cada draw la población implícita $\hat Y_i = \hat\delta_i \times V_i$ con las viviendas ocupadas **observadas**, y súmela por clasificación de cobertura.
+2. Calcule en cada réplica la población implícita $\hat Y_i = \hat\delta_i \times V_i$ con las viviendas ocupadas **observadas**, y súmela por clasificación de cobertura.
 3. Compare con las personas censadas. ¿Dónde aumenta o disminuye el total implícito? ¿Qué supuestos condicionan esa diferencia?
 4. ¿Qué pasa con los segmentos con $V_i = 0$? ¿Qué información faltaría para corregir la **subcobertura de viviendas**?
 :::
 
-## Recordatorio: totales por draw
+## Recordatorio: totales por réplica {#recordatorio-totales-por-draw}
 
 Para un conjunto de segmentos $A$:
 
@@ -268,9 +255,9 @@ T_A^{(s)} = \sum_{i \in A} \hat\delta_i^{(s)} V_i, \qquad
 \hat\delta_i^{(s)} = \exp\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)} + \sigma^{(s)}\varepsilon_i^{(s)}\big).
 $$
 
-- Se suma **dentro** de cada draw y luego se resumen los $T_A^{(s)}$.
+- Se suma **dentro** de cada réplica y luego se resumen los $T_A^{(s)}$.
 - Estos son totales implícitos continuos bajo un modelo de densidad. No incluyen una nueva simulación Poisson de personas ni constituyen una estimación validada de omisión censal.
-- Si $V_i = 0$, $\hat Y_i = 0$ en todos los draws: la fórmula aporta una densidad modelada, pero no identifica las **viviendas** faltantes.
+- Si $V_i = 0$, $\hat Y_i = 0$ en todas las réplicas: la fórmula aporta una densidad modelada, pero no identifica las **viviendas** faltantes.
 
 ## Solución 4
 
@@ -330,17 +317,8 @@ mostrar("grafico_ej5")
 
 Las probabilidades de superar umbrales se calculan en **escala logarítmica**, sin exponentiar valores extremos. `pct_overflow` indica qué porcentaje desbordaría al exponentiar y `pct_plot_omitted` qué porcentaje no se muestra en el gráfico. Los límites 1 y 6 son referencias ilustrativas, no límites universales de plausibilidad.
 
-El chequeo se realiza condicionado al diseño observado, antes de usar la respuesta. Las alternativas de previa son propuestas para evaluación; no se adoptan automáticamente por producir menos extremos.
-
 # Cierre
 
-## Diagnósticos PSIS-LOO
-
-```{r, eval = TRUE, echo = FALSE}
-mostrar("diagnostico_loo", digits = 3)
-```
-
-Si `n_flagged` es mayor que cero, la comparación es **provisional** hasta revisar los casos influyentes y comprobar la aproximación. Un Pareto-k favorable tampoco demuestra que el modelo sea adecuado para otra población o tarea predictiva.
 
 ## Diagnósticos de muestreo
 
@@ -359,14 +337,11 @@ Use R-hat menor que 1,01 y ESS_bulk/ESS_tail de al menos 400 como guías para cu
 ## Para llevar
 
 - Las diferencias entre regiones se evalúan mediante distribuciones de diferencias y comparación predictiva; un cambio de signo no impone un modelo por región.
-- **LOO** compara modelos por su capacidad de **predecir segmentos nuevos**; revise los $\hat k$ de Pareto.
+- **LOO** compara modelos según su capacidad de predecir los segmentos que se dejan fuera del ajuste.
 - La variabilidad no explicada puede depender de la **zona**; la indexación `sigma[zona]` en Stan lo permite.
 - Predecir $\delta_i$ no basta: con $V_i$ observado no se corrige la **subcobertura de viviendas**.
 - Revise siempre qué implican las **previas** en la escala de los datos.
 
-::: {.caja}
-**Próxima sesión:** un modelo de **conteos** para $Y_i$ con exposición $V_i$ (Poisson loglineal).
-:::
 
 ## Referencias
 

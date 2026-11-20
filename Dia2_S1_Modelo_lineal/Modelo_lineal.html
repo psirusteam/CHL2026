@@ -229,7 +229,7 @@
 Andrés Gutiérrez · Stalyn Guerrero 
 </div>
         <p class="quarto-title-affiliation">
-            CEPAL · UNFPA América Latina y el Caribe · INE Chile
+            CEPAL · UNFPA · INE Chile
           </p>
     </div>
 </div>
@@ -304,37 +304,30 @@ z_{ik} = \frac{x_{ik} - \bar x_k}{s_k}.
 <ul>
 <li>Un coeficiente en la escala original, <span class="math inline">\(\beta_k^{\text{orig}}\)</span>, se relaciona con el estandarizado por <span class="math inline">\(\beta_k = s_k\,\beta_k^{\text{orig}}\)</span>.</li>
 <li>Los coeficientes quedan <strong>comparables</strong> entre sí: todos miden el efecto de una desviación estándar.</li>
-<li>Para covariables continuas estandarizadas, la previa se interpreta por una desviación estándar. En las indicadoras de zona se refiere al cambio de categoría, no a una desviación estándar.</li>
-<li>En MCO, una transformación lineal invertible de las covariables conserva el ajuste. En Bayes, conservar las predicciones requiere transformar también las previas: usar la misma <span class="math inline">\(N(0,1)\)</span> en dos escalas define modelos distintos.</li>
+<li>Para covariables continuas estandarizadas, la distribución previa se interpreta por una desviación estándar. En las indicadoras de zona se refiere al cambio de categoría, no a una desviación estándar.</li>
+<li>En MCO, una transformación lineal invertible de las covariables conserva el ajuste. En Bayes, conservar las predicciones requiere transformar también las distribuciones previas: usar la misma <span class="math inline">\(N(0,1)\)</span> en dos escalas define modelos distintos.</li>
 </ul>
 </section>
 <section id="datos-segmentos-aptos-de-aysén" class="slide level2">
 <h2>Datos: segmentos aptos de Aysén</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>segmentos <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/segmentos_aysen.rds"</span>)</span>
-<span id="cb1-2"><a href=""></a>aptos <span class="ot">&lt;-</span> segmentos <span class="sc">%&gt;%</span> <span class="fu">filter</span>(apto_modelo)</span>
-<span id="cb1-3"><a href=""></a></span>
-<span id="cb1-4"><a href=""></a>covariables <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"_std$"</span>, <span class="fu">names</span>(segmentos), <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-5"><a href=""></a>covariables</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <p>Se usan los 1.455 segmentos <strong>aptos</strong>: según el indicador operativo: sin viviendas colectivas y con densidad definida mayor que 1. El código comprueba además positividad, finitud y rango completo del diseño.</p>
 <p>La elegibilidad selecciona un subconjunto de segmentos; generalizar sus relaciones a los no aptos requiere evaluar la transportabilidad del modelo. El filtro no convierte la Normal en una verosimilitud truncada.</p>
 </section>
 <section id="la-matriz-de-diseño" class="slide level2">
 <h2>La matriz de diseño</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a><span class="co"># Matriz de diseno: intercepto, zona (rural = referencia) y covariables estandarizadas</span></span>
-<span id="cb2-2"><a href=""></a>construir_X <span class="ot">&lt;-</span> <span class="cf">function</span>(datos) {</span>
-<span id="cb2-3"><a href=""></a>  <span class="fu">cbind</span>(<span class="at">intercepto  =</span> <span class="dv">1</span>,</span>
-<span id="cb2-4"><a href=""></a>        <span class="at">zona_urbana =</span> <span class="fu">as.numeric</span>(datos<span class="sc">$</span>zona <span class="sc">==</span> <span class="st">"urbana"</span>),</span>
-<span id="cb2-5"><a href=""></a>        <span class="at">zona_aldea  =</span> <span class="fu">as.numeric</span>(datos<span class="sc">$</span>zona <span class="sc">==</span> <span class="st">"aldea"</span>),</span>
-<span id="cb2-6"><a href=""></a>        <span class="fu">as.matrix</span>(datos[, covariables]))</span>
-<span id="cb2-7"><a href=""></a>}</span>
-<span id="cb2-8"><a href=""></a>X <span class="ot">&lt;-</span> <span class="fu">construir_X</span>(aptos)</span>
-<span id="cb2-9"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(aptos<span class="sc">$</span>delta)), <span class="fu">all</span>(aptos<span class="sc">$</span>delta <span class="sc">&gt;</span> <span class="dv">0</span>),</span>
-<span id="cb2-10"><a href=""></a>          <span class="fu">all</span>(<span class="fu">is.finite</span>(X)), <span class="fu">nrow</span>(X) <span class="sc">&gt;</span> <span class="fu">ncol</span>(X), <span class="fu">qr</span>(X)<span class="sc">$</span>rank <span class="sc">==</span> <span class="fu">ncol</span>(X))</span>
-<span id="cb2-11"><a href=""></a>y <span class="ot">&lt;-</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta)</span>
-<span id="cb2-12"><a href=""></a><span class="fu">dim</span>(X)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="co"># Matriz de diseno: intercepto, zona (rural = referencia) y covariables estandarizadas</span></span>
+<span id="cb1-2"><a href=""></a>construir_X <span class="ot">&lt;-</span> <span class="cf">function</span>(datos) {</span>
+<span id="cb1-3"><a href=""></a>  <span class="fu">cbind</span>(<span class="at">intercepto  =</span> <span class="dv">1</span>,</span>
+<span id="cb1-4"><a href=""></a>        <span class="at">zona_urbana =</span> <span class="fu">as.numeric</span>(datos<span class="sc">$</span>zona <span class="sc">==</span> <span class="st">"urbana"</span>),</span>
+<span id="cb1-5"><a href=""></a>        <span class="at">zona_aldea  =</span> <span class="fu">as.numeric</span>(datos<span class="sc">$</span>zona <span class="sc">==</span> <span class="st">"aldea"</span>),</span>
+<span id="cb1-6"><a href=""></a>        <span class="fu">as.matrix</span>(datos[, covariables]))</span>
+<span id="cb1-7"><a href=""></a>}</span>
+<span id="cb1-8"><a href=""></a>X <span class="ot">&lt;-</span> <span class="fu">construir_X</span>(aptos)</span>
+<span id="cb1-9"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(aptos<span class="sc">$</span>delta)), <span class="fu">all</span>(aptos<span class="sc">$</span>delta <span class="sc">&gt;</span> <span class="dv">0</span>),</span>
+<span id="cb1-10"><a href=""></a>          <span class="fu">all</span>(<span class="fu">is.finite</span>(X)), <span class="fu">nrow</span>(X) <span class="sc">&gt;</span> <span class="fu">ncol</span>(X), <span class="fu">qr</span>(X)<span class="sc">$</span>rank <span class="sc">==</span> <span class="fu">ncol</span>(X))</span>
+<span id="cb1-11"><a href=""></a>y <span class="ot">&lt;-</span> <span class="fu">log</span>(aptos<span class="sc">$</span>delta)</span>
+<span id="cb1-12"><a href=""></a><span class="fu">dim</span>(X)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
 <li>La zona tiene tres categorías: se incluyen <strong>dos indicadoras</strong> (urbana y aldea) y la <strong>rural</strong> es la referencia. Incluir las tres sería colineal con el intercepto.</li>
@@ -343,22 +336,6 @@ z_{ik} = \frac{x_{ik} - \bar x_k}{s_k}.
 </section>
 <section id="relación-de-logdelta_i-con-algunas-covariables" class="slide level2">
 <h2>Relación de <span class="math inline">\(\log\delta_i\)</span> con algunas covariables</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>grafico_exploracion <span class="ot">&lt;-</span> aptos <span class="sc">%&gt;%</span></span>
-<span id="cb3-2"><a href=""></a>  <span class="fu">select</span>(delta, zona, nlav_mean_std, dyn_world_urb_mean_std, ine_opb_area_ratio_std, dens_len_allroads_std) <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href=""></a>  <span class="fu">pivot_longer</span>(<span class="fu">ends_with</span>(<span class="st">"_std"</span>), <span class="at">names_to =</span> <span class="st">"covariable"</span>, <span class="at">values_to =</span> <span class="st">"valor"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">covariable =</span> <span class="fu">str_remove</span>(covariable, <span class="st">"_std$"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-5"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(valor, <span class="fu">log</span>(delta))) <span class="sc">+</span></span>
-<span id="cb3-6"><a href=""></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> zona), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb3-7"><a href=""></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> x, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">colour =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb3-8"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> covariable, <span class="at">scales =</span> <span class="st">"free_x"</span>, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb3-9"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Valor estandarizado"</span>, <span class="at">y =</span> <span class="st">"log(personas por vivienda)"</span>, <span class="at">colour =</span> <span class="st">"Zona"</span>) <span class="sc">+</span></span>
-<span id="cb3-10"><a href=""></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
-<span id="cb3-11"><a href=""></a><span class="fu">guardar_figura</span>(grafico_exploracion, <span class="st">"grafico_exploracion"</span>, <span class="at">alto =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="relación-de-logdelta_i-con-algunas-covariables-gráfico" class="slide level2">
-<h2>Relación de <span class="math inline">\(\log\delta_i\)</span> con algunas covariables (gráfico)</h2>
 
 <img data-src="resultados/grafico_exploracion.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%"><p>La línea negra resume una tendencia lineal descriptiva en cada panel; no controla simultáneamente por zona ni por las demás covariables.</p>
 </section></section>
@@ -401,11 +378,11 @@ E(\hat{\boldsymbol\beta}) = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\math
 <section id="resultados-de-mínimos-cuadrados" class="slide level2">
 <h2>Resultados de mínimos cuadrados</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>ajuste_mco <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> X <span class="sc">-</span> <span class="dv">1</span>)</span>
-<span id="cb4-2"><a href=""></a>tabla_mco <span class="ot">&lt;-</span> broom<span class="sc">::</span><span class="fu">tidy</span>(ajuste_mco) <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">term =</span> <span class="fu">str_remove</span>(<span class="fu">colnames</span>(X), <span class="st">"_std$"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-4"><a href=""></a>  <span class="fu">select</span>(<span class="at">termino =</span> term, <span class="at">estimacion =</span> estimate, <span class="at">error_est =</span> std.error, <span class="at">valor_p =</span> p.value)</span>
-<span id="cb4-5"><a href=""></a>tabla_mco</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a>ajuste_mco <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> X <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb2-2"><a href=""></a>tabla_mco <span class="ot">&lt;-</span> broom<span class="sc">::</span><span class="fu">tidy</span>(ajuste_mco) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">term =</span> <span class="fu">str_remove</span>(<span class="fu">colnames</span>(X), <span class="st">"_std$"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-4"><a href=""></a>  <span class="fu">select</span>(<span class="at">termino =</span> term, <span class="at">estimacion =</span> estimate, <span class="at">error_est =</span> std.error, <span class="at">valor_p =</span> p.value)</span>
+<span id="cb2-5"><a href=""></a>tabla_mco</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -525,8 +502,8 @@ p(\mathbf{y} \mid \boldsymbol\beta, \sigma) = (2\pi\sigma^2)^{-n/2}\exp\!\Big(-\
 \beta_k \overset{iid}{\sim} N(0, 1), \qquad \sigma \sim \text{Cauchy}^+(0;\ 2{,}5).
 \]</span></p>
 <ul>
-<li>Con covariables estandarizadas, <span class="math inline">\(|\beta_k| &lt; 2\)</span> con probabilidad 0,95: efectos de hasta <span class="math inline">\(e^{2} \approx 7{,}4\)</span> veces por desviación estándar. Su plausibilidad se evalúa en conjunto con el diseño y la predicción previa.</li>
-<li>El intercepto también tiene previa <span class="math inline">\(N(0, 1)\)</span>: <span class="math inline">\(e^{\beta_0}\)</span> entre <span class="math inline">\(0{,}14\)</span> y <span class="math inline">\(7{,}4\)</span> personas por vivienda.</li>
+<li>Con covariables estandarizadas, <span class="math inline">\(|\beta_k| &lt; 2\)</span> con probabilidad 0,95: efectos de hasta <span class="math inline">\(e^{2} \approx 7{,}4\)</span> veces por desviación estándar. Su plausibilidad se evalúa en conjunto con el diseño y la distribución predictiva previa.</li>
+<li>El intercepto también tiene distribución previa <span class="math inline">\(N(0, 1)\)</span>: <span class="math inline">\(e^{\beta_0}\)</span> entre <span class="math inline">\(0{,}14\)</span> y <span class="math inline">\(7{,}4\)</span> personas por vivienda.</li>
 <li>La Cauchy positiva para <span class="math inline">\(\sigma\)</span> tiene cola pesada. Su carácter informativo depende de la escala; se conserva aquí para dar continuidad a los ejemplos.</li>
 </ul>
 </section>
@@ -547,29 +524,25 @@ p(\boldsymbol\beta \mid \sigma, \mathbf{y}) &amp;\propto \exp\!\Big(-\frac{1}{2\
 \]</span></p>
 </section>
 <section id="interpretación-encogimiento-hacia-cero" class="slide level2">
-<h2>Interpretación: encogimiento hacia cero</h2>
-<p><span class="math display">\[
-\mathbf{m} = \big(\mathbf{X}^\top\mathbf{X} + \sigma^2\mathbf{I}\big)^{-1}\mathbf{X}^\top\mathbf{y}.
-\]</span></p>
+<h2>Cálculo de la media condicional en R</h2>
 <ul>
-<li>Con <span class="math inline">\(\sigma\)</span> fija es una forma de <strong>regresión ridge</strong>, aquí penalizando también el intercepto. La regularización contrae direcciones del diseño; no implica que cada coeficiente individual disminuya en valor absoluto.</li>
+<li>Con <span class="math inline">\(\sigma\)</span> fija es una forma de <strong>regresión con penalización cuadrática (ridge)</strong>, aquí penalizando también el intercepto. La regularización contrae direcciones del diseño; no implica que cada coeficiente individual disminuya en valor absoluto.</li>
 <li>Si la previa es muy vaga (<span class="math inline">\(\beta_k \sim N(0, \tau^2)\)</span> con <span class="math inline">\(\tau \to \infty\)</span>), <span class="math inline">\(\mathbf{m} \to \hat{\boldsymbol\beta}_{MCO}\)</span>.</li>
 <li>Si <span class="math inline">\(\mathbf{X}^\top\mathbf{X}\)</span> es casi singular (colinealidad), el término <span class="math inline">\(\sigma^2\mathbf{I}\)</span> la hace invertible: la previa <strong>estabiliza</strong> la estimación, en las direcciones poco informadas los coeficientes pueden depender más de la previa.</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a><span class="co"># Con beta ~ N(0, I) y sigma fija en su estimador, la condicional de beta es normal:</span></span>
-<span id="cb5-2"><a href=""></a><span class="co">#   beta | sigma, y ~ N( (X'X/sigma^2 + I)^{-1} X'y/sigma^2 , (X'X/sigma^2 + I)^{-1} )</span></span>
-<span id="cb5-3"><a href=""></a>s <span class="ot">&lt;-</span> <span class="fu">sigma</span>(ajuste_mco)</span>
-<span id="cb5-4"><a href=""></a>precision <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(X) <span class="sc">/</span> s<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">diag</span>(<span class="fu">ncol</span>(X))</span>
-<span id="cb5-5"><a href=""></a>covarianza <span class="ot">&lt;-</span> <span class="fu">solve</span>(precision)</span>
-<span id="cb5-6"><a href=""></a>media_condicional <span class="ot">&lt;-</span> covarianza <span class="sc">%*%</span> <span class="fu">crossprod</span>(X, y) <span class="sc">/</span> s<span class="sc">^</span><span class="dv">2</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="co"># Con beta ~ N(0, I) y sigma fija en su estimador, la condicional de beta es normal:</span></span>
+<span id="cb3-2"><a href=""></a>s <span class="ot">&lt;-</span> <span class="fu">sigma</span>(ajuste_mco)</span>
+<span id="cb3-3"><a href=""></a>precision <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(X) <span class="sc">/</span> s<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">diag</span>(<span class="fu">ncol</span>(X))</span>
+<span id="cb3-4"><a href=""></a>covarianza <span class="ot">&lt;-</span> <span class="fu">solve</span>(precision)</span>
+<span id="cb3-5"><a href=""></a>media_condicional <span class="ot">&lt;-</span> covarianza <span class="sc">%*%</span> <span class="fu">crossprod</span>(X, y) <span class="sc">/</span> s<span class="sc">^</span><span class="dv">2</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="por-qué-no-resolver-todo-analíticamente" class="slide level2">
 <h2>¿Por qué no resolver todo analíticamente?</h2>
 <ul>
-<li>Con la previa conjugada Normal–Gamma inversa, <span class="math inline">\(\boldsymbol\beta \mid \sigma^2 \sim N(\mathbf{m}_0, \sigma^2\mathbf{V}_0)\)</span> y <span class="math inline">\(\sigma^2 \sim \text{Inv-Gamma}(a_0, b_0)\)</span>, la posterior conjunta es analítica.</li>
-<li>Pero basta cambiar la previa de <span class="math inline">\(\sigma\)</span>, agregar un efecto por segmento o pasar a conteos Poisson para perder la solución cerrada.</li>
+<li>Con la distribución previa conjugada Normal–Gamma inversa, <span class="math inline">\(\boldsymbol\beta \mid \sigma^2 \sim N(\mathbf{m}_0, \sigma^2\mathbf{V}_0)\)</span> y <span class="math inline">\(\sigma^2 \sim \text{Inv-Gamma}(a_0, b_0)\)</span>, la distribución posterior conjunta es analítica.</li>
+<li>Pero basta cambiar la distribución previa de <span class="math inline">\(\sigma\)</span>, agregar un efecto por segmento o pasar a conteos Poisson para perder la solución cerrada.</li>
 <li>Stan resuelve todos esos casos con el <strong>mismo</strong> procedimiento: se usará este modelo para introducir la sintaxis que se reutiliza en el modelo de población.</li>
 </ul>
 </section>
@@ -579,34 +552,34 @@ p(\boldsymbol\beta \mid \sigma, \mathbf{y}) &amp;\propto \exp\!\Big(-\frac{1}{2\
 <div class="column" style="width:52%;">
 <div class="cell" data-layout-align="center">
 <div class="cell-output cell-output-stdout">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb6-1"><a href=""></a><span class="co">// Regresion lineal bayesiana para log(personas por vivienda)</span></span>
-<span id="cb6-2"><a href=""></a><span class="kw">data</span> {</span>
-<span id="cb6-3"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; n;              <span class="co">// segmentos</span></span>
-<span id="cb6-4"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; p;              <span class="co">// columnas de X (incluye el intercepto)</span></span>
-<span id="cb6-5"><a href=""></a>  <span class="dt">matrix</span>[n, p] X;              <span class="co">// covariables</span></span>
-<span id="cb6-6"><a href=""></a>  <span class="dt">vector</span>[n] y;                 <span class="co">// log(delta_i)</span></span>
-<span id="cb6-7"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sd_beta;       <span class="co">// desviacion estandar de la previa de beta</span></span>
-<span id="cb6-8"><a href=""></a>}</span>
-<span id="cb6-9"><a href=""></a><span class="kw">parameters</span> {</span>
-<span id="cb6-10"><a href=""></a>  <span class="dt">vector</span>[p] beta;</span>
-<span id="cb6-11"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sigma;</span>
-<span id="cb6-12"><a href=""></a>}</span>
-<span id="cb6-13"><a href=""></a><span class="kw">model</span> {</span>
-<span id="cb6-14"><a href=""></a>  beta ~ normal(<span class="dv">0</span>, sd_beta);</span>
-<span id="cb6-15"><a href=""></a>  sigma ~ cauchy(<span class="dv">0</span>, <span class="fl">2.5</span>);</span>
-<span id="cb6-16"><a href=""></a>  y ~ normal(X * beta, sigma);</span>
-<span id="cb6-17"><a href=""></a>}</span>
-<span id="cb6-18"><a href=""></a><span class="kw">generated quantities</span> {</span>
-<span id="cb6-19"><a href=""></a>  <span class="co">// Replicas de los datos para el chequeo predictivo</span></span>
-<span id="cb6-20"><a href=""></a>  <span class="dt">array</span>[n] <span class="dt">real</span> y_rep = normal_rng(X * beta, sigma);</span>
-<span id="cb6-21"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb4-1"><a href=""></a><span class="co">// Regresion lineal bayesiana para log(personas por vivienda)</span></span>
+<span id="cb4-2"><a href=""></a><span class="kw">data</span> {</span>
+<span id="cb4-3"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; n;              <span class="co">// segmentos</span></span>
+<span id="cb4-4"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; p;              <span class="co">// columnas de X (incluye el intercepto)</span></span>
+<span id="cb4-5"><a href=""></a>  <span class="dt">matrix</span>[n, p] X;              <span class="co">// covariables</span></span>
+<span id="cb4-6"><a href=""></a>  <span class="dt">vector</span>[n] y;                 <span class="co">// log(delta_i)</span></span>
+<span id="cb4-7"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sd_beta;       <span class="co">// desviacion estandar de la distribución previa de beta</span></span>
+<span id="cb4-8"><a href=""></a>}</span>
+<span id="cb4-9"><a href=""></a><span class="kw">parameters</span> {</span>
+<span id="cb4-10"><a href=""></a>  <span class="dt">vector</span>[p] beta;</span>
+<span id="cb4-11"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sigma;</span>
+<span id="cb4-12"><a href=""></a>}</span>
+<span id="cb4-13"><a href=""></a><span class="kw">model</span> {</span>
+<span id="cb4-14"><a href=""></a>  beta ~ normal(<span class="dv">0</span>, sd_beta);</span>
+<span id="cb4-15"><a href=""></a>  sigma ~ cauchy(<span class="dv">0</span>, <span class="fl">2.5</span>);</span>
+<span id="cb4-16"><a href=""></a>  y ~ normal(X * beta, sigma);</span>
+<span id="cb4-17"><a href=""></a>}</span>
+<span id="cb4-18"><a href=""></a><span class="kw">generated quantities</span> {</span>
+<span id="cb4-19"><a href=""></a>  <span class="co">// Replicas de los datos para el chequeo predictivo</span></span>
+<span id="cb4-20"><a href=""></a>  <span class="dt">array</span>[n] <span class="dt">real</span> y_rep = normal_rng(X * beta, sigma);</span>
+<span id="cb4-21"><a href=""></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div><div class="column" style="width:48%;">
 <ul>
 <li><code>matrix[n, p] X</code> y <code>X * beta</code>: el predictor lineal de todos los segmentos en una sola operación (<strong>vectorización</strong>).</li>
-<li><code>sd_beta</code> como dato permite cambiar la previa sin recompilar.</li>
-<li><code>y_rep</code>: réplicas de los datos en cada draw, para el chequeo predictivo.</li>
+<li><code>sd_beta</code> como dato permite cambiar la distribución previa sin recompilar.</li>
+<li><code>y_rep</code>: un conjunto de datos simulado por cada réplica de los parámetros, para el chequeo con la distribución predictiva posterior.</li>
 <li><code>normal_rng</code> vectorizado devuelve un arreglo con un valor por segmento.</li>
 </ul>
 </div></div>
@@ -614,72 +587,185 @@ p(\boldsymbol\beta \mid \sigma, \mathbf{y}) &amp;\propto \exp\!\Big(-\frac{1}{2\
 <section id="ajuste" class="slide level2">
 <h2>Ajuste</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>modelo_lineal <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/regresion_lineal.stan"</span>)</span>
-<span id="cb7-2"><a href=""></a></span>
-<span id="cb7-3"><a href=""></a>datos_stan <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">nrow</span>(X), <span class="at">p =</span> <span class="fu">ncol</span>(X), <span class="at">X =</span> X, <span class="at">y =</span> y, <span class="at">sd_beta =</span> <span class="dv">1</span>)</span>
-<span id="cb7-4"><a href=""></a></span>
-<span id="cb7-5"><a href=""></a>fit_lineal <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
-<span id="cb7-6"><a href=""></a>  modelo_lineal, <span class="at">data =</span> datos_stan,</span>
-<span id="cb7-7"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
-<span id="cb7-8"><a href=""></a>  <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
-<span id="cb7-9"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>modelo_lineal <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/regresion_lineal.stan"</span>)</span>
+<span id="cb5-2"><a href=""></a></span>
+<span id="cb5-3"><a href=""></a>datos_stan <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">nrow</span>(X), <span class="at">p =</span> <span class="fu">ncol</span>(X), <span class="at">X =</span> X, <span class="at">y =</span> y, <span class="at">sd_beta =</span> <span class="dv">1</span>)</span>
+<span id="cb5-4"><a href=""></a></span>
+<span id="cb5-5"><a href=""></a>fit_lineal <span class="ot">&lt;-</span> <span class="fu">sampling</span>(</span>
+<span id="cb5-6"><a href=""></a>  modelo_lineal, <span class="at">data =</span> datos_stan,</span>
+<span id="cb5-7"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb5-8"><a href=""></a>  <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="cb5-9"><a href=""></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>resumen <span class="ot">&lt;-</span> <span class="fu">summarise_draws</span>(<span class="fu">as_draws_df</span>(fit_lineal), <span class="st">"mean"</span>, <span class="st">"sd"</span>, <span class="st">"rhat"</span>, <span class="st">"ess_bulk"</span>, <span class="st">"ess_tail"</span>, <span class="st">"mcse_mean"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-2"><a href=""></a>  <span class="fu">filter</span>(<span class="fu">str_starts</span>(variable, <span class="st">"beta|sigma"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">termino =</span> <span class="fu">c</span>(<span class="fu">colnames</span>(X), <span class="st">"sigma"</span>)[<span class="fu">match</span>(variable,</span>
-<span id="cb8-4"><a href=""></a>    <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">"beta["</span>, <span class="fu">seq_len</span>(<span class="fu">ncol</span>(X)), <span class="st">"]"</span>), <span class="st">"sigma"</span>))], <span class="at">.after =</span> variable)</span>
-<span id="cb8-5"><a href=""></a></span>
-<span id="cb8-6"><a href=""></a><span class="fu">c</span>(<span class="at">Rhat_max =</span> <span class="fu">max</span>(resumen<span class="sc">$</span>rhat), <span class="at">ESS_min =</span> <span class="fu">min</span>(resumen<span class="sc">$</span>ess_bulk))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
+</section>
+<section id="coeficientes" class="slide level2">
+<h2>Coeficientes</h2>
+<p>Revise R-hat, ESS_bulk y ESS_tail junto con trazas y diagnósticos NUTS.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr class="header">
-<th style="text-align: right;" data-quarto-table-cell-role="th">Rhat_max</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">ESS_bulk_min</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">ESS_tail_min</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">termino</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sd</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">rhat</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ess_bulk</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ess_tail</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mcse_mean</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">1,003</td>
+<td style="text-align: left;">beta[1]</td>
+<td style="text-align: left;">intercepto</td>
+<td style="text-align: right;">0,8167</td>
+<td style="text-align: right;">0,0501</td>
+<td style="text-align: right;">0,9999</td>
+<td style="text-align: right;">1.903</td>
+<td style="text-align: right;">2.261</td>
+<td style="text-align: right;">0,0011</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[2]</td>
+<td style="text-align: left;">zona_urbana</td>
+<td style="text-align: right;">0,0167</td>
+<td style="text-align: right;">0,0572</td>
+<td style="text-align: right;">1,0001</td>
 <td style="text-align: right;">1.802</td>
+<td style="text-align: right;">2.271</td>
+<td style="text-align: right;">0,0013</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[3]</td>
+<td style="text-align: left;">zona_aldea</td>
+<td style="text-align: right;">-0,0704</td>
+<td style="text-align: right;">0,0588</td>
+<td style="text-align: right;">1,0008</td>
+<td style="text-align: right;">1.889</td>
 <td style="text-align: right;">2.228</td>
+<td style="text-align: right;">0,0014</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[4]</td>
+<td style="text-align: left;">nlav_mean_std</td>
+<td style="text-align: right;">-0,0590</td>
+<td style="text-align: right;">0,0220</td>
+<td style="text-align: right;">1,0029</td>
+<td style="text-align: right;">4.296</td>
+<td style="text-align: right;">2.774</td>
+<td style="text-align: right;">0,0003</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[5]</td>
+<td style="text-align: left;">dyn_world_urb_mean_std</td>
+<td style="text-align: right;">0,0334</td>
+<td style="text-align: right;">0,0238</td>
+<td style="text-align: right;">1,0007</td>
+<td style="text-align: right;">2.009</td>
+<td style="text-align: right;">2.375</td>
+<td style="text-align: right;">0,0005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[6]</td>
+<td style="text-align: left;">lu_pct_artif_urban_std</td>
+<td style="text-align: right;">0,0128</td>
+<td style="text-align: right;">0,0098</td>
+<td style="text-align: right;">1,0012</td>
+<td style="text-align: right;">4.870</td>
+<td style="text-align: right;">2.895</td>
+<td style="text-align: right;">0,0001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[7]</td>
+<td style="text-align: left;">building_fractional_count_sum_std</td>
+<td style="text-align: right;">0,0025</td>
+<td style="text-align: right;">0,0023</td>
+<td style="text-align: right;">1,0008</td>
+<td style="text-align: right;">5.745</td>
+<td style="text-align: right;">3.472</td>
+<td style="text-align: right;">0,0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[8]</td>
+<td style="text-align: left;">ine_opb_count_std</td>
+<td style="text-align: right;">0,0269</td>
+<td style="text-align: right;">0,0104</td>
+<td style="text-align: right;">1,0030</td>
+<td style="text-align: right;">4.485</td>
+<td style="text-align: right;">2.700</td>
+<td style="text-align: right;">0,0002</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[9]</td>
+<td style="text-align: left;">ine_opb_area_ratio_std</td>
+<td style="text-align: right;">0,0278</td>
+<td style="text-align: right;">0,0097</td>
+<td style="text-align: right;">1,0018</td>
+<td style="text-align: right;">3.915</td>
+<td style="text-align: right;">3.005</td>
+<td style="text-align: right;">0,0002</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[10]</td>
+<td style="text-align: left;">ine_opb_nnd_mean_std</td>
+<td style="text-align: right;">0,0133</td>
+<td style="text-align: right;">0,0103</td>
+<td style="text-align: right;">1,0017</td>
+<td style="text-align: right;">3.414</td>
+<td style="text-align: right;">2.948</td>
+<td style="text-align: right;">0,0002</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[11]</td>
+<td style="text-align: left;">dens_len_allroads_std</td>
+<td style="text-align: right;">0,0693</td>
+<td style="text-align: right;">0,0098</td>
+<td style="text-align: right;">1,0009</td>
+<td style="text-align: right;">3.942</td>
+<td style="text-align: right;">3.173</td>
+<td style="text-align: right;">0,0002</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[12]</td>
+<td style="text-align: left;">dist_closest_school_m_std</td>
+<td style="text-align: right;">-0,0198</td>
+<td style="text-align: right;">0,0062</td>
+<td style="text-align: right;">1,0003</td>
+<td style="text-align: right;">3.766</td>
+<td style="text-align: right;">3.015</td>
+<td style="text-align: right;">0,0001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[13]</td>
+<td style="text-align: left;">mean_slope_std</td>
+<td style="text-align: right;">0,0063</td>
+<td style="text-align: right;">0,0052</td>
+<td style="text-align: right;">1,0021</td>
+<td style="text-align: right;">5.148</td>
+<td style="text-align: right;">3.090</td>
+<td style="text-align: right;">0,0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sigma</td>
+<td style="text-align: left;">sigma</td>
+<td style="text-align: right;">0,1954</td>
+<td style="text-align: right;">0,0037</td>
+<td style="text-align: right;">1,0011</td>
+<td style="text-align: right;">4.500</td>
+<td style="text-align: right;">2.509</td>
+<td style="text-align: right;">0,0001</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>Revise R-hat, ESS_bulk y ESS_tail junto con trazas y diagnósticos NUTS. Los indicadores favorables no prueban convergencia ni validan la especificación del modelo.</p>
 </section>
 <section id="coeficientes-posteriores" class="slide level2">
-<h2>Coeficientes posteriores</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a>draws_beta <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fit_lineal, <span class="at">pars =</span> <span class="st">"beta"</span>) <span class="sc">%&gt;%</span> <span class="fu">setNames</span>(<span class="fu">colnames</span>(X))</span>
-<span id="cb9-2"><a href=""></a></span>
-<span id="cb9-3"><a href=""></a>grafico_coeficientes <span class="ot">&lt;-</span> <span class="fu">mcmc_intervals</span>(<span class="fu">select</span>(draws_beta, <span class="sc">-</span>intercepto), <span class="at">prob =</span> <span class="fl">0.5</span>, <span class="at">prob_outer =</span> <span class="fl">0.95</span>) <span class="sc">+</span></span>
-<span id="cb9-4"><a href=""></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb9-5"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Coeficiente (escala log de la densidad)"</span>)</span>
-<span id="cb9-6"><a href=""></a><span class="fu">guardar_figura</span>(grafico_coeficientes, <span class="st">"grafico_coeficientes"</span>, <span class="at">alto =</span> <span class="dv">6</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
+<h2>Distribuciones posteriores de los coeficientes</h2>
 
 <img data-src="resultados/grafico_coeficientes.png" class="quarto-figure quarto-figure-center r-stretch" style="width:78.0%"></section>
-<section id="bayes-condicional-exacta-y-mínimos-cuadrados" class="slide level2">
-<h2>Bayes, condicional exacta y mínimos cuadrados</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>comparacion <span class="ot">&lt;-</span> resumen <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href=""></a>  <span class="fu">filter</span>(termino <span class="sc">!=</span> <span class="st">"sigma"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href=""></a>  <span class="fu">transmute</span>(<span class="at">termino =</span> <span class="fu">str_remove</span>(termino, <span class="st">"_std$"</span>),</span>
-<span id="cb10-4"><a href=""></a>            <span class="at">media_bayes =</span> mean, <span class="at">de_bayes =</span> sd,</span>
-<span id="cb10-5"><a href=""></a>            <span class="at">condicional_sigma_fija =</span> media_condicional[, <span class="dv">1</span>],</span>
-<span id="cb10-6"><a href=""></a>            <span class="at">mco =</span> <span class="fu">coef</span>(ajuste_mco),</span>
-<span id="cb10-7"><a href=""></a>            <span class="at">efecto_pct =</span> <span class="fu">if_else</span>(termino <span class="sc">==</span> <span class="st">"intercepto"</span>, <span class="cn">NA_real_</span>,</span>
-<span id="cb10-8"><a href=""></a>              <span class="fu">colMeans</span>(<span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(<span class="fu">as.matrix</span>(draws_beta)) <span class="sc">-</span> <span class="dv">1</span>))))</span>
-<span id="cb10-9"><a href=""></a>comparacion</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
 <section id="comparación-resultados" class="slide level2">
 <h2>Comparación: resultados</h2>
 <div class="cell" data-layout-align="center">
@@ -809,32 +895,32 @@ p(\boldsymbol\beta \mid \sigma, \mathbf{y}) &amp;\propto \exp\!\Big(-\frac{1}{2\
 <h2>Lectura de la comparación</h2>
 <div class="caja">
 <ul>
-<li>Compare MCO y Bayes por término. La información depende de las direcciones de <span class="math inline">\(\mathbf X\)</span>, no solo de los 1.455 segmentos; un diseño colineal puede mantener sensibilidad a las previas.</li>
-<li><code>condicional_sigma_fija</code> es la media de <span class="math inline">\(\boldsymbol\beta\mid\sigma,\mathbf y\)</span> evaluada en <span class="math inline">\(\hat\sigma\)</span>. Stan integra la incertidumbre de <span class="math inline">\(\sigma\)</span>: no es una verificación exacta de la misma posterior.</li>
-<li><code>efecto_pct</code> es la media posterior de <span class="math inline">\(100(e^{\beta_k}-1)\)</span>, calculada draw a draw. Para covariables continuas se refiere a una desviación estándar; para zona es una comparación con rural. El intercepto es un nivel base, no un efecto de cambio.</li>
+<li>Compare MCO y Bayes por término. La información depende de las direcciones de <span class="math inline">\(\mathbf X\)</span>, no solo de los 1.455 segmentos; un diseño colineal puede mantener sensibilidad a las distribuciones previas.</li>
+<li><code>condicional_sigma_fija</code> es la media de <span class="math inline">\(\boldsymbol\beta\mid\sigma,\mathbf y\)</span> evaluada en <span class="math inline">\(\hat\sigma\)</span>. Stan integra la incertidumbre de <span class="math inline">\(\sigma\)</span>: no es una verificación exacta de la misma distribución posterior.</li>
+<li><code>efecto_pct</code> es la media de la distribución posterior de <span class="math inline">\(100(e^{\beta_k}-1)\)</span>, calculada réplica a réplica. Para covariables continuas se refiere a una desviación estándar; para zona es una comparación con rural. El intercepto es un nivel base, no un efecto de cambio.</li>
 </ul>
 </div>
 <p>La distribución posterior permite propagar la incertidumbre de coeficientes y dispersión a funciones y predicciones.</p>
 </section>
 <section id="sensibilidad-a-la-previa" class="slide level2">
-<h2>Sensibilidad a la previa</h2>
-<p>¿Y si la previa fuera mucho más vaga, <span class="math inline">\(\beta_k \sim N(0, 100^2)\)</span>? Como <code>sd_beta</code> es un dato, no hay que recompilar:</p>
+<h2>Sensibilidad a la distribución previa</h2>
+<p>¿Y si la distribución previa fuera mucho más vaga, <span class="math inline">\(\beta_k \sim N(0, 100^2)\)</span>? Como <code>sd_beta</code> es un dato, no hay que recompilar:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>fit_vaga <span class="ot">&lt;-</span> <span class="fu">sampling</span>(modelo_lineal, <span class="at">data =</span> <span class="fu">modifyList</span>(datos_stan, <span class="fu">list</span>(<span class="at">sd_beta =</span> <span class="dv">100</span>)),</span>
-<span id="cb11-2"><a href=""></a>                     <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">seed =</span> <span class="dv">5678</span>, <span class="at">refresh =</span> <span class="dv">0</span>)</span>
-<span id="cb11-3"><a href=""></a></span>
-<span id="cb11-4"><a href=""></a>grafico_previa <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">termino =</span> <span class="fu">str_remove</span>(<span class="fu">colnames</span>(X), <span class="st">"_std$"</span>),</span>
-<span id="cb11-5"><a href=""></a>                         <span class="st">`</span><span class="at">N(0, 1)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">colMeans</span>(draws_beta),</span>
-<span id="cb11-6"><a href=""></a>                         <span class="st">`</span><span class="at">N(0, 100²)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">colMeans</span>(<span class="fu">as.data.frame</span>(fit_vaga, <span class="at">pars =</span> <span class="st">"beta"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb11-7"><a href=""></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>termino, <span class="at">names_to =</span> <span class="st">"previa"</span>, <span class="at">values_to =</span> <span class="st">"media"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-8"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(media, <span class="fu">fct_rev</span>(<span class="fu">factor</span>(termino, <span class="at">levels =</span> <span class="fu">str_remove</span>(<span class="fu">colnames</span>(X), <span class="st">"_std$"</span>))), <span class="at">colour =</span> previa)) <span class="sc">+</span></span>
-<span id="cb11-9"><a href=""></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.5</span>)) <span class="sc">+</span></span>
-<span id="cb11-10"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Media posterior"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">colour =</span> <span class="st">"Previa"</span>)</span>
-<span id="cb11-11"><a href=""></a><span class="fu">guardar_figura</span>(grafico_previa, <span class="st">"grafico_previa"</span>, <span class="at">alto =</span> <span class="fl">5.5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>fit_vaga <span class="ot">&lt;-</span> <span class="fu">sampling</span>(modelo_lineal, <span class="at">data =</span> <span class="fu">modifyList</span>(datos_stan, <span class="fu">list</span>(<span class="at">sd_beta =</span> <span class="dv">100</span>)),</span>
+<span id="cb6-2"><a href=""></a>                     <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, <span class="at">seed =</span> <span class="dv">5678</span>, <span class="at">refresh =</span> <span class="dv">0</span>)</span>
+<span id="cb6-3"><a href=""></a></span>
+<span id="cb6-4"><a href=""></a>grafico_previa <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">termino =</span> <span class="fu">str_remove</span>(<span class="fu">colnames</span>(X), <span class="st">"_std$"</span>),</span>
+<span id="cb6-5"><a href=""></a>                         <span class="st">`</span><span class="at">N(0, 1)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">colMeans</span>(draws_beta),</span>
+<span id="cb6-6"><a href=""></a>                         <span class="st">`</span><span class="at">N(0, 100²)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">colMeans</span>(<span class="fu">as.data.frame</span>(fit_vaga, <span class="at">pars =</span> <span class="st">"beta"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href=""></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>termino, <span class="at">names_to =</span> <span class="st">"previa"</span>, <span class="at">values_to =</span> <span class="st">"media"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(media, <span class="fu">fct_rev</span>(<span class="fu">factor</span>(termino, <span class="at">levels =</span> <span class="fu">str_remove</span>(<span class="fu">colnames</span>(X), <span class="st">"_std$"</span>))), <span class="at">colour =</span> previa)) <span class="sc">+</span></span>
+<span id="cb6-9"><a href=""></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb6-10"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Media de la distribución posterior"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">colour =</span> <span class="st">"Distribución previa"</span>)</span>
+<span id="cb6-11"><a href=""></a><span class="fu">guardar_figura</span>(grafico_previa, <span class="st">"grafico_previa"</span>, <span class="at">alto =</span> <span class="fl">5.5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="sensibilidad-a-la-previa-gráfico" class="slide level2">
-<h2>Sensibilidad a la previa (gráfico)</h2>
+<h2>Sensibilidad a la distribución previa (gráfico)</h2>
 
 <img data-src="resultados/grafico_previa.png" class="quarto-figure quarto-figure-center r-stretch" style="width:85.0%"><p>Compare los desplazamientos por término y los diagnósticos de ambos ajustes. La sensibilidad debe examinarse también en intervalos y predicciones, no solo en medias.</p>
 </section></section>
@@ -845,7 +931,7 @@ p(\boldsymbol\beta \mid \sigma, \mathbf{y}) &amp;\propto \exp\!\Big(-\frac{1}{2\
 </section>
 <section id="cuánto-explica-el-modelo" class="slide level2">
 <h2>¿Cuánto explica el modelo?</h2>
-<p>El <strong><span class="math inline">\(R^2\)</span> bayesiano</strong> <span class="citation" data-cites="gelman2019r2">(<a href="#/referencias" role="doc-biblioref" onclick="">Gelman et&nbsp;al. 2019</a>)</span> se calcula en cada draw como la varianza explicada sobre la total:</p>
+<p>El <strong><span class="math inline">\(R^2\)</span> bayesiano</strong> <span class="citation" data-cites="gelman2019r2">(<a href="#/referencias" role="doc-biblioref" onclick="">Gelman et&nbsp;al. 2019</a>)</span> se calcula en cada réplica como la varianza explicada sobre la total:</p>
 <p><span class="math display">\[
 R^2_{(s)} = \frac{\text{Var}_{i}\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)}\big)}{\text{Var}_{i}\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)}\big) + \sigma^{2(s)}},
 \]</span></p>
@@ -855,14 +941,14 @@ R^2_{(s)} = \frac{\text{Var}_{i}\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)}\big
 <li>Siempre está entre 0 y 1, porque usa la varianza <strong>modelada</strong> del error.</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>sigma_draws <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fit_lineal)<span class="sc">$</span>sigma</span>
-<span id="cb12-2"><a href=""></a>var_ajustada <span class="ot">&lt;-</span> <span class="fu">apply</span>(<span class="fu">as.matrix</span>(draws_beta) <span class="sc">%*%</span> <span class="fu">t</span>(X), <span class="dv">1</span>, var)</span>
-<span id="cb12-3"><a href=""></a>r2 <span class="ot">&lt;-</span> var_ajustada <span class="sc">/</span> (var_ajustada <span class="sc">+</span> sigma_draws<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb12-4"><a href=""></a>r2_mco <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>(<span class="fu">residuals</span>(ajuste_mco)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((y <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)   <span class="co"># lm sin intercepto no centra el R2</span></span>
-<span id="cb12-5"><a href=""></a></span>
-<span id="cb12-6"><a href=""></a>tabla_r2 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">R2_media =</span> <span class="fu">mean</span>(r2), <span class="at">q2.5 =</span> <span class="fu">quantile</span>(r2, <span class="fl">0.025</span>), <span class="at">q97.5 =</span> <span class="fu">quantile</span>(r2, <span class="fl">0.975</span>),</span>
-<span id="cb12-7"><a href=""></a>                   <span class="at">R2_mco =</span> r2_mco)</span>
-<span id="cb12-8"><a href=""></a>tabla_r2</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>sigma_draws <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fit_lineal)<span class="sc">$</span>sigma</span>
+<span id="cb7-2"><a href=""></a>var_ajustada <span class="ot">&lt;-</span> <span class="fu">apply</span>(<span class="fu">as.matrix</span>(draws_beta) <span class="sc">%*%</span> <span class="fu">t</span>(X), <span class="dv">1</span>, var)</span>
+<span id="cb7-3"><a href=""></a>r2 <span class="ot">&lt;-</span> var_ajustada <span class="sc">/</span> (var_ajustada <span class="sc">+</span> sigma_draws<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb7-4"><a href=""></a>r2_mco <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>(<span class="fu">residuals</span>(ajuste_mco)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((y <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)   <span class="co"># lm sin intercepto no centra el R2</span></span>
+<span id="cb7-5"><a href=""></a></span>
+<span id="cb7-6"><a href=""></a>tabla_r2 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">R2_media =</span> <span class="fu">mean</span>(r2), <span class="at">q2.5 =</span> <span class="fu">quantile</span>(r2, <span class="fl">0.025</span>), <span class="at">q97.5 =</span> <span class="fu">quantile</span>(r2, <span class="fl">0.975</span>),</span>
+<span id="cb7-7"><a href=""></a>                   <span class="at">R2_mco =</span> r2_mco)</span>
+<span id="cb7-8"><a href=""></a>tabla_r2</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="r2-bayesiano-resultados" class="slide level2">
@@ -895,22 +981,12 @@ R^2_{(s)} = \frac{\text{Var}_{i}\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)}\big
 </div>
 </section>
 <section id="chequeo-predictivo-posterior" class="slide level2">
-<h2>Chequeo predictivo posterior</h2>
-<p>Para cada draw <span class="math inline">\(s\)</span> se simula <span class="math inline">\(\mathbf{y}^{rep,(s)} \sim N(\mathbf{X}\boldsymbol\beta^{(s)}, \sigma^{2(s)}\mathbf{I})\)</span> y se compara con <span class="math inline">\(\mathbf{y}\)</span>:</p>
+<h2>Chequeo con la distribución predictiva posterior</h2>
+<p>Para cada réplica <span class="math inline">\(s\)</span> se simula <span class="math inline">\(\mathbf{y}^{rep,(s)} \sim N(\mathbf{X}\boldsymbol\beta^{(s)}, \sigma^{2(s)}\mathbf{I})\)</span> y se compara con <span class="math inline">\(\mathbf{y}\)</span>:</p>
 <ul>
 <li><strong>Densidad superpuesta</strong>: ¿la distribución de los datos se parece a la de las réplicas?</li>
 <li><strong>Estadístico por grupo</strong>: <span class="math inline">\(T(\mathbf{y}) =\)</span> desviación estándar de <span class="math inline">\(\log\delta_i\)</span> en cada zona, frente a su distribución en las réplicas.</li>
 </ul>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>y_rep <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_lineal, <span class="at">pars =</span> <span class="st">"y_rep"</span>)</span>
-<span id="cb13-2"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb13-3"><a href=""></a>idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(y_rep), <span class="dv">50</span>)</span>
-<span id="cb13-4"><a href=""></a></span>
-<span id="cb13-5"><a href=""></a>grafico_ppc <span class="ot">&lt;-</span> <span class="fu">ppc_dens_overlay</span>(y, y_rep[idx, ]) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"log(personas por vivienda)"</span>) <span class="sc">+</span></span>
-<span id="cb13-6"><a href=""></a>  <span class="fu">ppc_stat_grouped</span>(y, y_rep, <span class="at">group =</span> aptos<span class="sc">$</span>zona, <span class="at">stat =</span> <span class="st">"sd"</span>) <span class="sc">+</span></span>
-<span id="cb13-7"><a href=""></a>  <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">1.3</span>))</span>
-<span id="cb13-8"><a href=""></a><span class="fu">guardar_figura</span>(grafico_ppc, <span class="st">"grafico_ppc"</span>, <span class="at">alto =</span> <span class="fl">4.8</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 </section>
 <section id="chequeo-predictivo-resultados" class="slide level2">
 <h2>Chequeo predictivo: resultados</h2>
@@ -931,22 +1007,7 @@ R^2_{(s)} = \frac{\text{Var}_{i}\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)}\big
 </section>
 <section id="el-ruido-de-conteo-en-los-datos" class="slide level2">
 <h2>El ruido de conteo en los datos</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a>grafico_residuos <span class="ot">&lt;-</span> aptos <span class="sc">%&gt;%</span></span>
-<span id="cb14-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">residuo =</span> y <span class="sc">-</span> <span class="fu">fitted</span>(ajuste_mco),</span>
-<span id="cb14-3"><a href=""></a>         <span class="at">viviendas =</span> <span class="fu">cut</span>(n_vpo, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">40</span>, <span class="cn">Inf</span>),</span>
-<span id="cb14-4"><a href=""></a>                         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"1–5"</span>, <span class="st">"6–10"</span>, <span class="st">"11–20"</span>, <span class="st">"21–40"</span>, <span class="st">"más de 40"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb14-5"><a href=""></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(viviendas, residuo)) <span class="sc">+</span></span>
-<span id="cb14-6"><a href=""></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"#9ecae1"</span>, <span class="at">outlier.alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb14-7"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Viviendas ocupadas del segmento"</span>, <span class="at">y =</span> <span class="st">"Residuo de log(δ)"</span>)</span>
-<span id="cb14-8"><a href=""></a>tabla_residuos <span class="ot">&lt;-</span> aptos <span class="sc">%&gt;%</span></span>
-<span id="cb14-9"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">residuo =</span> y <span class="sc">-</span> <span class="fu">fitted</span>(ajuste_mco),</span>
-<span id="cb14-10"><a href=""></a>         <span class="at">viviendas =</span> <span class="fu">cut</span>(n_vpo, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">40</span>, <span class="cn">Inf</span>),</span>
-<span id="cb14-11"><a href=""></a>                         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"1–5"</span>, <span class="st">"6–10"</span>, <span class="st">"11–20"</span>, <span class="st">"21–40"</span>, <span class="st">"más de 40"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb14-12"><a href=""></a>  <span class="fu">group_by</span>(viviendas) <span class="sc">%&gt;%</span></span>
-<span id="cb14-13"><a href=""></a>  <span class="fu">summarise</span>(<span class="at">segmentos =</span> <span class="fu">n</span>(), <span class="at">desv_residuo =</span> <span class="fu">sd</span>(residuo),</span>
-<span id="cb14-14"><a href=""></a>            <span class="at">desv_poisson_aprox =</span> <span class="fu">mean</span>(<span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> (n_vpo <span class="sc">*</span> delta))))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
+<p>Compare la desviación de los residuos con la aproximación Poisson, <span class="math inline">\(1/\sqrt{\delta_i V_i}\)</span>. La comparación es descriptiva: no descompone formalmente la varianza ni demuestra que el ruido de conteo explique la mayor parte. El modelo de conteos de D2S3 representa explícitamente este componente.</p>
 <div class="columns">
 <div class="column" style="width:58%;">
 <div class="cell" data-layout-align="center">
@@ -1006,11 +1067,10 @@ R^2_{(s)} = \frac{\text{Var}_{i}\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)}\big
 </div>
 </div>
 </div></div>
-<p>Compare la desviación de los residuos con la aproximación Poisson, <span class="math inline">\(1/\sqrt{\delta_i V_i}\)</span>. La comparación es descriptiva: no descompone formalmente la varianza ni demuestra que el ruido de conteo explique la mayor parte. El modelo de conteos de D2S3 representa explícitamente este componente.</p>
 </section>
 <section id="predicción-de-la-densidad" class="slide level2">
 <h2>Predicción de la densidad</h2>
-<p>Para un segmento con covariables <span class="math inline">\(\tilde{\mathbf{x}}\)</span>, la predictiva posterior es</p>
+<p>Para un segmento con covariables <span class="math inline">\(\tilde{\mathbf{x}}\)</span>, la distribución predictiva posterior es</p>
 <p><span class="math display">\[
 p(\tilde y \mid \mathbf{y}) = \iint N\big(\tilde y \mid \tilde{\mathbf{x}}^\top\boldsymbol\beta, \sigma^2\big)\,p(\boldsymbol\beta, \sigma \mid \mathbf{y})\,d\boldsymbol\beta\,d\sigma,
 \]</span></p>
@@ -1024,20 +1084,6 @@ p(\tilde y \mid \mathbf{y}) = \iint N\big(\tilde y \mid \tilde{\mathbf{x}}^\top\
 <section id="predicción-en-todos-los-segmentos" class="slide level2">
 <h2>Predicción en todos los segmentos</h2>
 <p>Se mantiene el diseño y la estandarización del ajuste. Las predicciones en no aptos son una extrapolación del modelo seleccionado; esta tabla ilustra <strong>personas por vivienda</strong>, no población corregida por cobertura. La media observada se calcula con densidades finitas y no necesariamente con el mismo conjunto que el ajuste.</p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>X_todos <span class="ot">&lt;-</span> <span class="fu">construir_X</span>(segmentos)</span>
-<span id="cb15-2"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">identical</span>(<span class="fu">colnames</span>(X_todos), <span class="fu">colnames</span>(X)), <span class="fu">all</span>(<span class="fu">is.finite</span>(X_todos)))</span>
-<span id="cb15-3"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb15-4"><a href=""></a>eta <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(draws_beta) <span class="sc">%*%</span> <span class="fu">t</span>(X_todos)                        <span class="co"># draws x segmentos</span></span>
-<span id="cb15-5"><a href=""></a>delta_pred <span class="ot">&lt;-</span> <span class="fu">exp</span>(eta <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fu">length</span>(eta)), <span class="fu">nrow</span>(eta)) <span class="sc">*</span> sigma_draws)</span>
-<span id="cb15-6"><a href=""></a></span>
-<span id="cb15-7"><a href=""></a>tabla_prediccion <span class="ot">&lt;-</span> segmentos <span class="sc">%&gt;%</span></span>
-<span id="cb15-8"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">delta_pred =</span> <span class="fu">colMeans</span>(delta_pred)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-9"><a href=""></a>  <span class="fu">group_by</span>(clasificacion_cobertura) <span class="sc">%&gt;%</span></span>
-<span id="cb15-10"><a href=""></a>  <span class="fu">summarise</span>(<span class="at">segmentos =</span> <span class="fu">n</span>(), <span class="at">delta_observado =</span> <span class="fu">mean</span>(delta[<span class="fu">is.finite</span>(delta)], <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb15-11"><a href=""></a>            <span class="at">delta_predicho =</span> <span class="fu">mean</span>(delta_pred))</span>
-<span id="cb15-12"><a href=""></a>tabla_prediccion</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
@@ -1120,7 +1166,6 @@ p(\tilde y \mid \mathbf{y}) = \iint N\big(\tilde y \mid \tilde{\mathbf{x}}^\top\
 <h2>Resumen de la sesión</h2>
 <ul>
 <li>La regresión modela la <strong>media de <span class="math inline">\(\log\delta_i\)</span></strong> con covariables estandarizadas; los efectos son <strong>multiplicativos</strong> sobre la densidad.</li>
-<li>La condicional de <span class="math inline">\(\boldsymbol\beta\)</span> con previa normal es la <strong>regresión ridge</strong>: la previa encoge y estabiliza; su cercanía a MCO depende de la información del diseño y de las previas.</li>
 <li>El <strong><span class="math inline">\(R^2\)</span> bayesiano</strong> y el <strong>chequeo predictivo</strong> muestran que las covariables explican parte de la variabilidad y que la varianza difiere por zona.</li>
 <li>Modelar <span class="math inline">\(\log(Y_i/V_i)\)</span> mezcla la variación real con el <strong>ruido de conteo</strong> de los segmentos pequeños: el paso siguiente es un modelo <strong>Poisson</strong> con exposición <span class="math inline">\(V_i\)</span>.</li>
 </ul>

@@ -1,6 +1,6 @@
 ##############################################################################
 ## Dia 2 - Sesion 3: Modelo Poisson con vinculo loglineal                  ##
-## Poisson con offset, sobredispersion y Poisson-lognormal en Aysen.       ##
+## Poisson, sobredispersion y Poisson-lognormal en Aysen.       ##
 ## Ejecutar con el directorio de trabajo en Dia2_S3_Modelo_Poisson/:       ##
 ##   source("Rcode/Modelo_Poisson.R")                                       ##
 ##############################################################################
@@ -25,36 +25,17 @@ stopifnot(all(is.finite(aptos$n_vpo)), all(aptos$n_vpo > 0),
           all(is.finite(aptos$n_per)), all(aptos$n_per > 0),
           all(aptos$n_per == floor(aptos$n_per)))
 
-## ---- offset ----
-ajuste_offset <- glm(n_per ~ log(n_vpo), family = poisson, data = aptos)
-ajuste_offset_quasi <- glm(n_per ~ log(n_vpo), family = quasipoisson, data = aptos)
-tabla_offset <- bind_rows(Poisson = broom::tidy(ajuste_offset),
-                          quasiPoisson = broom::tidy(ajuste_offset_quasi), .id = "model") %>%
-  select(model, term, estimate, std.error)
-tabla_offset
-
-## ---- guardar-offset ----
-guardar(tabla_offset, "tabla_offset")
-grafico_offset <- ggplot(aptos, aes(n_vpo, n_per)) +
-  geom_point(alpha = 0.3, colour = "#2e75b6") +
-  geom_abline(intercept = log10(sum(aptos$n_per) / sum(aptos$n_vpo)), slope = 1, colour = "#c00000", linewidth = 1) +
-  scale_x_log10() + scale_y_log10() +
-  labs(x = "Viviendas ocupadas (escala log)", y = "Personas (escala log)",
-       subtitle = "Línea roja: pendiente 1 (personas proporcionales a viviendas)")
-guardar_figura(grafico_offset, "grafico_offset", alto = 4.2)
-
 ## ---- x-glm ----
+aptos$zona <- relevel(factor(aptos$zona), ref = "rural")
 covariables <- grep("_std$", names(segmentos), value = TRUE)
-construir_X <- function(datos) {
-  cbind(intercepto  = 1,
-        zona_urbana = as.numeric(datos$zona == "urbana"),
-        zona_aldea  = as.numeric(datos$zona == "aldea"),
-        as.matrix(datos[, covariables]))
-}
-X <- construir_X(aptos)
-stopifnot(all(is.finite(X)), nrow(X) > ncol(X), qr(X)$rank == ncol(X))
+formula_poisson <- reformulate(c("log(n_vpo)", "zona", covariables), response = "n_per")
+X <- model.matrix(formula_poisson, data = aptos)
+stopifnot(nrow(X) == nrow(aptos), all(is.finite(X)), nrow(X) > ncol(X),
+          qr(X)$rank == ncol(X))
 
-ajuste_glm <- glm(aptos$n_per ~ X - 1 + offset(log(aptos$n_vpo)), family = poisson)
+ajuste_glm <- glm(formula_poisson, family = poisson, data = aptos, na.action = na.fail)
+stopifnot(identical(X, model.matrix(ajuste_glm)))
+
 dispersion_glm <- sum(residuals(ajuste_glm, type = "pearson")^2) / ajuste_glm$df.residual
 dispersion_glm
 
@@ -62,10 +43,10 @@ dispersion_glm
 guardar_valor("dispersion_glm", dispersion_glm)
 
 ## ---- ajuste-poisson ----
-modelo_poisson <- stan_model("stan/poisson_offset.stan")
+modelo_poisson <- stan_model("stan/poisson_conteos.stan")
 
 datos_stan <- list(n = nrow(X), p = ncol(X), X = X,
-                   y = aptos$n_per, log_v = log(aptos$n_vpo))
+                   y = aptos$n_per)
 
 set.seed(303)
 init_poisson <- lapply(seq_len(4), function(chain) {
@@ -91,7 +72,7 @@ guardar(resultado_poisson, "resultado_poisson")
 ## ---- ppc-poisson ----
 dispersion <- function(y, mu) sum((y - mu)^2 / mu) / (length(y) - ncol(X))
 
-mu_hat <- colMeans(exp(as.matrix(fit_poisson, pars = "beta") %*% t(X))) * aptos$n_vpo
+mu_hat <- colMeans(exp(as.matrix(fit_poisson, pars = "beta") %*% t(X)))
 y_rep <- as.matrix(fit_poisson, pars = "y_rep")
 stopifnot(all(as.matrix(fit_poisson, pars = "rng_out_of_range") == 0), all(y_rep >= 0))
 set.seed(1)
@@ -112,19 +93,19 @@ guardar_figura(grafico_ppc_poisson, "grafico_ppc_poisson", alto = 4.2)
 modelo_pln <- stan_model("stan/poisson_lognormal.stan")
 
 set.seed(304)
-initial_lm <- lm(log(aptos$n_per / aptos$n_vpo) ~ X - 1)
+initial_lm <- lm(log(aptos$n_per) ~ X - 1)
 initial_beta <- unname(coef(initial_lm))
 initial_scales <- c(0.08, 0.10, 0.12, 0.15)
 init_pln <- lapply(seq_len(4), function(chain) {
   beta <- initial_beta + rnorm(ncol(X), 0, 0.1 * sqrt(diag(vcov(initial_lm))))
   sigma <- initial_scales[chain]
-  z <- drop((log(aptos$n_per / aptos$n_vpo) - X %*% beta) / sigma)
+  z <- drop((log(aptos$n_per) - X %*% beta) / sigma)
   list(beta = beta, sigma = sigma, z = z + rnorm(nrow(X), 0, 0.05))
 })
 fit_pln <- sampling(modelo_pln, data = datos_stan, init = init_pln,
                     chains = 4, iter = 2000, warmup = 1000, seed = 302, refresh = 0,
                     control = list(adapt_delta = 0.95, max_treedepth = 12),
-                    pars = c("beta", "sigma", "z", "log_delta", "y_rep", "rng_out_of_range"))
+                    pars = c("beta", "sigma", "z", "log_mu", "y_rep", "rng_out_of_range"))
 
 saveRDS(fit_pln, "resultados/fit_pln.rds")
 
@@ -144,17 +125,17 @@ guardar(diagnostico_pln, "diagnostico_pln")
 guardar(resumen_pln, "resumen_pln")
 sigma_pln <- mean(as.matrix(fit_pln, pars = "sigma"))
 guardar_valor("sigma_pln", sigma_pln)
-guardar_valor("sigma_lineal", sigma(lm(log(aptos$delta) ~ X - 1)))
+X_lineal <- X[, colnames(X) != "log(n_vpo)", drop = FALSE]
+guardar_valor("sigma_lineal", sigma(lm(log(aptos$delta) ~ X_lineal - 1)))
 
 ## ---- momentos-pln ----
-# Momentos marginales del Poisson-lognormal: E(Y) = V exp(eta + sigma^2/2),
+# Momentos marginales del Poisson-lognormal: E(Y) = exp(eta + sigma^2/2),
 # Var(Y) = E(Y) + E(Y)^2 (exp(sigma^2) - 1). Se comparan con los de las replicas.
 beta_pln <- as.matrix(fit_pln, pars = "beta")
 sigma_draws <- as.matrix(fit_pln, pars = "sigma")[, 1]
 eta_draws <- beta_pln %*% t(X)
-eta_hat <- matrix(colMeans(eta_draws), nrow = 1)
-mean_draws <- exp(eta_draws + sigma_draws^2 / 2) *
-  matrix(aptos$n_vpo, nrow(eta_draws), ncol(eta_draws), byrow = TRUE)
+eta_hat <- colMeans(eta_draws)
+mean_draws <- exp(eta_draws + sigma_draws^2 / 2)
 variance_draws <- mean_draws + mean_draws^2 * expm1(sigma_draws^2)
 media_teorica <- colMeans(mean_draws)
 var_teorica <- colMeans(variance_draws) + apply(mean_draws, 2, var)
@@ -198,13 +179,13 @@ grafico_ppc_densidad <- (ppc_dens_overlay(aptos$n_per / aptos$n_vpo, y_rep_pln[i
 guardar_figura(grafico_ppc_densidad, "grafico_ppc_densidad", alto = 4.6)
 
 ## ---- encogimiento ----
-# Densidad posterior de cada segmento frente a la observada y a la de las covariables.
+# Distribución posterior de la densidad de cada segmento frente a la observada y a la de las covariables.
 # Aproximacion: log(Y/V) tiene varianza ~ 1/Y, asi que el peso del dato es
 #   w_i = sigma^2 / (sigma^2 + 1/Y_i)
-log_delta_draws <- as.matrix(fit_pln, pars = "log_delta")
+log_delta_draws <- sweep(as.matrix(fit_pln, pars = "log_mu"), 2, log(aptos$n_vpo), "-")
 log_delta_post <- colMeans(log_delta_draws)
 delta_median <- exp(apply(log_delta_draws, 2, median))
-eta_cov <- eta_hat[1, ]
+eta_cov <- eta_hat - log(aptos$n_vpo)
 w_aprox <- sigma_pln^2 / (sigma_pln^2 + 1 / aptos$n_per)
 w_stan <- (log_delta_post - eta_cov) / (log(aptos$n_per / aptos$n_vpo) - eta_cov)
 
@@ -223,7 +204,7 @@ grafico_encogimiento <- tibble(observada = aptos$n_per / aptos$n_vpo, posterior 
   geom_abline(linetype = "dashed") +
   geom_point(alpha = 0.6) +
   scale_colour_viridis_c(labels = function(x) round(10^x), name = "Viviendas") +
-  labs(x = "Densidad observada Y/V", y = "Densidad posterior (mediana)")
+  labs(x = "Densidad observada Y/V", y = "Mediana de la distribución posterior de Y/V")
 guardar_figura(grafico_encogimiento, "grafico_encogimiento", alto = 4.8)
 
 ## ---- diagnostics ----

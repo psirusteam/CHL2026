@@ -34,6 +34,8 @@ construir_X <- function(datos) {
 
 modelo_lineal <- stan_model("stan/regresion_lineal.stan")
 
+## ---- ej0 ----
+
 # =============================================================================
 # Ejercicio 1: efectos en dos regiones
 # =============================================================================
@@ -105,7 +107,7 @@ fit_B <- fit_ays  # same data, design and prior: reuse the regional fit
 ## ---- ej2-loo ----
 log_lik_lineal <- function(fit, X) {
   beta <- as.matrix(fit, pars = "beta"); sigma <- as.matrix(fit, pars = "sigma")[, 1]
-  mu <- beta %*% t(X)                                       # draws x segmentos
+  mu <- beta %*% t(X)                                       # réplicas x segmentos
   dnorm(matrix(y, nrow(mu), ncol(mu), byrow = TRUE), mu, sigma, log = TRUE)
 }
 compute_loo <- function(log_lik, fit) {
@@ -125,8 +127,7 @@ guardar_texto(comparacion_loo, "comparacion_loo")
 guardar(tibble(modelo = c("A: zona", "B: zona + satelitales"),
                sigma = c(mean(as.matrix(fit_A, pars = "sigma")), mean(as.matrix(fit_B, pars = "sigma"))),
                elpd_loo = c(loo_A$estimates["elpd_loo", 1], loo_B$estimates["elpd_loo", 1]),
-               p_loo = c(loo_A$estimates["p_loo", 1], loo_B$estimates["p_loo", 1]),
-               k_mayor_0.7 = c(sum(loo_A$diagnostics$pareto_k > 0.7), sum(loo_B$diagnostics$pareto_k > 0.7))),
+               p_loo = c(loo_A$estimates["p_loo", 1], loo_B$estimates["p_loo", 1])),
         "tabla_loo")
 delta_pointwise <- loo_B$pointwise[, "elpd_loo"] - loo_A$pointwise[, "elpd_loo"]
 guardar_valor("elpd_diff", sum(delta_pointwise))
@@ -164,6 +165,8 @@ y_rep_sz <- as.matrix(fit_sz, pars = "y_rep")
 grafico_ej3 <- ppc_stat_grouped(y, y_rep_sz, group = aptos_ays$zona, stat = "sd") +
   labs(subtitle = "Modelo con una sigma por zona")
 guardar_figura(grafico_ej3, "grafico_ej3", alto = 4.6)
+
+## ---- ej ----
 
 # =============================================================================
 # Ejercicio 4: densidad y poblacion en segmentos de cobertura incompleta
@@ -255,13 +258,6 @@ nuts <- purrr::imap_dfr(fits, function(fit, name) {
 })
 guardar(nuts, "diagnostico_nuts")
 guardar(list(A = loo_A, B = loo_B, C = loo_sz), "loo_models")
-loo_diagnostics <- purrr::imap_dfr(list(A = loo_A, B = loo_B, C = loo_sz), function(x, name) {
-  threshold <- min(1 - 1/log10(attr(x, "dims")[1]), 0.7)
-  tibble(model = name, k_threshold = threshold, k_max = max(loo::pareto_k_values(x)),
-         n_flagged = length(loo::pareto_k_ids(x)),
-         n_k_above_one = sum(loo::pareto_k_values(x) > 1))
-})
-guardar(loo_diagnostics, "diagnostico_loo")
 writeLines(capture.output(sessionInfo()), "resultados/sessionInfo.txt")
 
 

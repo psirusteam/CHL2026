@@ -69,7 +69,6 @@ guardar_valor("sigma_mco", sigma(ajuste_mco))
 
 ## ---- condicional-analitica ----
 # Con beta ~ N(0, I) y sigma fija en su estimador, la condicional de beta es normal:
-#   beta | sigma, y ~ N( (X'X/sigma^2 + I)^{-1} X'y/sigma^2 , (X'X/sigma^2 + I)^{-1} )
 s <- sigma(ajuste_mco)
 precision <- crossprod(X) / s^2 + diag(ncol(X))
 covarianza <- solve(precision)
@@ -87,16 +86,26 @@ fit_lineal <- sampling(
 )
 
 ## ---- diagnostico-rapido ----
-resumen <- summarise_draws(as_draws_df(fit_lineal), "mean", "sd", "rhat", "ess_bulk", "ess_tail", "mcse_mean") %>%
+resumen <- summarise_draws(as_draws_df(fit_lineal),
+                           "mean",
+                           "sd",
+                           "rhat",
+                           "ess_bulk",
+                           "ess_tail",
+                           "mcse_mean") %>%
   filter(str_starts(variable, "beta|sigma")) %>%
-  mutate(termino = c(colnames(X), "sigma")[match(variable,
-    c(paste0("beta[", seq_len(ncol(X)), "]"), "sigma"))], .after = variable)
+  mutate(termino = c(colnames(X), "sigma")[match(variable, c(paste0("beta[", seq_len(ncol(
+    X
+  )), "]"), "sigma"))], .after = variable)
 
 c(Rhat_max = max(resumen$rhat), ESS_min = min(resumen$ess_bulk))
 
 ## ---- guardar-diagnostico ----
-guardar(tibble(Rhat_max = max(resumen$rhat), ESS_bulk_min = round(min(resumen$ess_bulk)),
-               ESS_tail_min = round(min(resumen$ess_tail))), "diagnostico")
+
+guardar(resumen, "diagnostico")
+
+# guardar(tibble(Rhat_max = max(resumen$rhat), ESS_bulk_min = round(min(resumen$ess_bulk)),
+#                ESS_tail_min = round(min(resumen$ess_tail))), "diagnostico")
 
 ## ---- coeficientes ----
 draws_beta <- as.data.frame(fit_lineal, pars = "beta") %>% setNames(colnames(X))
@@ -130,7 +139,7 @@ grafico_previa <- tibble(termino = str_remove(colnames(X), "_std$"),
   pivot_longer(-termino, names_to = "previa", values_to = "media") %>%
   ggplot(aes(media, fct_rev(factor(termino, levels = str_remove(colnames(X), "_std$"))), colour = previa)) +
   geom_point(size = 3, position = position_dodge(width = 0.5)) +
-  labs(x = "Media posterior", y = NULL, colour = "Previa")
+  labs(x = "Media de la distribución posterior", y = NULL, colour = "Distribución previa")
 guardar_figura(grafico_previa, "grafico_previa", alto = 5.5)
 
 ## ---- r2 ----
@@ -148,7 +157,7 @@ guardar(tabla_r2, "tabla_r2")
 grafico_r2 <- ggplot(tibble(r2), aes(r2)) +
   geom_histogram(bins = 40, fill = "#2e75b6", colour = "white") +
   geom_vline(xintercept = r2_mco, colour = "#c00000", linewidth = 1.2) +
-  labs(x = expression(R^2~bayesiano), y = "Draws", subtitle = "Línea roja: R² de mínimos cuadrados")
+  labs(x = expression(R^2~bayesiano), y = "Réplicas", subtitle = "Línea roja: R² de mínimos cuadrados")
 guardar_figura(grafico_r2, "grafico_r2", alto = 4)
 
 ## ---- ppc ----
@@ -185,7 +194,7 @@ guardar(tabla_residuos, "tabla_residuos")
 X_todos <- construir_X(segmentos)
 stopifnot(identical(colnames(X_todos), colnames(X)), all(is.finite(X_todos)))
 set.seed(1)
-eta <- as.matrix(draws_beta) %*% t(X_todos)                        # draws x segmentos
+eta <- as.matrix(draws_beta) %*% t(X_todos)                        # réplicas x segmentos
 delta_pred <- exp(eta + matrix(rnorm(length(eta)), nrow(eta)) * sigma_draws)
 
 tabla_prediccion <- segmentos %>%

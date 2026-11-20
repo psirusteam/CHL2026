@@ -229,7 +229,7 @@
 Andrés Gutiérrez · Stalyn Guerrero 
 </div>
         <p class="quarto-title-affiliation">
-            CEPAL · UNFPA América Latina y el Caribe · INE Chile
+            CEPAL · UNFPA · INE Chile
           </p>
     </div>
 </div>
@@ -249,8 +249,6 @@ Andrés Gutiérrez · Stalyn Guerrero
 <li>Explorar una dispersión distinta por zona.</li>
 <li>Revisar las implicaciones de las previas antes de adoptar una especificación.</li>
 </ol>
-<p>El ejercicio 4 se conserva como extensión y puente al modelo de conteos.</p>
-<p><strong>Producto por pareja:</strong> una comparación de modelos con su diagnóstico, una conclusión predictiva y una propuesta de revisión de las previas.</p>
 </section>
 <section id="organización-de-la-práctica" class="slide level2">
 <h2>Organización de la práctica</h2>
@@ -308,11 +306,7 @@ Andrés Gutiérrez · Stalyn Guerrero
 <span id="cb1-10"><a href=""></a>        <span class="fu">as.matrix</span>(datos[, covariables]))</span>
 <span id="cb1-11"><a href=""></a>}</span>
 <span id="cb1-12"><a href=""></a></span>
-<span id="cb1-13"><a href=""></a>modelo_lineal <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/regresion_lineal.stan"</span>)</span>
-<span id="cb1-14"><a href=""></a></span>
-<span id="cb1-15"><a href=""></a><span class="co"># =============================================================================</span></span>
-<span id="cb1-16"><a href=""></a><span class="co"># Ejercicio 1: efectos en dos regiones</span></span>
-<span id="cb1-17"><a href=""></a><span class="co"># =============================================================================</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-13"><a href=""></a>modelo_lineal <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="st">"stan/regresion_lineal.stan"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section></section>
 <section>
@@ -476,9 +470,14 @@ Andrés Gutiérrez · Stalyn Guerrero
 </table>
 </div>
 </div>
-<div class="caja">
-<p>Mantienen el signo: building_fractional_count_sum, dens_len_allroads, dist_closest_school_m, ine_opb_area_ratio, lu_pct_artif_urban, mean_slope, nlav_mean, zona_urbana. Cambian de signo: dyn_world_urb_mean, ine_opb_count, ine_opb_nnd_mean, zona_aldea. Estos signos corresponden a medias posteriores de dos regiones. No prueban una diferencia entre efectos ni justifican por sí solos una especificación para todo el país.</p>
-</div>
+</section>
+<section id="solución-1-discusión-1" class="slide level2">
+<h2>Solución 1: discusión</h2>
+<ul>
+<li><strong>Qué muestra la tabla.</strong> Las medias de la distribución posterior tienen el mismo signo en 8 de los 12 términos. Por ejemplo, el coeficiente de <code>zona_aldea</code> cambia de −0,071 en Aysén a 0,335 en Magallanes. Es una comparación con la zona rural en cada región.</li>
+<li><strong>Cómo evaluar la diferencia.</strong> Reste Aysén de Magallanes réplica a réplica y revise el intervalo de la diferencia. La diapositiva siguiente muestra ese resultado.</li>
+<li><strong>Antes de elegir un modelo común o regional.</strong> Compare cómo predice cada opción y compruebe si genera valores plausibles de personas por vivienda. La solución 5 ilustra cómo revisar esa plausibilidad antes de ajustar el modelo.</li>
+</ul>
 </section>
 <section id="diferencias-posteriores-entre-regiones" class="slide level2">
 <h2>Diferencias posteriores entre regiones</h2>
@@ -601,7 +600,7 @@ Andrés Gutiérrez · Stalyn Guerrero
 <ol type="1">
 <li>Ajuste ambos y compare su <span class="math inline">\(\sigma\)</span> posterior.</li>
 <li>Calcule en R la <strong>log-verosimilitud puntual</strong> <span class="math inline">\(\log p(y_i \mid \boldsymbol\beta^{(s)}, \sigma^{(s)})\)</span> y compare los modelos con <strong>LOO</strong> <span class="citation" data-cites="vehtari2017loo">(<a href="#/referencias" role="doc-biblioref" onclick="">Vehtari et&nbsp;al. 2017</a>)</span> usando <code>loo()</code> y <code>loo_compare()</code>.</li>
-<li>Revise Pareto-k antes de interpretar diferencias de elpd. Si hay casos señalados, indique cómo comprobaría la comparación mediante reajustes exactos o K-fold.</li>
+<li>Explique cómo comprobaría la comparación si la aproximación fuera poco fiable para un segmento.</li>
 </ol>
 </div>
 </section>
@@ -613,12 +612,8 @@ Andrés Gutiérrez · Stalyn Guerrero
 \qquad
 p(y_i \mid \mathbf{y}_{-i}) = \int p(y_i \mid \boldsymbol\theta)\,p(\boldsymbol\theta \mid \mathbf{y}_{-i})\,d\boldsymbol\theta.
 \]</span></p>
-<p>Reajustar el modelo <span class="math inline">\(n\)</span> veces puede ser costoso; <strong>PSIS-LOO</strong> lo aproxima con los draws de un solo ajuste mediante muestreo por importancia:</p>
-<p><span class="math display">\[
-p(y_i \mid \mathbf{y}_{-i}) \approx \frac{\sum_s w_i^{(s)}\,p(y_i \mid \boldsymbol\theta^{(s)})}{\sum_s w_i^{(s)}}, \qquad
-w_i^{(s)} \propto \frac{1}{p(y_i \mid \boldsymbol\theta^{(s)})},
-\]</span></p>
-<p>con pesos suavizados por una distribución de Pareto. El umbral de Pareto-k depende del número de draws: <span class="math inline">\(\min(1-1/\log_{10}S,\ 0{,}7)\)</span>. Revise las observaciones señaladas y, si procede, use reajustes LOO exactos o validación cruzada K-fold antes de adoptar el ranking.</p>
+<p><strong>LOO</strong> deja fuera un segmento por vez y evalúa cuánto respaldo da el modelo al valor observado de ese segmento usando los demás para el ajuste. La suma de los puntajes es <code>elpd_loo</code>. Un valor mayor indica un mejor desempeño predictivo estimado para esta tarea.</p>
+<p><strong>PSIS</strong> es el método que aproxima esos reajustes. Reutiliza las réplicas de un solo ajuste y cambia el peso de cada una para aproximar el resultado de dejar fuera cada segmento.</p>
 </section>
 <section id="solución-2-ajustes" class="slide level2">
 <h2>Solución 2: ajustes</h2>
@@ -641,7 +636,7 @@ w_i^{(s)} \propto \frac{1}{p(y_i \mid \boldsymbol\theta^{(s)})},
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>log_lik_lineal <span class="ot">&lt;-</span> <span class="cf">function</span>(fit, X) {</span>
 <span id="cb5-2"><a href=""></a>  beta <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"beta"</span>); sigma <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit, <span class="at">pars =</span> <span class="st">"sigma"</span>)[, <span class="dv">1</span>]</span>
-<span id="cb5-3"><a href=""></a>  mu <span class="ot">&lt;-</span> beta <span class="sc">%*%</span> <span class="fu">t</span>(X)                                       <span class="co"># draws x segmentos</span></span>
+<span id="cb5-3"><a href=""></a>  mu <span class="ot">&lt;-</span> beta <span class="sc">%*%</span> <span class="fu">t</span>(X)                                       <span class="co"># réplicas x segmentos</span></span>
 <span id="cb5-4"><a href=""></a>  <span class="fu">dnorm</span>(<span class="fu">matrix</span>(y, <span class="fu">nrow</span>(mu), <span class="fu">ncol</span>(mu), <span class="at">byrow =</span> <span class="cn">TRUE</span>), mu, sigma, <span class="at">log =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb5-5"><a href=""></a>}</span>
 <span id="cb5-6"><a href=""></a>compute_loo <span class="ot">&lt;-</span> <span class="cf">function</span>(log_lik, fit) {</span>
@@ -672,7 +667,6 @@ A: zona               -59.0      12.3  </code></pre>
 <th style="text-align: right;" data-quarto-table-cell-role="th">sigma</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">elpd_loo</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">p_loo</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">k_mayor_0.7</th>
 </tr>
 </thead>
 <tbody>
@@ -681,68 +675,24 @@ A: zona               -59.0      12.3  </code></pre>
 <td style="text-align: right;">0,205</td>
 <td style="text-align: right;">242,325</td>
 <td style="text-align: right;">5,166</td>
-<td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">B: zona + satelitales</td>
 <td style="text-align: right;">0,195</td>
 <td style="text-align: right;">301,344</td>
 <td style="text-align: right;">19,017</td>
-<td style="text-align: right;">1</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-</section>
-<section id="antes-de-interpretar-loo" class="slide level2">
-<h2>Antes de interpretar LOO</h2>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">model</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">k_threshold</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">k_max</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">n_flagged</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">n_k_above_one</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">A</td>
-<td style="text-align: right;">0,7</td>
-<td style="text-align: right;">0,093</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">B</td>
-<td style="text-align: right;">0,7</td>
-<td style="text-align: right;">1,061</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">C</td>
-<td style="text-align: right;">0,7</td>
-<td style="text-align: right;">0,838</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>En esta ejecución, el modelo B tiene un Pareto-k superior a 1: la aproximación por importancia es problemática para ese segmento. Las diferencias de elpd mostradas son <strong>provisionales y no justifican adoptar el ranking</strong>. Primero hay que comprobar el caso con un reajuste LOO exacto o una estrategia alternativa de validación.</p>
 </section>
 <section id="solución-2-interpretación" class="slide level2">
 <h2>Solución 2: interpretación</h2>
 <div class="caja">
 <ul>
 <li><code>elpd_diff</code> es la diferencia en capacidad predictiva fuera de muestra; el mejor modelo aparece con 0.</li>
-<li>La diferencia <strong>B menos A</strong> es 59,0 unidades de elpd, con error estándar 12,3. El signo indica la dirección; interprete la magnitud respecto de su incertidumbre y los diagnósticos PSIS.</li>
+<li>La diferencia <strong>B menos A</strong> es 59,0 unidades de elpd, con error estándar 12,3. El signo indica la dirección; interprete la magnitud respecto de su incertidumbre y la fiabilidad de la aproximación.</li>
 <li>Esta validación deja fuera un segmento del conjunto apto de Aysén. No evalúa directamente predicción en otra región, en no aptos o en bloques espaciales; esas tareas requieren una partición adecuada.</li>
 <li><code>p_loo</code> mide complejidad efectiva y puede diferir del número de coeficientes; valores inusuales motivan revisar el ajuste y las observaciones influyentes.</li>
 </ul>
@@ -872,22 +822,12 @@ B: sigma común    -16.8       6.8  </code></pre>
 </section>
 <section id="solución-3-chequeo-predictivo" class="slide level2">
 <h2>Solución 3: chequeo predictivo</h2>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>y_rep_sz <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_sz, <span class="at">pars =</span> <span class="st">"y_rep"</span>)</span>
-<span id="cb11-2"><a href=""></a>grafico_ej3 <span class="ot">&lt;-</span> <span class="fu">ppc_stat_grouped</span>(y, y_rep_sz, <span class="at">group =</span> aptos_ays<span class="sc">$</span>zona, <span class="at">stat =</span> <span class="st">"sd"</span>) <span class="sc">+</span></span>
-<span id="cb11-3"><a href=""></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">"Modelo con una sigma por zona"</span>)</span>
-<span id="cb11-4"><a href=""></a><span class="fu">guardar_figura</span>(grafico_ej3, <span class="st">"grafico_ej3"</span>, <span class="at">alto =</span> <span class="fl">4.6</span>)</span>
-<span id="cb11-5"><a href=""></a></span>
-<span id="cb11-6"><a href=""></a><span class="co"># =============================================================================</span></span>
-<span id="cb11-7"><a href=""></a><span class="co"># Ejercicio 4: densidad y poblacion en segmentos de cobertura incompleta</span></span>
-<span id="cb11-8"><a href=""></a><span class="co"># =============================================================================</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
+<p>Compare la desviación observada con las réplicas por zona. Reproducir ese estadístico no garantiza adecuación en colas, medias, otros subgrupos o dependencia espacial.</p>
 
-<img data-src="resultados/grafico_ej3.png" class="quarto-figure quarto-figure-center r-stretch" style="width:85.0%"><p>Compare la desviación observada con las réplicas por zona. Reproducir ese estadístico no garantiza adecuación en colas, medias, otros subgrupos o dependencia espacial.</p>
-</section></section>
+<img data-src="resultados/grafico_ej3.png" class="quarto-figure quarto-figure-center r-stretch" style="width:85.0%"></section></section>
 <section>
-<section id="ejercicio-4-extensión-población-implícita-con-viviendas-observadas" class="title-slide slide level1 center">
-<h1>Ejercicio 4 (extensión): población implícita con viviendas observadas</h1>
+<section id="ejercicio-4-población-implícita-con-viviendas-observadas" class="title-slide slide level1 center">
+<h1>Ejercicio 4: población implícita con viviendas observadas</h1>
 
 </section>
 <section id="ejercicio-4" class="slide level2">
@@ -895,47 +835,47 @@ B: sigma común    -16.8       6.8  </code></pre>
 <div class="ejercicio">
 <ol type="1">
 <li>Con el modelo B ajustado en Aysén, simule la predictiva posterior de <span class="math inline">\(\delta_i\)</span> para <strong>todos</strong> los segmentos, aptos y no aptos.</li>
-<li>Calcule en cada draw la población implícita <span class="math inline">\(\hat Y_i = \hat\delta_i \times V_i\)</span> con las viviendas ocupadas <strong>observadas</strong>, y súmela por clasificación de cobertura.</li>
+<li>Calcule en cada réplica la población implícita <span class="math inline">\(\hat Y_i = \hat\delta_i \times V_i\)</span> con las viviendas ocupadas <strong>observadas</strong>, y súmela por clasificación de cobertura.</li>
 <li>Compare con las personas censadas. ¿Dónde aumenta o disminuye el total implícito? ¿Qué supuestos condicionan esa diferencia?</li>
 <li>¿Qué pasa con los segmentos con <span class="math inline">\(V_i = 0\)</span>? ¿Qué información faltaría para corregir la <strong>subcobertura de viviendas</strong>?</li>
 </ol>
 </div>
 </section>
 <section id="recordatorio-totales-por-draw" class="slide level2">
-<h2>Recordatorio: totales por draw</h2>
+<h2>Recordatorio: totales por réplica</h2>
 <p>Para un conjunto de segmentos <span class="math inline">\(A\)</span>:</p>
 <p><span class="math display">\[
 T_A^{(s)} = \sum_{i \in A} \hat\delta_i^{(s)} V_i, \qquad
 \hat\delta_i^{(s)} = \exp\big(\mathbf{x}_i^\top\boldsymbol\beta^{(s)} + \sigma^{(s)}\varepsilon_i^{(s)}\big).
 \]</span></p>
 <ul>
-<li>Se suma <strong>dentro</strong> de cada draw y luego se resumen los <span class="math inline">\(T_A^{(s)}\)</span>.</li>
+<li>Se suma <strong>dentro</strong> de cada réplica y luego se resumen los <span class="math inline">\(T_A^{(s)}\)</span>.</li>
 <li>Estos son totales implícitos continuos bajo un modelo de densidad. No incluyen una nueva simulación Poisson de personas ni constituyen una estimación validada de omisión censal.</li>
-<li>Si <span class="math inline">\(V_i = 0\)</span>, <span class="math inline">\(\hat Y_i = 0\)</span> en todos los draws: la fórmula aporta una densidad modelada, pero no identifica las <strong>viviendas</strong> faltantes.</li>
+<li>Si <span class="math inline">\(V_i = 0\)</span>, <span class="math inline">\(\hat Y_i = 0\)</span> en todas las réplicas: la fórmula aporta una densidad modelada, pero no identifica las <strong>viviendas</strong> faltantes.</li>
 </ul>
 </section>
 <section id="solución-4" class="slide level2">
 <h2>Solución 4</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>beta_B <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_B, <span class="at">pars =</span> <span class="st">"beta"</span>); sigma_B <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_B, <span class="at">pars =</span> <span class="st">"sigma"</span>)[, <span class="dv">1</span>]</span>
-<span id="cb12-2"><a href=""></a>X_todos <span class="ot">&lt;-</span> <span class="fu">construir_X</span>(aysen)</span>
-<span id="cb12-3"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">identical</span>(<span class="fu">colnames</span>(X_todos), <span class="fu">colnames</span>(X_B)), <span class="fu">all</span>(<span class="fu">is.finite</span>(X_todos)),</span>
-<span id="cb12-4"><a href=""></a>          <span class="sc">!</span><span class="fu">anyNA</span>(aysen<span class="sc">$</span>n_vpo), <span class="fu">all</span>(aysen<span class="sc">$</span>n_vpo <span class="sc">&gt;=</span> <span class="dv">0</span>))</span>
-<span id="cb12-5"><a href=""></a></span>
-<span id="cb12-6"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">4</span>)</span>
-<span id="cb12-7"><a href=""></a>eta <span class="ot">&lt;-</span> beta_B <span class="sc">%*%</span> <span class="fu">t</span>(X_todos)</span>
-<span id="cb12-8"><a href=""></a>delta_pred <span class="ot">&lt;-</span> <span class="fu">exp</span>(eta <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fu">length</span>(eta)), <span class="fu">nrow</span>(eta)) <span class="sc">*</span> sigma_B)</span>
-<span id="cb12-9"><a href=""></a>y_pred <span class="ot">&lt;-</span> delta_pred <span class="sc">*</span> <span class="fu">matrix</span>(aysen<span class="sc">$</span>n_vpo, <span class="fu">nrow</span>(eta), <span class="fu">ncol</span>(eta), <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-10"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(y_pred)))</span>
-<span id="cb12-11"><a href=""></a></span>
-<span id="cb12-12"><a href=""></a>ej4 <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">levels</span>(aysen<span class="sc">$</span>clasificacion_cobertura), <span class="cf">function</span>(k) {</span>
-<span id="cb12-13"><a href=""></a>  cols <span class="ot">&lt;-</span> aysen<span class="sc">$</span>clasificacion_cobertura <span class="sc">==</span> k</span>
-<span id="cb12-14"><a href=""></a>  total <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(y_pred[, cols, <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
-<span id="cb12-15"><a href=""></a>  <span class="fu">tibble</span>(<span class="at">cobertura =</span> k, <span class="at">censado =</span> <span class="fu">sum</span>(aysen<span class="sc">$</span>n_per[cols]),</span>
-<span id="cb12-16"><a href=""></a>         <span class="at">predicho =</span> <span class="fu">mean</span>(total), <span class="at">q025 =</span> <span class="fu">quantile</span>(total, <span class="fl">0.025</span>), <span class="at">q975 =</span> <span class="fu">quantile</span>(total, <span class="fl">0.975</span>),</span>
-<span id="cb12-17"><a href=""></a>         <span class="at">V_cero =</span> <span class="fu">sum</span>(aysen<span class="sc">$</span>n_vpo[cols] <span class="sc">==</span> <span class="dv">0</span>))</span>
-<span id="cb12-18"><a href=""></a>})</span>
-<span id="cb12-19"><a href=""></a>ej4</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>beta_B <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_B, <span class="at">pars =</span> <span class="st">"beta"</span>); sigma_B <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(fit_B, <span class="at">pars =</span> <span class="st">"sigma"</span>)[, <span class="dv">1</span>]</span>
+<span id="cb11-2"><a href=""></a>X_todos <span class="ot">&lt;-</span> <span class="fu">construir_X</span>(aysen)</span>
+<span id="cb11-3"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">identical</span>(<span class="fu">colnames</span>(X_todos), <span class="fu">colnames</span>(X_B)), <span class="fu">all</span>(<span class="fu">is.finite</span>(X_todos)),</span>
+<span id="cb11-4"><a href=""></a>          <span class="sc">!</span><span class="fu">anyNA</span>(aysen<span class="sc">$</span>n_vpo), <span class="fu">all</span>(aysen<span class="sc">$</span>n_vpo <span class="sc">&gt;=</span> <span class="dv">0</span>))</span>
+<span id="cb11-5"><a href=""></a></span>
+<span id="cb11-6"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">4</span>)</span>
+<span id="cb11-7"><a href=""></a>eta <span class="ot">&lt;-</span> beta_B <span class="sc">%*%</span> <span class="fu">t</span>(X_todos)</span>
+<span id="cb11-8"><a href=""></a>delta_pred <span class="ot">&lt;-</span> <span class="fu">exp</span>(eta <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fu">length</span>(eta)), <span class="fu">nrow</span>(eta)) <span class="sc">*</span> sigma_B)</span>
+<span id="cb11-9"><a href=""></a>y_pred <span class="ot">&lt;-</span> delta_pred <span class="sc">*</span> <span class="fu">matrix</span>(aysen<span class="sc">$</span>n_vpo, <span class="fu">nrow</span>(eta), <span class="fu">ncol</span>(eta), <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-10"><a href=""></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">is.finite</span>(y_pred)))</span>
+<span id="cb11-11"><a href=""></a></span>
+<span id="cb11-12"><a href=""></a>ej4 <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">levels</span>(aysen<span class="sc">$</span>clasificacion_cobertura), <span class="cf">function</span>(k) {</span>
+<span id="cb11-13"><a href=""></a>  cols <span class="ot">&lt;-</span> aysen<span class="sc">$</span>clasificacion_cobertura <span class="sc">==</span> k</span>
+<span id="cb11-14"><a href=""></a>  total <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(y_pred[, cols, <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb11-15"><a href=""></a>  <span class="fu">tibble</span>(<span class="at">cobertura =</span> k, <span class="at">censado =</span> <span class="fu">sum</span>(aysen<span class="sc">$</span>n_per[cols]),</span>
+<span id="cb11-16"><a href=""></a>         <span class="at">predicho =</span> <span class="fu">mean</span>(total), <span class="at">q025 =</span> <span class="fu">quantile</span>(total, <span class="fl">0.025</span>), <span class="at">q975 =</span> <span class="fu">quantile</span>(total, <span class="fl">0.975</span>),</span>
+<span id="cb11-17"><a href=""></a>         <span class="at">V_cero =</span> <span class="fu">sum</span>(aysen<span class="sc">$</span>n_vpo[cols] <span class="sc">==</span> <span class="dv">0</span>))</span>
+<span id="cb11-18"><a href=""></a>})</span>
+<span id="cb11-19"><a href=""></a>ej4</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -1021,24 +961,24 @@ p(\mathbf{y}) = \int p(\mathbf{y} \mid \boldsymbol\theta)\,p(\boldsymbol\theta)\
 <section id="solución-5" class="slide level2">
 <h2>Solución 5</h2>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>simular_previa <span class="ot">&lt;-</span> <span class="cf">function</span>(sd_beta, media_b0, sd_b0, sim_sigma, seed, <span class="at">n_sim =</span> <span class="dv">200</span>) {</span>
-<span id="cb13-2"><a href=""></a>  <span class="fu">set.seed</span>(seed)</span>
-<span id="cb13-3"><a href=""></a>  <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_sim, <span class="cf">function</span>(s) {</span>
-<span id="cb13-4"><a href=""></a>    beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">1</span>, media_b0, sd_b0), <span class="fu">rnorm</span>(<span class="fu">ncol</span>(X_todos) <span class="sc">-</span> <span class="dv">1</span>, <span class="dv">0</span>, sd_beta))</span>
-<span id="cb13-5"><a href=""></a>    sigma <span class="ot">&lt;-</span> <span class="fu">sim_sigma</span>()</span>
-<span id="cb13-6"><a href=""></a>    <span class="fu">tibble</span>(<span class="at">log_delta =</span> <span class="fu">drop</span>(X_todos <span class="sc">%*%</span> beta) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">nrow</span>(X_todos), <span class="dv">0</span>, sigma))</span>
-<span id="cb13-7"><a href=""></a>  })</span>
-<span id="cb13-8"><a href=""></a>}</span>
-<span id="cb13-9"><a href=""></a>previa_vaga <span class="ot">&lt;-</span> <span class="fu">simular_previa</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="cf">function</span>() <span class="fu">abs</span>(<span class="fu">rcauchy</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">2.5</span>)), <span class="at">seed =</span> <span class="dv">501</span>)</span>
-<span id="cb13-10"><a href=""></a>previa_info <span class="ot">&lt;-</span> <span class="fu">simular_previa</span>(<span class="fl">0.2</span>, <span class="fu">log</span>(<span class="fl">2.5</span>), <span class="fl">0.5</span>, <span class="cf">function</span>() <span class="fu">abs</span>(<span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)), <span class="at">seed =</span> <span class="dv">502</span>)</span>
-<span id="cb13-11"><a href=""></a></span>
-<span id="cb13-12"><a href=""></a>ej5 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="st">`</span><span class="at">β ~ N(0, 1), σ ~ Cauchy⁺</span><span class="st">`</span> <span class="ot">=</span> previa_vaga, <span class="st">`</span><span class="at">Previas informativas</span><span class="st">`</span> <span class="ot">=</span> previa_info, <span class="at">.id =</span> <span class="st">"previa"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-13"><a href=""></a>  <span class="fu">group_by</span>(previa) <span class="sc">%&gt;%</span></span>
-<span id="cb13-14"><a href=""></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">% δ &gt; 20</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&gt;</span> <span class="fu">log</span>(<span class="dv">20</span>)), <span class="st">`</span><span class="at">% δ &lt; 1</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&lt;</span> <span class="dv">0</span>),</span>
-<span id="cb13-15"><a href=""></a>            <span class="st">`</span><span class="at">mediana δ</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">exp</span>(<span class="fu">median</span>(log_delta)), <span class="st">`</span><span class="at">P90 δ</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">exp</span>(<span class="fu">quantile</span>(log_delta, <span class="fl">0.90</span>)),</span>
-<span id="cb13-16"><a href=""></a>            <span class="at">pct_overflow =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&gt;</span> <span class="fu">log</span>(.Machine<span class="sc">$</span>double.xmax)),</span>
-<span id="cb13-17"><a href=""></a>            <span class="at">pct_plot_omitted =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&lt;=</span> <span class="fu">log</span>(<span class="fl">0.01</span>) <span class="sc">|</span> log_delta <span class="sc">&gt;=</span> <span class="fu">log</span>(<span class="dv">100</span>)))</span>
-<span id="cb13-18"><a href=""></a>ej5</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>simular_previa <span class="ot">&lt;-</span> <span class="cf">function</span>(sd_beta, media_b0, sd_b0, sim_sigma, seed, <span class="at">n_sim =</span> <span class="dv">200</span>) {</span>
+<span id="cb12-2"><a href=""></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb12-3"><a href=""></a>  <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_sim, <span class="cf">function</span>(s) {</span>
+<span id="cb12-4"><a href=""></a>    beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">1</span>, media_b0, sd_b0), <span class="fu">rnorm</span>(<span class="fu">ncol</span>(X_todos) <span class="sc">-</span> <span class="dv">1</span>, <span class="dv">0</span>, sd_beta))</span>
+<span id="cb12-5"><a href=""></a>    sigma <span class="ot">&lt;-</span> <span class="fu">sim_sigma</span>()</span>
+<span id="cb12-6"><a href=""></a>    <span class="fu">tibble</span>(<span class="at">log_delta =</span> <span class="fu">drop</span>(X_todos <span class="sc">%*%</span> beta) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">nrow</span>(X_todos), <span class="dv">0</span>, sigma))</span>
+<span id="cb12-7"><a href=""></a>  })</span>
+<span id="cb12-8"><a href=""></a>}</span>
+<span id="cb12-9"><a href=""></a>previa_vaga <span class="ot">&lt;-</span> <span class="fu">simular_previa</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="cf">function</span>() <span class="fu">abs</span>(<span class="fu">rcauchy</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">2.5</span>)), <span class="at">seed =</span> <span class="dv">501</span>)</span>
+<span id="cb12-10"><a href=""></a>previa_info <span class="ot">&lt;-</span> <span class="fu">simular_previa</span>(<span class="fl">0.2</span>, <span class="fu">log</span>(<span class="fl">2.5</span>), <span class="fl">0.5</span>, <span class="cf">function</span>() <span class="fu">abs</span>(<span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)), <span class="at">seed =</span> <span class="dv">502</span>)</span>
+<span id="cb12-11"><a href=""></a></span>
+<span id="cb12-12"><a href=""></a>ej5 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="st">`</span><span class="at">β ~ N(0, 1), σ ~ Cauchy⁺</span><span class="st">`</span> <span class="ot">=</span> previa_vaga, <span class="st">`</span><span class="at">Previas informativas</span><span class="st">`</span> <span class="ot">=</span> previa_info, <span class="at">.id =</span> <span class="st">"previa"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href=""></a>  <span class="fu">group_by</span>(previa) <span class="sc">%&gt;%</span></span>
+<span id="cb12-14"><a href=""></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">% δ &gt; 20</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&gt;</span> <span class="fu">log</span>(<span class="dv">20</span>)), <span class="st">`</span><span class="at">% δ &lt; 1</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&lt;</span> <span class="dv">0</span>),</span>
+<span id="cb12-15"><a href=""></a>            <span class="st">`</span><span class="at">mediana δ</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">exp</span>(<span class="fu">median</span>(log_delta)), <span class="st">`</span><span class="at">P90 δ</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">exp</span>(<span class="fu">quantile</span>(log_delta, <span class="fl">0.90</span>)),</span>
+<span id="cb12-16"><a href=""></a>            <span class="at">pct_overflow =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&gt;</span> <span class="fu">log</span>(.Machine<span class="sc">$</span>double.xmax)),</span>
+<span id="cb12-17"><a href=""></a>            <span class="at">pct_plot_omitted =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(log_delta <span class="sc">&lt;=</span> <span class="fu">log</span>(<span class="fl">0.01</span>) <span class="sc">|</span> log_delta <span class="sc">&gt;=</span> <span class="fu">log</span>(<span class="dv">100</span>)))</span>
+<span id="cb12-18"><a href=""></a>ej5</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="solución-5-resultados" class="slide level2">
@@ -1082,54 +1022,11 @@ p(\mathbf{y}) = \int p(\mathbf{y} \mid \boldsymbol\theta)\,p(\boldsymbol\theta)\
 </div>
 
 <img data-src="resultados/grafico_ej5.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"><p>Las probabilidades de superar umbrales se calculan en <strong>escala logarítmica</strong>, sin exponentiar valores extremos. <code>pct_overflow</code> indica qué porcentaje desbordaría al exponentiar y <code>pct_plot_omitted</code> qué porcentaje no se muestra en el gráfico. Los límites 1 y 6 son referencias ilustrativas, no límites universales de plausibilidad.</p>
-<p>El chequeo se realiza condicionado al diseño observado, antes de usar la respuesta. Las alternativas de previa son propuestas para evaluación; no se adoptan automáticamente por producir menos extremos.</p>
 </section></section>
 <section>
 <section id="cierre" class="title-slide slide level1 center">
 <h1>Cierre</h1>
 
-</section>
-<section id="diagnósticos-psis-loo" class="slide level2">
-<h2>Diagnósticos PSIS-LOO</h2>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<table class="table table-striped table-condensed lightable-classic caption-top" style="width: auto !important; margin-left: auto; margin-right: auto; font-family: Arial Narrow; width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">model</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">k_threshold</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">k_max</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">n_flagged</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">n_k_above_one</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">A</td>
-<td style="text-align: right;">0,7</td>
-<td style="text-align: right;">0,093</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">B</td>
-<td style="text-align: right;">0,7</td>
-<td style="text-align: right;">1,061</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">C</td>
-<td style="text-align: right;">0,7</td>
-<td style="text-align: right;">0,838</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Si <code>n_flagged</code> es mayor que cero, la comparación es <strong>provisional</strong> hasta revisar los casos influyentes y comprobar la aproximación. Un Pareto-k favorable tampoco demuestra que el modelo sea adecuado para otra población o tarea predictiva.</p>
 </section>
 <section id="diagnósticos-de-muestreo" class="slide level2">
 <h2>Diagnósticos de muestreo</h2>
@@ -1189,14 +1086,11 @@ p(\mathbf{y}) = \int p(\mathbf{y} \mid \boldsymbol\theta)\,p(\boldsymbol\theta)\
 <h2>Para llevar</h2>
 <ul>
 <li>Las diferencias entre regiones se evalúan mediante distribuciones de diferencias y comparación predictiva; un cambio de signo no impone un modelo por región.</li>
-<li><strong>LOO</strong> compara modelos por su capacidad de <strong>predecir segmentos nuevos</strong>; revise los <span class="math inline">\(\hat k\)</span> de Pareto.</li>
+<li><strong>LOO</strong> compara modelos según su capacidad de predecir los segmentos que se dejan fuera del ajuste.</li>
 <li>La variabilidad no explicada puede depender de la <strong>zona</strong>; la indexación <code>sigma[zona]</code> en Stan lo permite.</li>
 <li>Predecir <span class="math inline">\(\delta_i\)</span> no basta: con <span class="math inline">\(V_i\)</span> observado no se corrige la <strong>subcobertura de viviendas</strong>.</li>
 <li>Revise siempre qué implican las <strong>previas</strong> en la escala de los datos.</li>
 </ul>
-<div class="caja">
-<p><strong>Próxima sesión:</strong> un modelo de <strong>conteos</strong> para <span class="math inline">\(Y_i\)</span> con exposición <span class="math inline">\(V_i\)</span> (Poisson loglineal).</p>
-</div>
 </section>
 <section id="referencias" class="slide level2 smaller scrollable">
 <h2>Referencias</h2>
